@@ -10,7 +10,9 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/test-utils',
     '@nuxt/scripts',
-    'nuxt-swiper'
+    'nuxt-swiper',
+    '@pinia/nuxt',
+    '@nuxt/icon'
   ],
-  css: ['~/assets/css/main.css']
+  css: ['~/assets/css/main.css'],
 })
