@@ -1,2 +1,29 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+:root {
+    --mw-background: 25 26 28;
+    --mw-status-yellow: 218 117 0;
+    --mw-status-red: 255 64 64;
+    --mw-status-purple: 125 64 255;
+}
+
+.banner-bg {
+    background: linear-gradient(
+        to bottom,
+        rgb(var(--mw-background) / 0.6),
+        rgb(var(--mw-background))
+    );
+}
+
+.bg-status-yellow {
+    background-color: rgb(var(--mw-status-yellow));
+}
+
+.bg-status-red {
+    background-color: rgb(var(--mw-status-red));
+}
+
+.bg-status-purple {
+    background-color: rgb(var(--mw-status-purple));
+}
