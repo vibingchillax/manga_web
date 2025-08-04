@@ -4,6 +4,7 @@ import { computed } from 'vue'
 const props = defineProps<{
     label?: string
     tag?: Tag
+    link?: boolean
 }>()
 
 const styleMap: Record<string, string> = {
@@ -24,8 +25,12 @@ const tagClass = computed(() => {
 </script>
 
 <template>
-    <span class="inline-flex items-center gap-1 rounded uppercase text-[0.625rem] 
+    <span v-if="!link || link===undefined || label" class="inline-flex items-center gap-1 rounded uppercase text-[0.625rem] 
     font-bold px-[0.375rem] leading-[1.5em] my-auto" :class="tagClass">
         {{ tagName }}
     </span>
+    <a v-else :href="`/tags/${tag?.id}/${tagName.toLowerCase()}`" class="inline-flex items-center gap-1 rounded uppercase 
+    text-[0.625rem] font-bold px-[0.375rem] leading-[1.5em] my-auto" :class="tagClass">
+        {{ tagName }}
+    </a>
 </template>
