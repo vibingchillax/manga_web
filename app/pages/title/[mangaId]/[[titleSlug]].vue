@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { MangaDetails } from '#components';
 
 const route = useRoute()
 const { manga, pending, error } = useMangaById(route.params.mangaId as string)
