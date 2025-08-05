@@ -24,18 +24,17 @@ const { mangas, pending, error } = useMangaPopular();
       </swiper-container>
       <div class="absolute w-full bottom-2 left-0 pointer-events-none z-[3]">
         <div class="flex justify-end items-center gap-4 max-w-[1440px] mx-auto px-4">
-          <!-- <span class="uppercase text-sm font-semibold" style="z-index: 4;">No. {{ index + 1 }}</span> -->
+          <!-- <span class="uppercase text-sm font-semibold" style="z-index: 4;">No. {{ swiper.activeIndex }}</span> -->
 
           <button @click="swiper.prev()" class="prev p-1 pointer-events-auto relative flex items-center justify-center rounded-full w-10 h-10
          transition duration-200 ease-in-out hover:bg-gray-700 hover:shadow-md">
-            <Icon name="feather:chevron-left" class="w-5 h-5" />
+            <Icon name="i-lucide-chevron-left" class="w-5 h-5" />
           </button>
 
           <button @click="swiper.next()" class="next p-1 pointer-events-auto relative flex items-center justify-center rounded-full w-10 h-10
          transition duration-200 ease-in-out hover:bg-gray-700 hover:shadow-md">
-            <Icon name="feather:chevron-right" class="w-5 h-5" />
+            <Icon name="i-lucide-chevron-right" class="w-5 h-5" />
           </button>
-
         </div>
       </div>
     </div>
