@@ -8,7 +8,7 @@ export const useMangaAuthor = (manga: Manga) => {
 
   return {
     authors,
-    artists: samePeople ? [] : artists,
+    artists,
     samePeople,
   }
 }
