@@ -9,3 +9,13 @@
         </div>
     </div>
 </template>
+<style lang="css" scoped>
+.content > * {
+    margin-bottom: 2rem;
+    margin-bottom: calc(var(--bottom-nav-area) + var(--botton-margin));
+    margin-top: 0;
+    margin-top: var(--top-margin);
+    padding-left: var(--side-margin);
+    padding-right: var(--side-margin);
+}
+</style>
