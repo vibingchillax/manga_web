@@ -1,7 +1,7 @@
 import { targets, makeSimpleProxyFetcher, makeSources, makeStandardFetcher } from "@manga_web/sources";
 import type { Source } from "@manga_web/sources";
 
-const proxyBase = 'http://localhost:1265'; //TODO: use proxyurl from settings
+const proxyBase = useProxy().proxyUrl;
 const fetcher = makeStandardFetcher(fetch);
 const proxiedFetcher = makeSimpleProxyFetcher(proxyBase, fetch);
 
