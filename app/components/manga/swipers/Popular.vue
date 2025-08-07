@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const createdAtSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
+const isoDate = createdAtSince.toISOString().slice(0, 19)
 const swiperContainerRef = ref(null);
 const swiper = useSwiper(swiperContainerRef, {
   loop: true,
@@ -6,8 +8,17 @@ const swiper = useSwiper(swiperContainerRef, {
     delay: 10000,
   },
 });
-const { mangas, pending, error } = useMangaPopular();
-
+const { data, pending, error } = await useMangadex("/manga", {
+  query: {
+    'includes[]': ['cover_art', 'author', 'artist'],
+    'contentRating[]': ['safe', 'suggestive', 'erotica'],
+    'order[followedCount]': 'desc', //it's all because of this line
+    hasAvailableChapters: 'true',
+    createdAtSince: isoDate,
+    limit: 10
+  } as any //💀
+})
+const mangas = data.value?.data
 </script>
 <template>
   <div class="relative !p-0 !m-0 -top-16 left-0 w-full">

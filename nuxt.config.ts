@@ -12,7 +12,15 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     'nuxt-swiper',
     '@pinia/nuxt',
-    '@nuxt/icon'
+    '@nuxt/icon',
+    'nuxt-open-fetch'
   ],
   css: ['~/assets/css/main.css'],
+  openFetch: {
+    clients: {
+      mangadex: {
+        baseURL: 'https://api.mangadex.org'
+      }
+    }
+  }
 })

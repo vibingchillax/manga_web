@@ -1,7 +1,15 @@
 <script setup lang="ts">
 
 const route = useRoute()
-const { manga, pending, error } = useMangaById(route.params.mangaId as string)
+const { data, pending, error } = await useMangadex('/manga/{id}', {
+  path: {
+    id: route.params.mangaId as string
+  },
+  query: {
+    "includes[]": ['cover_art', 'author', 'artist']
+  }
+})
+const manga = data.value?.data
 </script>
 
 <template>

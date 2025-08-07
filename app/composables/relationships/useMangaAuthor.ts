@@ -1,3 +1,5 @@
+import type { Manga } from "~/shared/types/types"
+
 export const useMangaAuthor = (manga: Manga) => {
   const authors = manga.relationships?.filter(r => r.type === 'author') ?? []
   const artists = manga.relationships?.filter(r => r.type === 'artist') ?? []

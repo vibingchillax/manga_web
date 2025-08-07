@@ -3,6 +3,7 @@ import { useMangaAuthor } from '~/composables/relationships/useMangaAuthor';
 import { useMangaCover } from '~/composables/relationships/useMangaCover';
 import StatusBadge from './StatusBadge.vue';
 import { toKebabCase } from '~/utils/kebab-case';
+import type { Manga } from '~/shared/types/types';
 const props = defineProps<{
   manga: Manga
 }>()

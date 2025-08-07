@@ -1,14 +1,18 @@
 <script setup lang="ts">
+import type { Manga } from '~/shared/types/types';
 const props = defineProps<{
   manga: Manga
 }>();
 const manga = props.manga;
-const { data, pending, error } = useAsyncData(`covers-${manga.id}`, () =>
-  getCover({
-    'manga[]': [manga.id!],
-    // 'locales[]'
-  }))
-const covers = computed(() => data.value?.data)
+const locales = ref<string[]>([]);
+
+const { data, pending, error } = await useMangadex('/cover', {
+  query: {
+    'manga[]': [manga.id as string],
+    'locales[]': locales
+  }
+});
+const covers = data.value?.data
 const coverUrlBase = `https://uploads.mangadex.org/covers/${manga.id}/`
 </script>
 <template>

@@ -1,7 +1,20 @@
 <script setup lang="ts">
-import type { Source, SourceChaptersOutput } from '@manga_web/sources';
+import { makeSimpleProxyFetcher, makeSources, makeStandardFetcher, targets, type Source, type SourceChaptersOutput } from '@manga_web/sources';
 import ChaptersList from './ChaptersList.vue';
 import { ref, computed, watch } from 'vue';
+import type { Manga } from '~/shared/types/types';
+
+const proxyBase = useProxy().proxyUrl;
+const fetcher = makeStandardFetcher(fetch);
+const proxiedFetcher = makeSimpleProxyFetcher(proxyBase, fetch);
+
+const sourcesInstance = makeSources({
+  fetcher,
+  proxiedFetcher,
+  target: targets.BROWSER,
+});
+
+const availableSources = sourcesInstance.listSources() as Source[];
 
 const props = defineProps<{
   manga: Manga

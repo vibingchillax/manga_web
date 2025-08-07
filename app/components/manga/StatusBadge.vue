@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-
+import type { Tag } from '~/shared/types/types';
 const props = defineProps<{
   label?: string
   tag?: Tag
