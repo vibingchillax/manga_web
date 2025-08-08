@@ -41,7 +41,7 @@ for (const tag of tags!) {
       <div class="font-bold mb-2">Author</div>
       <div class="flex gap-2 flex-wrap">
         <NuxtLink v-for="author in authors" class="tag"
-          :href="`/author/${author.id}/${toKebabCase(author.attributes?.name as string)}`">
+          :href="`/author/${author.id}/${toKebabCase(author.attributes?.name!)}`">
           {{ author.attributes?.name }}
         </NuxtLink>
       </div>
@@ -50,7 +50,7 @@ for (const tag of tags!) {
       <div class="font-bold mb-2">Artist</div>
       <div class="flex gap-2 flex-wrap">
         <NuxtLink v-for="artist in artists" class="tag"
-          :href="`/author/${artist.id}/${toKebabCase(artist.attributes?.name as string)}`">
+          :href="`/author/${artist.id}/${toKebabCase(artist.attributes?.name!)}`">
           {{ artist.attributes?.name }}
         </NuxtLink>
       </div>
