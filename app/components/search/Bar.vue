@@ -79,6 +79,10 @@ watch(() => useRoute().fullPath, () => {
           <div v-if="!query">
             Enter a search query...
           </div>
+          <div v-else-if="loading">
+            <!-- temp loading -->
+            Loading...
+          </div>
           <div v-else class="-mt-4">
             <div v-if="!loading">
               <NuxtLink class="flex items-center my-4" :href="`/titles?q=${query}`">
@@ -90,10 +94,6 @@ watch(() => useRoute().fullPath, () => {
                   @click="unfocus()">
                 </MangaCardDense>
               </div>
-            </div>
-            <div v-else>
-              <!-- temp loading -->
-              Loading...
             </div>
           </div>
         </div>
