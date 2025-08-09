@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useMangaAuthor } from '~/composables/relationships/useMangaAuthor';
-import { useMangaCover } from '~/composables/relationships/useMangaCover';
+import { useMangaAuthor } from '~/composables/useMangaAuthor';
+import { useMangaCover } from '~/composables/useMangaCover';
 import StatusBadge from './StatusBadge.vue';
 import { toKebabCase } from '~/utils/kebab-case';
 import type { Manga } from '~/shared/types/types';
@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 const manga = props.manga
 const coverUrl = useMangaCover(manga).coverUrl;
-const title = manga.attributes?.title?.en
+const title = useMangaTitle(manga);
 const contentRating = manga.attributes?.contentRating
 const tags = manga.attributes?.tags
 const description = manga.attributes?.description

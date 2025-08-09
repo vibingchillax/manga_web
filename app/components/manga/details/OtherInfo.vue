@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useMangaAuthor } from '~/composables/relationships/useMangaAuthor';
+import { useMangaAuthor } from '~/composables/useMangaAuthor';
 import type { Manga } from '~/shared/types/types';
 import type { Tag } from '~/shared/types/types';
 const props = defineProps<{

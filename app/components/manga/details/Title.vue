@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useMangaAuthor } from '~/composables/relationships/useMangaAuthor';
+import { useMangaAuthor } from '~/composables/useMangaAuthor';
 import type { Manga } from '~/shared/types/types';
 const props = defineProps<{
   manga: Manga
 }>()
 const manga = props.manga
-const enTitle = manga.attributes?.title?.en || 'Unknown Title'
+const title = useMangaTitle(manga);
 const altTitles = manga.attributes?.altTitles
 const preferredAltTitle = computed(() => {
   const priority = ['en', 'ja', 'kr']; // TODO user preferences
@@ -25,7 +25,7 @@ const { authors, artists, samePeople } = useMangaAuthor(manga);
   <div class="title">
     <p class="mb-1"
       style="line-height: 1.1em; overflow-wrap: break-word; text-shadow: rgba(0, 0, 0, 0.3) 1px 2px 4px; font-size: 3rem; width: 728px;">
-      {{ enTitle }}</p>
+      {{ title }}</p>
     <div v-if="preferredAltTitle" class="font-normal line-clamp-2 text-base sm:text-xl inline-block leading-5"
       :title="preferredAltTitle">
       {{ preferredAltTitle }}

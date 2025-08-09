@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useMangaCover } from '~/composables/relationships/useMangaCover';
+import { useMangaCover } from '~/composables/useMangaCover';
 import type { Manga } from '~/shared/types/types';
 
 const props = defineProps<{
