@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDebounce } from '@vueuse/core'
-import type { MangaList } from '~/shared/types/types'
+import type { MangaList } from '~~/shared/types/types'
 const { $mangadex } = useNuxtApp()
 const router = useRouter()
 const focus = ref(false)

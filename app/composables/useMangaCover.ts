@@ -1,4 +1,4 @@
-import type { Manga } from "~/shared/types/types";
+import type { Manga } from "~~/shared/types/types";
 
 export const useMangaCover = (manga: Manga) => {
     const cover = manga.relationships?.find(r => r.type === 'cover_art');

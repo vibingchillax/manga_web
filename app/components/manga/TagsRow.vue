@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tag } from '~/shared/types/types'
+import type { Tag } from '~~/shared/types/types'
 
 const props = defineProps<{
   tags: Tag[],

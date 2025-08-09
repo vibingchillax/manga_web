@@ -3,7 +3,7 @@ import type { TabsItem } from '@nuxt/ui';
 import Covers from './Covers.vue';
 import Comments from './Comments.vue';
 import Chapters from './Chapters.vue';
-import type { Manga } from '~/shared/types/types';
+import type { Manga } from '~~/shared/types/types';
 
 const props = defineProps<{
   manga: Manga

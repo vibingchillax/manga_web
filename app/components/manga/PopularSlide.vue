@@ -2,7 +2,7 @@
 import { useMangaAuthor } from '~/composables/useMangaAuthor';
 import { useMangaCover } from '~/composables/useMangaCover';
 import { toKebabCase } from '~/utils/kebab-case';
-import type { Manga } from '~/shared/types/types';
+import type { Manga } from '~~/shared/types/types';
 const props = defineProps<{
   manga: Manga
 }>()
