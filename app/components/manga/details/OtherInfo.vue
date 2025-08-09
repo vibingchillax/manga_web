@@ -86,6 +86,7 @@ for (const tag of tags!) {
         <NuxtLink v-if="links?.engtl" :href="links?.engtl" class="tag" target="_blank">Official English</NuxtLink>
         <NuxtLink v-if="links?.amz" :href="links?.amz" class="tag" target="_blank">Amazon</NuxtLink>
         <NuxtLink v-if="links?.bw" :href="`https://bookwalker.jp/${links?.bw}`" class="tag" target="_blank">Book☆Walker</NuxtLink>
+        <NuxtLink v-if="links?.cdj" :href="links?.cdj" class="tag" target="_blank">CDJapan</NuxtLink>
         <NuxtLink v-if="links?.ebj" :href="links?.ebj" class="tag" target="_blank">eBookJapan</NuxtLink>
       </div>
     </div>
