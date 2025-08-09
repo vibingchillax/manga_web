@@ -7,7 +7,8 @@ const { data, pending, error } = await useMangadex('/manga/{id}', {
   },
   query: {
     "includes[]": ['cover_art', 'author', 'artist']
-  }
+  },
+  key: `manga-${route.params.mangaId}`
 })
 const manga = data.value?.data
 </script>

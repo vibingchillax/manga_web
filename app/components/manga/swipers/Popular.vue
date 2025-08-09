@@ -16,7 +16,8 @@ const { data, pending, error } = await useMangadex("/manga", {
     hasAvailableChapters: 'true',
     createdAtSince: isoDate,
     limit: 10
-  } as any //💀
+  } as any, //💀,
+  key: 'popular'
 })
 const mangas = data.value?.data
 </script>

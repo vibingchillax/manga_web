@@ -9,8 +9,10 @@ const locales = ref<string[]>([]);
 const { data, pending, error } = await useMangadex('/cover', {
   query: {
     'manga[]': [manga.id as string],
-    'locales[]': locales
-  }
+    'locales[]': locales,
+    limit: 100
+  },
+  key: `cover-${manga.id}-${locales.value}`
 });
 const covers = data.value?.data
 const coverUrlBase = `https://uploads.mangadex.org/covers/${manga.id}/`
