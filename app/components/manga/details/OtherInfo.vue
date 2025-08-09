@@ -40,65 +40,65 @@ for (const tag of tags!) {
     <div class="mb-2">
       <div class="font-bold mb-2">Author</div>
       <div class="flex gap-2 flex-wrap">
-        <NuxtLink v-for="author in authors" class="tag"
+        <MangaTag v-for="author in authors"
           :href="`/author/${author.id}/${toKebabCase(author.attributes?.name!)}`">
           {{ author.attributes?.name }}
-        </NuxtLink>
+        </MangaTag>
       </div>
     </div>
     <div class="mb-2">
       <div class="font-bold mb-2">Artist</div>
       <div class="flex gap-2 flex-wrap">
-        <NuxtLink v-for="artist in artists" class="tag"
+        <MangaTag v-for="artist in artists"
           :href="`/author/${artist.id}/${toKebabCase(artist.attributes?.name!)}`">
           {{ artist.attributes?.name }}
-        </NuxtLink>
+        </MangaTag>
       </div>
     </div>
     <div v-if="genres" class="mb-2">
       <div class="font-bold mb-2">Genres</div>
       <div class="flex gap-2 flex-wrap">
-        <NuxtLink v-for="tag in genres" class="tag" :href="`/tag/${tag.id}/${toKebabCase(tag.attributes?.name?.en!)}`">
+        <MangaTag v-for="tag in genres" :href="`/tag/${tag.id}/${toKebabCase(tag.attributes?.name?.en!)}`">
           {{ tag.attributes?.name?.en }}
-        </NuxtLink>
+        </MangaTag>
       </div>
     </div>
     <div v-if="demographic" class="mb-2">
       <div class="font-bold mb-2">Demographic</div>
       <div class="flex gap-2 flex-wrap">
-        <NuxtLink class="tag">
+        <MangaTag>
           {{ demographic }}
-        </NuxtLink>
+        </MangaTag>
       </div>
     </div>
     <div v-if="format" class="mb-2">
       <div class="font-bold mb-2">Format</div>
       <div class="flex gap-2 flex-wrap">
-        <NuxtLink v-for="tag in format" class="tag" :href="`/tag/${tag.id}/${toKebabCase(tag.attributes?.name?.en!)}`">
+        <MangaTag v-for="tag in format" :href="`/tag/${tag.id}/${toKebabCase(tag.attributes?.name?.en!)}`">
           {{ tag.attributes?.name?.en }}
-        </NuxtLink>
+        </MangaTag>
       </div>
     </div>
     <div class="mb-2">
       <div class="font-bold mb-2">Read or Buy</div>
       <div class="flex gap-2 flex-wrap">
-        <NuxtLink v-if="links?.raw" :href="links?.raw" class="tag" target="_blank">Official Raw</NuxtLink>
-        <NuxtLink v-if="links?.engtl" :href="links?.engtl" class="tag" target="_blank">Official English</NuxtLink>
-        <NuxtLink v-if="links?.amz" :href="links?.amz" class="tag" target="_blank">Amazon</NuxtLink>
-        <NuxtLink v-if="links?.bw" :href="`https://bookwalker.jp/${links?.bw}`" class="tag" target="_blank">Book☆Walker</NuxtLink>
-        <NuxtLink v-if="links?.cdj" :href="links?.cdj" class="tag" target="_blank">CDJapan</NuxtLink>
-        <NuxtLink v-if="links?.ebj" :href="links?.ebj" class="tag" target="_blank">eBookJapan</NuxtLink>
+        <MangaTag v-if="links?.raw" :href="links?.raw" target="_blank">Official Raw</MangaTag>
+        <MangaTag v-if="links?.engtl" :href="links?.engtl" target="_blank">Official English</MangaTag>
+        <MangaTag v-if="links?.amz" :href="links?.amz" target="_blank">Amazon</MangaTag>
+        <MangaTag v-if="links?.bw" :href="`https://bookwalker.jp/${links?.bw}`" target="_blank">Book☆Walker</MangaTag>
+        <MangaTag v-if="links?.cdj" :href="links?.cdj" target="_blank">CDJapan</MangaTag>
+        <MangaTag v-if="links?.ebj" :href="links?.ebj" target="_blank">eBookJapan</MangaTag>
       </div>
     </div>
     <div class="mb-2">
       <div class="font-bold mb-2">Track</div>
       <div class="flex gap-2 flex-wrap">
-        <NuxtLink v-if="links?.al" :href="`https://anilist.co/manga/${links?.al}`" class="tag" target="_blank">AniList</NuxtLink>
-        <NuxtLink v-if="links?.ap" :href="`https://www.anime-planet.com/manga/${links?.ap}`" class="tag" target="_blank">Anime-Planet</NuxtLink>
-        <NuxtLink v-if="links?.kt" :href="`https://kitsu.app/manga/${links?.kt}`" class="tag" target="_blank">Kitsu</NuxtLink>
-        <NuxtLink v-if="links?.mal" :href="`https://myanimelist.net/manga/${links?.mal}`" class="tag" target="_blank">MyAnimeList</NuxtLink>
-        <NuxtLink v-if="links?.mu" :href="`https://www.mangaupdates.com/series/${links?.mu}`" class="tag" target="_blank">MangaUpdates</NuxtLink>
-        <NuxtLink v-if="links?.nu" :href="`https://www.novelupdates.com/series/${links?.nu}`" class="tag" target="_blank">NovelUpdates</NuxtLink>
+        <MangaTag v-if="links?.al" :href="`https://anilist.co/manga/${links?.al}`" target="_blank">AniList</MangaTag>
+        <MangaTag v-if="links?.ap" :href="`https://www.anime-planet.com/manga/${links?.ap}`" target="_blank">Anime-Planet</MangaTag>
+        <MangaTag v-if="links?.kt" :href="`https://kitsu.app/manga/${links?.kt}`" target="_blank">Kitsu</MangaTag>
+        <MangaTag v-if="links?.mal" :href="`https://myanimelist.net/manga/${links?.mal}`" target="_blank">MyAnimeList</MangaTag>
+        <MangaTag v-if="links?.mu" :href="`https://www.mangaupdates.com/series/${links?.mu}`" target="_blank">MangaUpdates</MangaTag>
+        <MangaTag v-if="links?.nu" :href="`https://www.novelupdates.com/series/${links?.nu}`" target="_blank">NovelUpdates</MangaTag>
       </div>
     </div>
 

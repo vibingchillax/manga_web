@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useMangaAuthor } from '~/composables/useMangaAuthor';
 import { useMangaCover } from '~/composables/useMangaCover';
-import StatusBadge from './StatusBadge.vue';
 import { toKebabCase } from '~/utils/kebab-case';
 import type { Manga } from '~/shared/types/types';
 const props = defineProps<{
@@ -11,7 +10,7 @@ const manga = props.manga
 const coverUrl = useMangaCover(manga).coverUrl;
 const title = useMangaTitle(manga);
 const contentRating = manga.attributes?.contentRating
-const tags = manga.attributes?.tags
+const tags = manga.attributes?.tags!
 const description = manga.attributes?.description
 const { authors, artists, samePeople } = useMangaAuthor(manga);
 </script>
@@ -37,10 +36,7 @@ const { authors, artists, samePeople } = useMangaAuthor(manga);
           style="min-height: 0px; grid-template-rows: max-content min-content auto max-content;">
           <h2 class="font-bold text-xl line-clamp-5 sm:line-clamp-2 lg:text-4xl overflow-hidden"
             style="line-height: 2.75rem;">{{ title }}</h2>
-          <div class="flex flex-wrap gap-1 select-none overflow-hidden">
-            <StatusBadge v-if="contentRating !== 'safe'" :label="contentRating" />
-            <StatusBadge v-for="(tag, index) in tags" :key="index" :tag="tag" />
-          </div>
+          <MangaTagsRow class="overflow-hidden" :tags="tags" :contentRating="contentRating"></MangaTagsRow>
           <div class="preview-description">
             <div class="relative overflow-hidden py-0">
               <div class="mw-container dense noEmptyLines">
