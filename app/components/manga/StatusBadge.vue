@@ -12,6 +12,7 @@ const styleMap: Record<string, string> = {
   erotica: 'bg-status-red text-white',
   pornographic: 'bg-status-red text-white',
   'sexual violence': 'bg-status-red text-white',
+  gore: 'bg-status-red text-white',
   doujinshi: 'bg-status-purple text-white',
 }
 
