@@ -13,7 +13,8 @@ export default defineNuxtConfig({
     'nuxt-swiper',
     '@pinia/nuxt',
     '@nuxt/icon',
-    'nuxt-open-fetch'
+    'nuxt-open-fetch',
+    'pinia-plugin-persistedstate/nuxt'
   ],
   css: ['~/assets/css/main.css'],
   openFetch: {
