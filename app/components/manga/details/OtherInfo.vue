@@ -55,7 +55,7 @@ for (const tag of tags!) {
         </MangaTag>
       </div>
     </div>
-    <div v-if="genres" class="mb-2">
+    <div v-if="genres.length > 0" class="mb-2">
       <div class="font-bold mb-2">Genres</div>
       <div class="flex gap-2 flex-wrap">
         <MangaTag v-for="tag in genres" :href="`/tag/${tag.id}/${toKebabCase(tag.attributes?.name?.en!)}`">
@@ -71,7 +71,7 @@ for (const tag of tags!) {
         </MangaTag>
       </div>
     </div>
-    <div v-if="format" class="mb-2">
+    <div v-if="format.length > 0" class="mb-2">
       <div class="font-bold mb-2">Format</div>
       <div class="flex gap-2 flex-wrap">
         <MangaTag v-for="tag in format" :href="`/tag/${tag.id}/${toKebabCase(tag.attributes?.name?.en!)}`">
@@ -90,7 +90,7 @@ for (const tag of tags!) {
         <MangaTag v-if="links?.ebj" :href="links?.ebj" target="_blank">eBookJapan</MangaTag>
       </div>
     </div>
-    <div class="mb-2">
+    <div class="mb-2" v-if="links?.al || links?.ap || links?.kt || links?.mal || links?.mu || links?.nu">
       <div class="font-bold mb-2">Track</div>
       <div class="flex gap-2 flex-wrap">
         <MangaTag v-if="links?.al" :href="`https://anilist.co/manga/${links?.al}`" target="_blank">AniList</MangaTag>
