@@ -1,62 +1,66 @@
 <script setup lang="ts">
-import type { Chapter, Page } from '@manga_web/sources';
-const props = defineProps<{ chapter: Chapter }>();
-const { data, pending, error } = useFetch('/api/pages', {
-  query: {
-    chapter: JSON.stringify(props.chapter)
+import Settings from './Settings.vue';
+
+const store = useScrapedReaderStore();
+const settings = useReaderSettingsStore();
+const router = useRouter();
+const overlay = useOverlay();
+const menuOpen = ref(false);
+
+const settingsModal = overlay.create(Settings);
+
+function navigate(direction: "prev" | "next") {
+  if (direction === "next") {
+    if (store.goToNextPage()) return;
+    if (!settings.autoAdvance) return;
+    if (store.nextChapter) {
+      store.goToNextChapter();
+    } else if (store.titleEntry) {
+      return router.push(`/title/${store.titleEntry.id}/${toKebabCase(useMangaTitle(store.titleEntry))}`);
+    }
+  }
+
+  if (direction === "prev") {
+    if (store.goToPrevPage()) return;
+    if (!settings.autoAdvance) return;
+    if (store.previousChapter) {
+      store.goToPrevChapter();
+    } else if (store.titleEntry) {
+      return router.push(`/title/${store.titleEntry.id}/${toKebabCase(useMangaTitle(store.titleEntry))}`);
+    }
+  }
+  return router.push({ params: { chapterId: store.currentChapter?.id } })
+}
+
+defineShortcuts({
+  arrowleft: () => {
+    navigate("prev")
+  },
+  arrowright: () => {
+    navigate("next")
+  },
+  m: () => {
+    menuOpen.value = !menuOpen.value;
+  },
+  i: () => {
+    const fits: ReaderSettings["imageFit"][] = ["fitWidth", "fitHeight", "fitBoth", "noLimit"];
+    const currentIndex = fits.indexOf(settings.imageFit);
+    const nextIndex = (currentIndex + 1) % fits.length;
+    settings.setImageFit(fits[nextIndex]!);
+  },
+  g: () => {
+    settingsModal.open()
   }
 })
-const pages: Page[] = data.value ?? [];
-const currentPage = ref(0);
-const totalPages = pages.length;
 </script>
-<template>
+<template v-if="store.currentChapter">
   <div class="mw--reader-wrap">
     <div class="mw--reader-chapter">
-      <div class="reader--header hide mw-reader-header">
-        <div class="flex-grow">
-          <div class="reader--header-title">
-            <!-- {{ chapter.chapterNumber, chapter.chapterTitle }} -->
-          </div>
-          <NuxtLink class="reader--header-manga"></NuxtLink>
-        </div>
-        <div class="reader--header-meta">
-          <div class="reader--header chapter">
-            Ch. {{ chapter.chapterNumber }}
-          </div>
-          <div class="reader--header page">
-            Pg. {{ currentPage }} / {{ totalPages }}
-          </div>
-          <div class="reader--header menu">
-            Menu
-            <Icon name="i-lucide-chevron-left" />
-          </div>
-        </div>
-        <div class="reader--header groups">
-          <div class="flex items-center">
-            <!-- user / uploader icon -->
-            <div class="flex items-center space-x-1">
-              <NuxtLink class="group-tag"></NuxtLink>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="min-w-0 relative pages-wrap md--reader pages">
-        <div class="overflow-x-auto flex items-center h-full select-none" style="background: transparent;">
-          <div class="mx-auto h-full md--page w-full flex"
-            style="transform-origin: left top 0px; touch-action: revert; transform: translate(0px) scale(1);">
-            <NuxtImg class="img sp-limit-width mx-auto" v-for="image in data" :src="image.url"></NuxtImg>
-          </div>
-        </div>
-      </div>
-      <div class="reader-progress-wrap normal mw--reader-progress">
-        <div class="reader--menu open pinned header-hidden">
-          
-        </div>
-      </div>
+      <MangaReaderHeader @toggle-menu="menuOpen = !menuOpen" />
+      <MangaReaderContent />
+      <MangaReaderProgressBar />
     </div>
-    <div class="mw--reader-menu"></div>
-    <div id="reader-menu-attach"></div>
+    <MangaReaderMenu :open="menuOpen" />
   </div>
 </template>
 <style lang="css" scoped>
@@ -72,5 +76,19 @@ const totalPages = pages.length;
   padding: 0 !important;
   width: 100%;
   --header-padding: 0px;
+}
+
+.mw--reader-chapter {
+  display: grid;
+  grid-template-rows: min-content auto min-content min-content;
+  height: 100%;
+}
+
+.mw--reader-chapter {
+  grid-template-areas:
+    "header  "
+    "pages   "
+    "progress"
+    "next    ";
 }
 </style>

@@ -10,6 +10,8 @@
 
 .dark {
   --mw-accent: 44 44 44;
+  --mw-accent-10: 61 61 61;
+  --mw-accent-20: 79 79 79;
 }
 
 :root {
