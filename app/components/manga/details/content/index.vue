@@ -2,16 +2,21 @@
 import type { TabsItem } from '@nuxt/ui';
 import Covers from './Covers.vue';
 import Comments from './Comments.vue';
-import Chapters from './Chapters.vue';
 import type { Manga } from '~~/shared/types/types';
+import ScrapedChapters from './ScrapedChapters.vue';
+import UploadedChapters from './UploadedChapters.vue';
 
 const props = defineProps<{
   manga: Manga
 }>()
 const items = ref<TabsItem[]>([
   {
-    label: 'Chapters',
-    slot: 'chapters',
+    label: 'Uploaded Chapters',
+    slot: 'uploaded_chapters',
+  },
+  {
+    label: 'Scraped Chapters',
+    slot: 'scraped_chapters',
   },
   {
     label: 'Comments',
@@ -30,8 +35,11 @@ const items = ref<TabsItem[]>([
 <template>
   <div class="min-w-0" style="grid-area: content;">
     <u-tabs :items="items" :unmount-on-hide="false">
-      <template #chapters="{ item }">
-        <Chapters :manga="manga" />
+      <template #uploaded_chapters="{ item }">
+        <UploadedChapters :manga="manga" />
+      </template>
+      <template #scraped_chapters="{ item }">
+        <ScrapedChapters :manga="manga" />
       </template>
       <template #comments="{ item }">
         <Comments :manga="manga" />
