@@ -5,10 +5,15 @@ import Comments from './Comments.vue';
 import type { Manga } from '~~/shared/types/types';
 import ScrapedChapters from './ScrapedChapters.vue';
 import UploadedChapters from './UploadedChapters.vue';
+import Related from './Related.vue';
+import type { components } from "#open-fetch-schemas/mangadex"
 
 const props = defineProps<{
   manga: Manga
 }>()
+
+const hasRelated = (props.manga.relationships ?? [].some((r: components["schemas"]["Relationship"]) => r.type === "manga"))
+
 const items = ref<TabsItem[]>([
   {
     label: 'Uploaded Chapters',
@@ -26,10 +31,11 @@ const items = ref<TabsItem[]>([
     label: 'Art',
     slot: 'covers',
   },
-  {
-    label: 'Related',
-    slot: 'related',
-  }
+  ...(hasRelated ? [
+    {
+      label: 'Related',
+      slot: 'related',
+    }] : [])
 ])
 </script>
 <template>
@@ -48,7 +54,7 @@ const items = ref<TabsItem[]>([
         <Covers :manga="manga" />
       </template>
       <template #related="{ item }">
-
+        <Related :manga="manga" />
       </template>
     </u-tabs>
   </div>
