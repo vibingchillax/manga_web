@@ -66,4 +66,11 @@ const { authors, artists, samePeople } = useMangaAuthor(manga);
       rgb(var(--mw-background) / 0.6),
       rgb(var(--mw-background)));
 }
+
+img {
+  -o-object-fit: cover;
+  object-fit: cover;
+  -o-object-position: center center;
+  object-position: center center;
+}
 </style>
