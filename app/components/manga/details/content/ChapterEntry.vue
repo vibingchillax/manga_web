@@ -2,6 +2,12 @@
 const props = defineProps<{ chapter: ScrapedChapter, mangaTitle: string }>();
 const chapterUrl = `/${props.chapter.sourceId}/${encodeURIComponent(props.mangaTitle)}/${props.chapter.id}`;
 const store = useScrapedReaderStore();
+
+function isValidDate(date: string | undefined) {
+  if (!date) return false;
+  const d = new Date(date);
+  return !isNaN(d.getTime());
+}
 </script>
 <template>
   <div class="bg-accent rounded-sm">
@@ -12,11 +18,13 @@ const store = useScrapedReaderStore();
             <NuxtLink class="flex flex-grow items-center" style="grid-area: title;">
               {{ chapter.translatedLanguage ? chapter.translatedLanguage : 'en' }}
               <span class="chapter-link ml-2 font-bold my-auto flex items-center space-x-1 break-all">
-                <span class="line-clamp-1">Ch. {{ chapter.chapterNumber }}</span>
+                <span v-if="chapter.title === 'Oneshot'" class="line-clamp-1">Oneshot</span>
+                <span v-else-if="chapter.title" class="line-clamp-1">Ch. {{ chapter.chapterNumber }} - {{ chapter.title }}</span>
+                <span v-else class="line-clamp-1">Ch. {{ chapter.chapterNumber }}</span>
               </span>
             </NuxtLink>
             <div class="flex items-center justify-self-start" style="grid-area: comments;">
-              <Icon name="i-lucide-chat"></Icon>
+              <Icon name="i-lucide-message-square"></Icon>
               <span>N/A</span>
             </div>
             <div class="flex items-center justify-self-start" style="grid-area: groups;">
@@ -39,7 +47,8 @@ const store = useScrapedReaderStore();
             </div>
             <div class="flex items-center timestamp justify-self-start" style="grid-area: timestamp;">
               <Icon name="i-lucide-clock"></Icon>
-              <time class="whitespace-nowrap">{{ chapter.date ? chapter.date : 'N/A' }}</time>
+              <NuxtTime v-if="isValidDate(chapter.date)" :datetime="chapter.date!" relative />
+              <time v-else class="whitespace-nowrap">{{ chapter.date ? chapter.date : 'N/A' }}</time>
             </div>
           </NuxtLink>
         </div>
