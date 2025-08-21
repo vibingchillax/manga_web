@@ -2,7 +2,7 @@
 const route = useRoute();
 const store = useScrapedReaderStore();
 
-const title = store.titleEntry ? useMangaTitle(store.titleEntry) : route.params.title as string;
+const title = route.params.title as string;
 const titlePage = store.titleEntry ? `/title/${store.titleEntry?.id}/${toKebabCase(useMangaTitle(store.titleEntry))}` : undefined;
 
 const chapter = computed(() => store.currentChapter!); //if header is rendered then chapter exist
