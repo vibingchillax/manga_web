@@ -7,7 +7,7 @@ const focus = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
 const query = ref('')
 const debouncedQuery = useDebounce(query, 500)
-
+const preferences = usePreferencesStore();
 const results = ref<MangaList>()
 const loading = ref(false)
 const error = ref<string>('')
@@ -38,9 +38,10 @@ watch(debouncedQuery, async (val) => {
     results.value = await $mangadex('/manga', {
       query: {
         title: val,
-        "includes[]": ['cover_art'],
+        'includes[]': ['cover_art'],
         'order[followedCount]': 'desc',
         'order[relevance]': 'desc',
+        'contentRating[]': preferences.contentRating,
         limit: 5
       } as any,
     })
@@ -76,7 +77,7 @@ watch(() => useRoute().fullPath, () => {
         <!-- <UKbd key="K" /> -->
         <!-- </div> -->
         <div class="nav-bar-search__results" v-if="focus">
-          <div v-if="!query">
+          <div v-if="!debouncedQuery">
             Enter a search query...
           </div>
           <div v-else-if="loading">
@@ -146,6 +147,63 @@ watch(() => useRoute().fullPath, () => {
   z-index: 12;
 }
 
+.mw-inputwrap:after {
+  background-color: rgb(var(--mw-accent));
+  border-radius: .5rem;
+  content: " ";
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transition: all var(--nav-search-anim-attr);
+  width: 100%;
+  z-index: -1
+}
+
+@media (min-width:48rem) {
+  .mw-inputwrap {
+    transition: all var(--nav-search-anim-attr)
+  }
+}
+
+@supports ((-webkit-backdrop-filter:blur(10px)) or (backdrop-filter:blur(10px))) {
+  .mw-inputwrap.mw-blur {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px)
+  }
+}
+
+.mw-inputwrap.mw-blur:after {
+  filter: brightness(1.1);
+  /* depend on inputwrap */
+  opacity: 0.65;
+  /* depend on inputwrap */
+}
+
+.mw-inputwrap:not(.mw-blur):after {
+  opacity: 1
+}
+
+.mw-inputwrap .mw-border {
+  border-radius: inherit;
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transition: all var(--nav-search-anim-attr);
+  width: 100%
+}
+
+.mw-inputwrap:focus-within .mw-border {
+  border: 1px solid var(--ui-primary);
+  opacity: 1
+}
+
+.mw-inputwrap.mw-blur {
+  background-color: transparent;
+}
+
 .mw-inputwrap input {
   padding: .25rem;
 }
@@ -162,6 +220,10 @@ watch(() => useRoute().fullPath, () => {
   position: relative;
   width: 100%;
   z-index: 12;
+}
+
+.mw-inputwrap input:focus {
+  outline: none
 }
 
 #header-search-input {
