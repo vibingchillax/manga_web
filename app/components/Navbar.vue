@@ -4,10 +4,10 @@
       <div class="nav-bar flex flex-grow justify-end w-full items-center gap-2">
         <!-- Logo  -->
         <!-- Announcement -->
-         <SearchBar/>
+        <SearchBar />
         <!-- User -->
       </div>
-      <div class="navbar-background" style="opacity: 0;"></div>
+      <div class="navbar-background" :style="{ opacity: 0 }"></div>
     </div>
   </div>
   <div class="h-[var(--navbar-height)]"></div>
@@ -30,5 +30,15 @@
   padding-left: var(--side-margin);
   padding-right: var(--side-margin);
   z-index: 1;
+}
+
+.navbar-background {
+  background-color: rgb(var(--mw-background));
+  border-bottom: 1px solid var(--ui-primary);
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
 }
 </style>

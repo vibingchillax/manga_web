@@ -10,7 +10,6 @@ const props = defineProps<{
       <UModal title="Add to Library">
         <UButton label="Add to Library" />
         <template #body>
-          <Placeholder class="h-48 m-4" />
         </template>
       </UModal>
 

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 const route = useRoute()
 const { data, pending, error } = await useMangadex('/manga/{id}', {
   path: {
@@ -14,13 +13,13 @@ const manga = data.value?.data
 </script>
 
 <template>
-    <template v-if="pending">
-      Loading manga...
-    </template>
+  <template v-if="pending">
+    Loading manga...
+  </template>
 
-    <template v-else-if="error">
-      Failed to load manga.
-    </template>
+  <template v-else-if="error">
+    Failed to load manga.
+  </template>
 
-    <MangaDetails :manga v-else-if="manga"/>
+  <MangaDetails :manga v-else-if="manga" />
 </template>
