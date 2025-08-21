@@ -20,6 +20,7 @@ const selectedManga = ref<ScrapedManga>();
 const scrapedChapters = ref<ScrapedChapter[]>([]);
 
 const loading = ref(false);
+const progressValue = ref(0);
 
 const { data, refresh, status } = await useLazyFetch('/api/sources', { immediate: false });
 
@@ -36,7 +37,9 @@ async function selectSource(source: SourceLabel) {
   try {
     readerStore.setUseProxy(source.flags.includes("needs-referer-header"));
     await readerStore.fetchMangas(title.value, source.id);
+    progressValue.value = 1;
     await readerStore.fetchChapters();
+    progressValue.value = 2;
     selectedManga.value = readerStore.manga ?? undefined;
     scrapedChapters.value = readerStore.chapters;
   }
@@ -55,10 +58,12 @@ async function selectSource(source: SourceLabel) {
 async function selectManga(manga: ScrapedManga) {
   readerStore.manga = manga;
   selectedManga.value = manga;
-  loading.value = true
+  loading.value = true;
   title.value = selectedManga.value.title;
+  progressValue.value = 1;
   try {
     await readerStore.fetchChapters();
+    progressValue.value = 2;
     scrapedChapters.value = readerStore.chapters;
   } catch (error) {
     toast.add({
@@ -91,7 +96,8 @@ async function selectChapter(row: TableRow<ScrapedChapter>) {
           <span class="px-4 text-muted">{{ item.flags }}</span>
         </template>
       </USelectMenu>
-      <USelectMenu v-if="readerStore.mangas.length > 0 && scrapedChapters.length > 0" class="mt-6 mx-4" placeholder="Incorrect match?" v-model="selectedManga" :items="readerStore.mangas"
+      <USelectMenu v-if="readerStore.mangas.length > 0 && scrapedChapters.length > 0" class="mt-6 mx-4"
+        placeholder="Incorrect match?" v-model="selectedManga" :items="readerStore.mangas"
         :ui="{ content: 'min-w-fit' }" @update:model-value="selectManga">
         <template #item-label="{ item }">
           {{ item.title }}
@@ -99,7 +105,8 @@ async function selectChapter(row: TableRow<ScrapedChapter>) {
         </template>
       </USelectMenu>
       <div class="my-6">
-        <UProgress v-if="loading" animation="swing" />
+        <UProgress v-if="loading" v-model="progressValue"
+          :max="['Waiting...', 'Fetching mangas...', 'Fetching chapters...']" />
         <div v-if="!loading && scrapedChapters.length > 0">
           <UTable ref="table" :data="scrapedChapters" @select="selectChapter" v-model:pagination="pagination"
             :pagination-options="{
