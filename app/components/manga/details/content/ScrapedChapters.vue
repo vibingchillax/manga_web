@@ -15,6 +15,7 @@ const title = ref<string>(useMangaTitle(manga));
 
 const selectedSource = ref<SourceLabel>();
 const selectedManga = ref<ScrapedManga>();
+const hasFetched = ref(false);
 
 readerStore.titleEntry = manga;
 
@@ -32,6 +33,7 @@ async function selectSource(source: SourceLabel) {
     await readerStore.fetchChapters();
     progressValue.value = 2;
     selectedManga.value = readerStore.manga ?? undefined;
+    hasFetched.value = true;
   }
   catch (error) {
     toast.add({
@@ -54,6 +56,7 @@ async function selectManga(manga: ScrapedManga) {
   try {
     await readerStore.fetchChapters();
     progressValue.value = 2;
+    hasFetched.value = true;
   } catch (error) {
     toast.add({
       title: 'Error',
@@ -103,7 +106,7 @@ const groupedChapters = computed(() => {
         <span class="px-4 text-muted">{{ item.flags }}</span>
       </template>
     </USelectMenu>
-    <USelectMenu v-if="readerStore.mangas.length > 0 && readerStore.chapters.length > 0" class="mx-4"
+    <USelectMenu v-if="hasFetched && readerStore.mangas.length > 0 && readerStore.chapters.length > 0" class="mx-4"
       placeholder="Incorrect match?" v-model="selectedManga" :items="readerStore.mangas" :ui="{ content: 'min-w-fit' }"
       @update:model-value="selectManga">
       <template #item-label="{ item }">
@@ -113,8 +116,8 @@ const groupedChapters = computed(() => {
     </USelectMenu>
     <div class="flex-grow">
       <UProgress v-if="loading" v-model="progressValue"
-        :max="['Waiting...', 'Fetching mangas...', 'Fetching chapters...']" />
-      <div v-if="!loading && readerStore.chapters.length > 0">
+        :max="['Fetching mangas...', 'Fetching chapters...']" />
+      <div v-if="!loading && hasFetched && readerStore.chapters.length > 0">
         <ChaptersList v-for="([vol, chapters]) in groupedChapters" :key="vol" :volume="vol" :chapters="chapters"
           :mangaTitle="title" />
       </div>
