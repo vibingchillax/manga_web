@@ -1,13 +1,41 @@
 <script setup lang="ts">
+import type { TableRow } from '@nuxt/ui';
+
+const toast = useToast();
+const router = useRouter();
+
 const store = useScrapedReaderStore();
+const loadingIndicator = useLoadingIndicator();
 
 defineProps<{
   open: boolean
 }>();
 const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): false }>();
 
+const selectorOpen = ref(false);
+
 function close() {
   emit('update:modelValue', false);
+}
+
+async function selectManga(row: TableRow<ScrapedManga>) {
+  const manga = row.original;
+  store.manga = manga;
+  const title = manga.title;
+  try {
+    selectorOpen.value = false;
+    loadingIndicator.start();
+    await store.fetchChapters();
+    loadingIndicator.finish();
+    router.push({ params: { title: title, chapterId: store.chapters[store.chapters.length - 1]?.id } })
+  } catch (error) {
+    toast.add({
+      title: 'Error',
+      description: error instanceof Error ? error.message : String(error),
+      color: 'error'
+    })
+    selectorOpen.value = true;
+  }
 }
 </script>
 <template>
@@ -20,6 +48,12 @@ function close() {
           <Icon name="i-lucide-sticky-note"></Icon>
           {{ store.manga?.title }}
         </div>
+        <UModal v-model:open="selectorOpen">
+          <UButton label="Incorrect match?"></UButton>
+          <template #content>
+            <UTable :data="store.mangas" @select="selectManga"></UTable>
+          </template>
+        </UModal>
         <div class="flex items-center break-words">
           <Icon name="i-lucide-book-open"></Icon>
           Chapter {{ store.currentChapter?.chapterNumber }}
