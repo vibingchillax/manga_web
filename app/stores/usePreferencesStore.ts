@@ -18,7 +18,9 @@ export const usePreferencesStore = defineStore('userPreferences', {
     showErotic: true,
     showHentai: true
   }),
-  persist: true,
+  persist: {
+    storage: localStorage
+  },
   getters: {
     contentRating(): ("safe" | "suggestive" | "erotica" | "pornographic")[] {
       const ratings: ("safe" | "suggestive" | "erotica" | "pornographic")[] = []

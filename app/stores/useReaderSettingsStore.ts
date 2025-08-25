@@ -67,5 +67,7 @@ export const useReaderSettingsStore = defineStore("readerSettings", {
     },
   },
 
-  persist: true,
+  persist: {
+    storage: localStorage
+  },
 });
