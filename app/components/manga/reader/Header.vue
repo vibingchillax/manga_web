@@ -17,7 +17,7 @@ function toggleMenu() {
 </script>
 
 <template>
-  <div class="reader--header hide mw-reader-header">
+  <div class="reader--header hide mw--reader-header">
     <div class="flex-grow">
       <div class="reader--header-title">
         <template v-if="chapter.title">

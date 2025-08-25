@@ -55,7 +55,10 @@ defineShortcuts({
 </script>
 <template v-if="store.currentChapter">
   <div class="mw--reader-wrap">
-    <div class="mw--reader-chapter">
+    <div class="mw--reader-chapter" :class="[
+      settings.progressBarPosition === 'left' ? 'left-progress' : '',
+      settings.progressBarPosition === 'right' ? 'right-progress' : '',
+    ]">
       <MangaReaderHeader @toggle-menu="menuOpen = !menuOpen" />
       <MangaReaderContent />
       <MangaReaderProgressBar />
@@ -90,5 +93,17 @@ defineShortcuts({
     "pages   "
     "progress"
     "next    ";
+}
+
+.mw--reader-chapter.left-progress {
+  grid-template-areas: "header header" "progress pages" "next next";
+  grid-template-columns: 0 auto;
+  grid-template-rows: min-content auto min-content
+}
+
+.mw--reader-chapter.right-progress {
+  grid-template-areas: "header header" "pages progress" "next next";
+  grid-template-columns: auto 0;
+  grid-template-rows: min-content auto min-content
 }
 </style>

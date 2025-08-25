@@ -1,12 +1,17 @@
 <script setup lang="ts">
 const store = useScrapedReaderStore();
+const settings = useReaderSettingsStore();
 const currentPage = computed(() => store.currentPage);
 const totalPages = computed(() => store.totalPages);
 </script>
 
 <template>
-  <div class="reader-progress-wrap normal mw--reader-progress" :style="{
-    '--slider-heighthuh': '4px',
+  <div class="reader-progress-wrap mw--reader-progress" :class="[
+    settings.progressBarStyle === 'normal' ? 'normal' : '',
+    settings.progressBarPosition === 'left' ? 'side left' : '',
+    settings.progressBarPosition === 'right' ? 'side right' : ''
+  ]" :style="{
+    '--progress-bar-size': `${settings.progressBarSize}px`,
     '--slider-ball-left': `calc(${currentPage} * (100% - var(--divider-width)) / max(${totalPages - 1}, 1) + var(--divider-width)/2)`,
     '--slider-borderhuh': '1px',
     '--divider-width': `${100 / totalPages}%`
@@ -16,15 +21,26 @@ const totalPages = computed(() => store.totalPages);
         {{ currentPage + 1 }}
       </div>
       <div class="page-slider mx-2">
-        <div id="slider-ball">
-          <div class="slider-ball-tooltip" style="display: none;">
+        <div id="slider-ball" :class="{
+          'side left': settings.progressBarPosition === 'left',
+          'side right': settings.progressBarPosition === 'right'
+        }">
+          <div class="slider-ball-tooltip" :class="{
+            'side left': settings.progressBarPosition === 'left',
+            'side right': settings.progressBarPosition === 'right'
+          }" style="display: none;">
             {{ currentPage + 1 }}
           </div>
         </div>
-        <div class="slider-dividers" v-if="totalPages > 1">
+        <div class="slider-dividers" :class="{
+          'side left': settings.progressBarPosition === 'left',
+          'side right': settings.progressBarPosition === 'right'
+        }" v-if="totalPages > 1">
           <div v-for="i in totalPages" :key=i class="prog-divider loaded" :class="{
             read: i - 1 <= currentPage,
-            current: i - 1 === currentPage
+            current: i - 1 === currentPage,
+            'side left': settings.progressBarPosition === 'left',
+            'side right': settings.progressBarPosition === 'right'
           }" @click="store.currentPage = i - 1">
             <div class="prog-divider-label">{{ i }}</div>
           </div>
@@ -161,8 +177,8 @@ const totalPages = computed(() => store.totalPages);
 }
 
 .reader-progress-wrap.normal:not(.mobile):not(.break, :hover) {
-  --slider-height: var(--slider-heighthuh);
-  --slider-ball-diameter: var(--slider-heighthuh);
+  --slider-height: var(--progress-bar-size);
+  --slider-ball-diameter: var(--progress-bar-size);
 }
 
 .reader-progress-wrap.break,
@@ -299,9 +315,9 @@ const totalPages = computed(() => store.totalPages);
 }
 
 #slider-ball.side {
-  height: var(--slider-heighthuh);
+  height: var(--divider-width);
   left: 0;
-  top: var(--slider-borderhuh);
+  top: var(--slider-ball-left);
   transform: translateY(-50%);
   width: var(--slider-height)
 }
@@ -359,20 +375,6 @@ const totalPages = computed(() => store.totalPages);
   transform: translate(-100%)
 }
 
-.slider-dividers {
-  border-radius: 9999px;
-  display: flex;
-  height: 100%;
-  justify-content: space-evenly;
-  overflow: hidden;
-  position: relative;
-}
-
-@media (min-width: 40rem) {
-  .slider-dividers {
-    overflow: visible;
-  }
-}
 
 .slider-dividers::before {
   background-color: var(--ui-primary);
@@ -432,6 +434,21 @@ const totalPages = computed(() => store.totalPages);
 .slider-dividers:not(.side).rtl:before {
   left: unset;
   right: 0
+}
+
+.slider-dividers {
+  border-radius: 9999px;
+  display: flex;
+  height: 100%;
+  justify-content: space-evenly;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (min-width: 40rem) {
+  .slider-dividers {
+    overflow: visible;
+  }
 }
 
 .prog-divider {
