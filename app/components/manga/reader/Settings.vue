@@ -92,7 +92,7 @@ const progressBarPositionItems = [
 </script>
 <template>
   <UModal title="Reader Settings">
-    <template #content>
+    <template #body>
       Page Display Style
       <UTabs v-model="pageDisplayStyle" :content="false" :items="pageDisplayItems"/>
       Reading Direction
