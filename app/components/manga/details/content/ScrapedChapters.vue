@@ -9,6 +9,7 @@ const props = defineProps<{
 }>();
 
 const readerStore = useScrapedReaderStore();
+const preferences = usePreferencesStore();
 
 const manga = props.manga;
 const title = ref<string>(useMangaTitle(manga));
@@ -71,7 +72,10 @@ async function selectManga(manga: ScrapedManga) {
 
 const groupedChapters = computed(() => {
   const groups = new Map<string, ScrapedChapter[]>();
-  for (const ch of readerStore.chapters) {
+  const filteredChapters = readerStore.chapters.filter(ch =>
+    preferences.filteredLanguages.length === 0 || preferences.filteredLanguages.includes(ch.translatedLanguage || 'en')
+  )
+  for (const ch of filteredChapters) {
     const vol = ch.volume ?? 'No Volume';
     if (!groups.has(vol)) groups.set(vol, []);
     groups.get(vol)!.push(ch);
@@ -115,8 +119,7 @@ const groupedChapters = computed(() => {
       </template>
     </USelectMenu>
     <div class="flex-grow">
-      <UProgress v-if="loading" v-model="progressValue"
-        :max="['Fetching mangas...', 'Fetching chapters...']" />
+      <UProgress v-if="loading" v-model="progressValue" :max="['Fetching mangas...', 'Fetching chapters...']" />
       <div v-if="!loading && hasFetched && readerStore.chapters.length > 0">
         <ChaptersList v-for="([vol, chapters]) in groupedChapters" :key="vol" :volume="vol" :chapters="chapters"
           :mangaTitle="title" />
