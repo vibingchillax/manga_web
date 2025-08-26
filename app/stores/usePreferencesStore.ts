@@ -11,12 +11,12 @@ interface UserPreferences {
 export const usePreferencesStore = defineStore('userPreferences', {
   state: (): UserPreferences => ({
     excludedTags: [],
-    filteredLanguages: ["en"],
+    filteredLanguages: [],
     originLanguages: [],
     showSafe: true,
     showSuggestive: true,
     showErotic: true,
-    showHentai: true
+    showHentai: false
   }),
   persist: {
     storage: localStorage

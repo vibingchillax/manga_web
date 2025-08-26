@@ -37,6 +37,10 @@ body {
   line-height: inherit;
 }
 
+.bg-accent {
+  background-color: rgb(var(--mw-accent));
+}
+
 .mw-content>* {
   margin-bottom: 2rem;
   margin-bottom: calc(var(--bottom-nav-area) + var(--bottom-margin));

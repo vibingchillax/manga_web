@@ -57,10 +57,6 @@ function isValidDate(date: string | undefined) {
   </div>
 </template>
 <style lang="css" scoped>
-.bg-accent {
-  background-color: rgb(var(--mw-accent));
-}
-
 .chapter {
   --main-background: var(--mw-background);
 }

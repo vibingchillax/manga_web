@@ -1,3 +1,6 @@
+<script setup lang="ts">
+import User from './User.vue';
+</script>
 <template>
   <div class="navbar-wrap flex flex-col transparent fixed top-0 right-0">
     <div class="nav-bar-main flex justify-center">
@@ -5,7 +8,7 @@
         <!-- Logo  -->
         <!-- Announcement -->
         <SearchBar />
-        <!-- User -->
+        <User />
       </div>
       <div class="navbar-background" :style="{ opacity: 0 }"></div>
     </div>
