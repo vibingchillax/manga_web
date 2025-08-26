@@ -22,7 +22,6 @@ const { data, pending, error } = await useMangadex("/manga", {
     createdAtSince: isoLocal,
     limit: 10
   } as any, //💀,
-  key: 'popular'
 })
 
 </script>

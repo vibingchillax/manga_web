@@ -21,7 +21,6 @@ const { data: mangasList, pending, error } = await useMangadex('/manga', {
     "contentRating[]": preferences.contentRating,
     "ids[]": idList.value
   } as any,
-  key: 'seasonalpage'
 })
 
 const items = ref([
