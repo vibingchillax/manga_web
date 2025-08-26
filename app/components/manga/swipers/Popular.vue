@@ -3,12 +3,7 @@ import dayjs from 'dayjs';
 import type { SwiperContainer } from 'swiper/element'
 
 const swiperContainerRef = ref<SwiperContainer | null>(null);
-const swiper = useSwiper(swiperContainerRef, {
-  loop: true,
-  autoplay: {
-    delay: 8000
-  }
-});
+const swiper = useSwiper(swiperContainerRef);
 
 const currentSlideIndex = ref(0);
 
@@ -40,7 +35,9 @@ const { data, pending, error } = await useMangadex("/manga", {
     </div>
     <div>
       <ClientOnly>
-        <swiper-container ref="swiperContainerRef" @swiperslidechange="onSlideChange">
+        <swiper-container ref="swiperContainerRef" @swiperrealindexchange="onSlideChange" :autoplay="{
+          delay: 8000
+        }" :loop="true">
           <swiper-slide v-for="(manga, index) in data?.data" :key="index">
             <MangaPopularSlide :manga="manga" />
           </swiper-slide>
