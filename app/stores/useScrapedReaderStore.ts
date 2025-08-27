@@ -4,7 +4,7 @@ import { defineStore } from "pinia";
 interface ReaderState {
   mangas: ScrapedManga[];
   manga: ScrapedManga | null;
-  titleEntry: Manga | null;
+  titleEntry: string | null;
   chapters: ScrapedChapter[];
   currentChapterIndex: number;
   pages: Page[];

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const route = useRoute();
 const store = useScrapedReaderStore();
+const history = useReadingHistoryStore();
 const toast = useToast();
 
 const sourceId = route.params.sourceId as string;
@@ -31,6 +32,13 @@ if (!store.titleEntry || !ready) {
 }
 try {
   await store.fetchPages();
+  history._readingHistory.push({
+    titleEntry: store.titleEntry ?? undefined,
+    sourceId,
+    title,
+    chapterId,
+    time: new Date().toISOString()
+  })
 } catch (err) {
   toast.add({
     title: 'Error',

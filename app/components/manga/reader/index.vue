@@ -16,7 +16,7 @@ function navigate(direction: "prev" | "next") {
     if (store.nextChapter) {
       store.goToNextChapter();
     } else if (store.titleEntry) {
-      return router.push(`/title/${store.titleEntry.id}/${toKebabCase(useMangaTitle(store.titleEntry))}`);
+      return router.push(store.titleEntry);
     }
   }
 
@@ -26,7 +26,7 @@ function navigate(direction: "prev" | "next") {
     if (store.previousChapter) {
       store.goToPrevChapter();
     } else if (store.titleEntry) {
-      return router.push(`/title/${store.titleEntry.id}/${toKebabCase(useMangaTitle(store.titleEntry))}`);
+      return router.push(store.titleEntry);
     }
   }
   return router.push({ params: { chapterId: store.currentChapter?.id } })

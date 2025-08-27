@@ -3,6 +3,7 @@ import { type ScrapedManga, type Manga, type SourceLabel, type ScrapedChapter } 
 import ChaptersList from './ChaptersList.vue';
 
 const toast = useToast();
+const route = useRoute();
 
 const props = defineProps<{
   manga: Manga
@@ -18,7 +19,7 @@ const selectedSource = ref<SourceLabel>();
 const selectedManga = ref<ScrapedManga>();
 const hasFetched = ref(false);
 
-readerStore.titleEntry = manga;
+readerStore.titleEntry = route.path;
 
 const loading = ref(false);
 const progressValue = ref(0);

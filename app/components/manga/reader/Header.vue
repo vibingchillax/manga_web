@@ -3,7 +3,6 @@ const route = useRoute();
 const store = useScrapedReaderStore();
 
 const title = route.params.title as string;
-const titlePage = store.titleEntry ? `/title/${store.titleEntry?.id}/${toKebabCase(useMangaTitle(store.titleEntry))}` : undefined;
 
 const chapter = computed(() => store.currentChapter!); //if header is rendered then chapter exist
 const currentPage = computed(() => store.currentPage);
@@ -27,7 +26,7 @@ function toggleMenu() {
           Chapter {{ chapter.chapterNumber }}
         </template>
       </div>
-      <NuxtLink class="reader--header-manga" :to="titlePage">{{ title }}</NuxtLink>
+      <NuxtLink class="reader--header-manga" :to="store.titleEntry ? store.titleEntry : undefined">{{ title }}</NuxtLink>
     </div>
     <div class="reader--header-meta">
       <div class="reader--meta chapter">
