@@ -2,31 +2,6 @@
 
 const settings = useReaderSettingsStore();
 
-const pageDisplayStyle = computed({
-  get: () => settings.pageDisplayStyle,
-  set: (val) => settings.setPageDisplayStyle(val)
-});
-
-const readingDirection = computed({
-  get: () => settings.readingDirection,
-  set: (val) => settings.setReadingDirection(val)
-});
-
-const progressBarStyle = computed({
-  get: () => settings.progressBarStyle,
-  set: (val) => settings.setProgressBarStyle(val)
-});
-
-const progressBarPosition = computed({
-  get: () => settings.progressBarPosition,
-  set: (val) => settings.setProgressBarPosition(val)
-});
-
-const progressBarSize = computed({
-  get: () => settings.progressBarSize,
-  set: (val) => settings.setProgressBarSize(val)
-});
-
 const pageDisplayItems = [
   {
     label: 'Single Page',
@@ -94,15 +69,15 @@ const progressBarPositionItems = [
   <UModal title="Reader Settings">
     <template #body>
       Page Display Style
-      <UTabs v-model="pageDisplayStyle" :content="false" :items="pageDisplayItems"/>
+      <UTabs v-model="settings.pageDisplayStyle" :content="false" :items="pageDisplayItems"/>
       Reading Direction
-      <UTabs v-model="readingDirection" :content="false" :items="readingDirectionItems"/>
+      <UTabs v-model="settings.readingDirection" :content="false" :items="readingDirectionItems"/>
       Progress Bar Style
-      <UTabs v-model="progressBarStyle" :content="false" :items="progressBarStyleItems"/>
+      <UTabs v-model="settings.progressBarStyle" :content="false" :items="progressBarStyleItems"/>
       Progress Bar Position
-      <UTabs v-model="progressBarPosition" :content="false" :items="progressBarPositionItems"/>
+      <UTabs v-model="settings.progressBarPosition" :content="false" :items="progressBarPositionItems"/>
       Progress Size
-      <USlider :min="2" :max="16" v-model="progressBarSize" tooltip />
+      <USlider :min="2" :max="16" v-model="settings.progressBarSize" tooltip />
     </template>
   </UModal>
 </template>

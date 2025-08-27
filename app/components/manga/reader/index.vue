@@ -46,7 +46,7 @@ defineShortcuts({
     const fits: ReaderSettings["imageFit"][] = ["fitWidth", "fitHeight", "fitBoth", "noLimit"];
     const currentIndex = fits.indexOf(settings.imageFit);
     const nextIndex = (currentIndex + 1) % fits.length;
-    settings.setImageFit(fits[nextIndex]!);
+    settings.imageFit = fits[nextIndex]!;
   },
   g: () => {
     settingsModal.open()
