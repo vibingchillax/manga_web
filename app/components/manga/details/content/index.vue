@@ -2,7 +2,7 @@
 import type { TabsItem } from '@nuxt/ui';
 import Covers from './Covers.vue';
 import Comments from './Comments.vue';
-import type { Manga } from '~~/shared/types/types';
+import type { Manga } from '~~/shared/types';
 import ScrapedChapters from './ScrapedChapters.vue';
 import UploadedChapters from './UploadedChapters.vue';
 import Related from './Related.vue';

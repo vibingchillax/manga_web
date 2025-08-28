@@ -1,4 +1,4 @@
-import { ScrapedManga } from "~~/shared/types/types";
+import { ScrapedManga } from "~~/shared/types";
 
 type ChaptersRequestBody = {
   manga: ScrapedManga

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMangaAuthor } from '~/composables/useMangaAuthor';
 import { useMangaCover } from '~/composables/useMangaCover';
-import type { Manga } from '~~/shared/types/types';
+import type { Manga } from '~~/shared/types';
 
 const props = defineProps<{
   manga: Manga,

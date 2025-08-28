@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type ScrapedManga, type Manga, type SourceLabel, type ScrapedChapter } from '~~/shared/types/types';
+import { type ScrapedManga, type Manga, type SourceLabel, type ScrapedChapter } from '~~/shared/types';
 import ChaptersList from './ChaptersList.vue';
 
 const toast = useToast();
