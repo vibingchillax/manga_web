@@ -24,7 +24,10 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    if (!manga) throw new Error('Manga not found')
+    if (!manga) throw createError({
+      statusCode: 404,
+      statusMessage: 'Manga not found'
+    })
 
     const result = await sourcesInstance.runSourceForChapters({
       manga: {
@@ -34,7 +37,10 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    if (!(result.length > 0)) throw new Error('Nothing found')
+    if (!(result.length > 0)) throw createError({
+      statusCode: 404,
+      statusMessage: 'No chapters found'
+    })
 
     const created = await prisma.scrapedChapters.createManyAndReturn({
       data: result.map(chapter => ({

@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    if (pages) return pages;
+    if (pages?.data && pages.data.length > 0) return pages;
 
     const chapter = await prisma.scrapedChapters.findUnique({
       where: {
@@ -17,7 +17,10 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    if (!chapter) throw new Error('Chapter not found')
+    if (!chapter) throw createError({
+      statusCode: 404,
+      statusMessage: 'Chapter not found'
+    })
 
     const result = await sourcesInstance.runSourceForPages({
       chapter: {
@@ -25,6 +28,11 @@ export default defineEventHandler(async (event) => {
         sourceId: chapter.sourceId,
         url: chapter.url
       }
+    })
+
+    if (result.length === 0) throw createError({
+      statusCode: 404,
+      statusMessage: 'Pages not found'
     })
 
     const created = await prisma.scrapedPages.create({
