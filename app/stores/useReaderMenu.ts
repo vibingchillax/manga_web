@@ -259,6 +259,7 @@ export const useReaderMenu = defineStore("readerMenu", {
     shouldAutoScroll() {
       this.scrollLock.width && this.limitWidth || this.scrollLock.height && this.limitHeight || this.scrollLock.none && !(this.limitHeight || this.limitWidth) || this.viewStyle === ViewStyleEnum.LongStrip || this.viewStyle === ViewStyleEnum.WideStrip
     },
+    growPages: (state) => state._growPages && (state._limitWidth || state._limitHeight),
     maxWidthPixels(state) {
       if (state.limitMaxWidth) return `${state.maxWidth}px`
     },
