@@ -11,13 +11,6 @@ export default defineEventHandler(async (event) => {
   }
   
   try {
-    const chapters = await prisma.scrapedChapters.findMany({
-      where: {
-        mangaId: id
-      }
-    })
-    if (chapters.length > 0) return chapters;
-
     const manga = await prisma.scrapedMangas.findUnique({
       where: {
         id
@@ -42,7 +35,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'No chapters found'
     })
 
-    const created = await prisma.scrapedChapters.createManyAndReturn({
+    await prisma.scrapedChapters.createMany({
       data: result.map(chapter => ({
         id: randomUUID(),
         mangaId: id,
@@ -56,9 +49,15 @@ export default defineEventHandler(async (event) => {
         scanlationGroup: chapter.scanlationGroup,
         branch: chapter.branch,
         publishedAt: chapter.date
-      }))
+      })),
+      skipDuplicates: true
     })
-    return created
+
+    return await prisma.scrapedChapters.findMany({
+      where: {
+        mangaId: id
+      }
+    })
 
   } catch (error) {
     throw createError({
