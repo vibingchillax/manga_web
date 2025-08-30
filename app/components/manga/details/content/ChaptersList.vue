@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { scrapedChapters } from '~~/shared/prisma/client';
 import ChapterEntry from './ChapterEntry.vue';
-const props = defineProps<{ volume: string, chapters: ScrapedChapter[], mangaTitle: string }>();
+defineProps<{ volume: string, chapters: scrapedChapters[], mangaTitle: string }>();
 
 const isOpen = ref(true);
 const toggle = () => {
@@ -13,7 +14,7 @@ const toggle = () => {
       <div class="col-span-4" v-if="volume === 'No Volume'">{{ volume }}</div>
       <div class="col-span-4" v-else>Volume {{ volume }}</div>
       <div class="text-center col-span-4">
-        Ch. {{ chapters[chapters.length - 1]?.chapterNumber }} - {{ chapters[0]?.chapterNumber }}
+        Ch. {{ chapters[chapters.length - 1]?.chapter }} - {{ chapters[0]?.chapter }}
       </div>
       <div class="text-right col-span-4">
         <span>

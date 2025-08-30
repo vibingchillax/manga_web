@@ -1,40 +1,44 @@
 <script setup lang="ts">
-import { type ScrapedManga, type Manga, type SourceLabel, type ScrapedChapter } from '~~/shared/types';
+import { type Manga } from '~~/shared/types';
 import ChaptersList from './ChaptersList.vue';
+import type { scrapedChapters, scrapedMangas } from '~~/shared/prisma/client';
 
 const toast = useToast();
-const route = useRoute();
 
 const props = defineProps<{
   manga: Manga
 }>();
 
-const readerStore = useScrapedReaderStore();
 const preferences = usePreferencesStore();
 
 const manga = props.manga;
 const title = ref<string>(useMangaTitle(manga));
 
 const selectedSource = ref<SourceLabel>();
-const selectedManga = ref<ScrapedManga>();
+const scrapedMangas = ref<scrapedMangas[]>([]);
+const scrapedChapters = ref<scrapedChapters[]>([]);
+const selectedManga = ref<scrapedMangas>();
 const hasFetched = ref(false);
-
-readerStore.titleEntry = route.path;
 
 const loading = ref(false);
 const progressValue = ref(0);
 
-const { data, refresh, status } = await useLazyFetch('/api/sources', { immediate: false });
+const { data, refresh, status } = await useLazyFetch('/sources', { immediate: false });
 
 async function selectSource(source: SourceLabel) {
   loading.value = true;
   try {
-    readerStore.setUseProxy(source.flags.includes("needs-referer-header"));
-    await readerStore.fetchMangas(title.value, source.id);
+    const mangas = await $fetch<scrapedMangas[]>('/scrape/mangas', {
+      method: 'POST',
+      body: { title: title.value, sourceId: source.id, mangadexId: manga.id }
+    });
+    if (!mangas || !(mangas.length > 0)) throw new Error('Nothing found');
+    scrapedMangas.value = mangas;
     progressValue.value = 1;
-    await readerStore.fetchChapters();
+    const chapters = await $fetch<scrapedChapters[]>(`/scraped/manga/${mangas[0]!.id}/feed`);
+    if (!chapters || !(chapters.length > 0)) throw new Error('Nothing found');
+    scrapedChapters.value = chapters;
     progressValue.value = 2;
-    selectedManga.value = readerStore.manga ?? undefined;
     hasFetched.value = true;
   }
   catch (error) {
@@ -49,14 +53,15 @@ async function selectSource(source: SourceLabel) {
   }
 }
 
-async function selectManga(manga: ScrapedManga) {
-  readerStore.manga = manga;
+async function selectManga(manga: scrapedMangas) {
   selectedManga.value = manga;
   loading.value = true;
   title.value = selectedManga.value.title;
   progressValue.value = 1;
   try {
-    await readerStore.fetchChapters();
+    const chapters = await $fetch<scrapedChapters[]>(`/scraped/manga/${manga.id}/feed`);
+    if (!chapters || !(chapters.length > 0)) throw new Error('Nothing found');
+    scrapedChapters.value = chapters;
     progressValue.value = 2;
     hasFetched.value = true;
   } catch (error) {
@@ -72,8 +77,8 @@ async function selectManga(manga: ScrapedManga) {
 }
 
 const groupedChapters = computed(() => {
-  const groups = new Map<string, ScrapedChapter[]>();
-  const filteredChapters = readerStore.chapters.filter(ch =>
+  const groups = new Map<string, scrapedChapters[]>();
+  const filteredChapters = scrapedChapters.value.filter(ch =>
     preferences.filteredLanguages.length === 0 || preferences.filteredLanguages.includes(ch.translatedLanguage || 'en')
   )
   for (const ch of filteredChapters) {
@@ -111,8 +116,8 @@ const groupedChapters = computed(() => {
         <span class="px-4 text-muted">{{ item.flags }}</span>
       </template>
     </USelectMenu>
-    <USelectMenu v-if="hasFetched && readerStore.mangas.length > 0 && readerStore.chapters.length > 0" class="mx-4"
-      placeholder="Incorrect match?" v-model="selectedManga" :items="readerStore.mangas" :ui="{ content: 'min-w-fit' }"
+    <USelectMenu v-if="hasFetched && scrapedMangas.length > 0 && scrapedChapters.length > 0" class="mx-4"
+      placeholder="Incorrect match?" v-model="selectedManga" :items="scrapedMangas" :ui="{ content: 'min-w-fit' }"
       @update:model-value="selectManga">
       <template #item-label="{ item }">
         {{ item.title }}
@@ -121,7 +126,7 @@ const groupedChapters = computed(() => {
     </USelectMenu>
     <div class="flex-grow">
       <UProgress v-if="loading" v-model="progressValue" :max="['Fetching mangas...', 'Fetching chapters...']" />
-      <div v-if="!loading && hasFetched && readerStore.chapters.length > 0">
+      <div v-if="!loading && hasFetched && scrapedChapters.length > 0">
         <ChaptersList v-for="([vol, chapters]) in groupedChapters" :key="vol" :volume="vol" :chapters="chapters"
           :mangaTitle="title" />
       </div>

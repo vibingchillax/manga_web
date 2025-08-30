@@ -1,9 +1,10 @@
 <script setup lang="ts">
-const props = defineProps<{ chapter: ScrapedChapter, mangaTitle: string }>();
-const chapterUrl = `/${props.chapter.sourceId}/${encodeURIComponent(props.mangaTitle)}/${props.chapter.id}`;
-const store = useScrapedReaderStore();
+import type { scrapedChapters } from '~~/shared/prisma/client';
 
-function isValidDate(date: string | undefined) {
+const props = defineProps<{ chapter: scrapedChapters, mangaTitle: string }>();
+const chapterUrl = `/chapter/scraped/${props.chapter.id}`;
+
+function isValidDate(date: string | null) {
   if (!date) return false;
   const d = new Date(date);
   return !isNaN(d.getTime());
@@ -14,13 +15,13 @@ function isValidDate(date: string | undefined) {
     <div>
       <div class="chapter relative">
         <div class="flex">
-          <NuxtLink class="chapter-grid flex-grow" :to="chapterUrl" @click="store.setChapter(chapter)">
+          <NuxtLink class="chapter-grid flex-grow" :to="chapterUrl">
             <NuxtLink class="flex flex-grow items-center" style="grid-area: title;">
               {{ chapter.translatedLanguage ? chapter.translatedLanguage : 'en' }}
               <span class="chapter-link ml-2 font-bold my-auto flex items-center space-x-1 break-all">
                 <span v-if="chapter.title === 'Oneshot'" class="line-clamp-1">Oneshot</span>
-                <span v-else-if="chapter.title" class="line-clamp-1">Ch. {{ chapter.chapterNumber }} - {{ chapter.title }}</span>
-                <span v-else class="line-clamp-1">Ch. {{ chapter.chapterNumber }}</span>
+                <span v-else-if="chapter.title" class="line-clamp-1">Ch. {{ chapter.chapter }} - {{ chapter.title }}</span>
+                <span v-else class="line-clamp-1">Ch. {{ chapter.chapter }}</span>
               </span>
             </NuxtLink>
             <div class="flex items-center justify-self-start" style="grid-area: comments;">
@@ -47,8 +48,8 @@ function isValidDate(date: string | undefined) {
             </div>
             <div class="flex items-center timestamp justify-self-start" style="grid-area: timestamp;">
               <Icon name="i-lucide-clock"></Icon>
-              <NuxtTime v-if="isValidDate(chapter.date)" :datetime="chapter.date!" relative />
-              <time v-else class="whitespace-nowrap">{{ chapter.date ? chapter.date : 'N/A' }}</time>
+              <NuxtTime v-if="isValidDate(chapter.publishedAt)" :datetime="chapter.publishedAt!" relative />
+              <time v-else class="whitespace-nowrap">{{ chapter.publishedAt ? chapter.publishedAt : 'N/A' }}</time>
             </div>
           </NuxtLink>
         </div>
