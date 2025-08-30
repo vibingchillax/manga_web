@@ -415,7 +415,9 @@ export const useReaderStore = defineStore("reader", {
     },
     showImagePage(pageGroup: number) {
       const readerMenu = useReaderMenu()
-      return readerMenu.viewStyle === ViewStyleEnum.LongStrip || readerMenu.viewStyle === ViewStyleEnum.WideStrip
+      return readerMenu.viewStyle === ViewStyleEnum.LongStrip || 
+      readerMenu.viewStyle === ViewStyleEnum.WideStrip ||
+      pageGroup === this.currentPageGroup
     },
     setCommentsOpen(bool: boolean) {
       this.commentsOpen = bool
