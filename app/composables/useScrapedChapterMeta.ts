@@ -29,7 +29,7 @@ export const useScrapedChapterMeta = () => {
     if (!reader.currentChapter) return ""
     let identifier = ""
     if (volumeNo) identifier += `Vol ${volumeNo}, `
-    identifier += chapterNo ? `Ch, ${chapterNo}` : "Oneshot"
+    identifier += chapterNo ? `Ch. ${chapterNo}` : "Oneshot"
     return identifier
   })()
 
