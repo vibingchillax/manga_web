@@ -1,5 +1,3 @@
-import { randomUUID } from 'crypto';
-
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
@@ -22,44 +20,32 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Manga not found'
     })
 
-    const result = await sourcesInstance.runSourceForChapters({
-      manga: {
-        sourceId: manga?.sourceId,
-        title: manga?.title,
-        url: manga?.url
-      }
-    })
-
-    if (!(result.length > 0)) throw createError({
-      statusCode: 404,
-      statusMessage: 'No chapters found'
-    })
-
-    await prisma.scrapedChapters.createMany({
-      data: result.map(chapter => ({
-        id: randomUUID(),
-        mangaId: id,
-        sourceId: chapter.sourceId,
-        url: chapter.url,
-        title: chapter.title,
-        volume: chapter.volume,
-        chapter: chapter.chapterNumber,
-        translatedLanguage: chapter.translatedLanguage ?? "en",
-        uploader: chapter.uploader,
-        scanlationGroup: chapter.scanlationGroup,
-        branch: chapter.branch,
-        publishedAt: chapter.date
-      })),
-      skipDuplicates: true
-    })
-
-    return await prisma.scrapedChapters.findMany({
+    const result = await prisma.scrapedChapters.findMany({
       where: {
         mangaId: id
       }
     })
 
-  } catch (error) {
+    if (!(result.length > 0)) {
+      return await refreshChapters(manga)
+    }
+
+    const lastUpdated = result[0].updatedAt
+    const stale = Date.now() - lastUpdated.getTime() > 1000 * 60 * 60
+
+    if (stale) {
+      refreshChapters(manga).catch((err: any)=> {
+        console.error(`Background refresh failed for manga ${id}`, err)
+      })
+    }
+
+    return result
+
+  } catch (error: any) {
+    if (error?.statusCode) {
+      throw error
+    }
+
     throw createError({
       statusCode: 500,
       statusMessage: error instanceof Error ? error.message : String(error)
