@@ -1,69 +1,95 @@
 <script setup lang="ts">
+import { ProgressSideEnum } from '~/stores/useReaderMenu';
 import Settings from './Settings.vue';
 
-const store = useScrapedReaderStore();
-const settings = useReaderSettingsStore();
-const router = useRouter();
+const root = ref<HTMLElement | null>(null);
+const readerChapter = ref<HTMLElement | null>(null);
+const pageContainer = ref<HTMLElement | null>(null);
+const contentWarningVisible = ref(false);
+
+const readerStore = useReaderStore();
+const menuStore = useReaderMenu();
+const pageManager = useReaderPageManager();
+
+const {
+  currentChapter,
+  chapterLoadError,
+  chapterMeta,
+  currentPageNumber,
+  immersive,
+  manga,
+  showContentWarning,
+  chapterState,
+  immersionBreak
+} = storeToRefs(readerStore);
+
+const {
+  menuOpen,
+  progressSide,
+  viewStyle,
+  readStyle,
+  turnPages,
+  turnPagesByScrolling
+} = storeToRefs(menuStore);
+
+const is404 = computed(() => !!chapterLoadError && chapterLoadError.value?.status === 404 && useReaderPageManager().pageState === 'error404');
+const pageTitle = computed(() => {
+  if (is404.value || chapterLoadError) return '';
+  if (chapterState.value !== 'loaded') return `Loading...`;
+  const chapterLabel = chapterMeta.value.chapterNo ? `Ch. ${chapterMeta.value.chapterNo}` : 'Oneshot';
+  return `${currentPageNumber} | ${chapterLabel} - ${chapterMeta.value.mangaTitle}`;
+});
+
+const router = useRouter()
+const settings = useReaderMenu()
 const overlay = useOverlay();
-const menuOpen = ref(false);
 
 const settingsModal = overlay.create(Settings);
 
-function navigate(direction: "prev" | "next") {
-  if (direction === "next") {
-    if (store.goToNextPage()) return;
-    if (!settings.autoAdvance) return;
-    if (store.nextChapter) {
-      store.goToNextChapter();
-    } else if (store.titleEntry) {
-      return router.push(store.titleEntry);
-    }
-  }
-
-  if (direction === "prev") {
-    if (store.goToPrevPage()) return;
-    if (!settings.autoAdvance) return;
-    if (store.previousChapter) {
-      store.goToPrevChapter();
-    } else if (store.titleEntry) {
-      return router.push(store.titleEntry);
-    }
-  }
-  return router.push({ params: { chapterId: store.currentChapter?.id } })
-}
-
 defineShortcuts({
   arrowleft: () => {
-    navigate("prev")
+    readerStore.incrementPageGroup(-1, router)
   },
   arrowright: () => {
-    navigate("next")
+    readerStore.incrementPageGroup(1, router)
   },
   m: () => {
-    menuOpen.value = !menuOpen.value;
+    settings.toggleMenuOpen()
   },
   i: () => {
-    const fits: ReaderSettings["imageFit"][] = ["fitWidth", "fitHeight", "fitBoth", "noLimit"];
-    const currentIndex = fits.indexOf(settings.imageFit);
-    const nextIndex = (currentIndex + 1) % fits.length;
-    settings.imageFit = fits[nextIndex]!;
+
   },
   g: () => {
     settingsModal.open()
   }
 })
+
+watch([currentChapter, currentPageNumber], () => {
+  document.title = pageTitle.value;
+});
 </script>
-<template v-if="store.currentChapter">
-  <div class="mw--reader-wrap">
-    <div class="mw--reader-chapter" :class="[
-      settings.progressBarPosition === 'left' ? 'left-progress' : '',
-      settings.progressBarPosition === 'right' ? 'right-progress' : '',
+<template>
+  <div ref="root" class="mw--reader-wrap">
+    <div v-if="showContentWarning && contentWarningVisible" class="mw--reader-warning">
+      <h2>Content Warning</h2>
+      <p>{{ manga?.title }} - Chapter contains filtered out content</p>
+      <button @click="router.back()">Back</button>
+      <button @click="contentWarningVisible = false">OK</button>
+    </div>
+
+    <div v-else-if="is404" class="mw--reader-error">
+      Chapter not found
+    </div>
+    <div v-else class="mw--reader-chapter" :class="[
+      settings.progressSide === ProgressSideEnum.Left ? 'left-progress' : '',
+      settings.progressSide === ProgressSideEnum.Right ? 'right-progress' : '',
     ]">
-      <MangaReaderHeader @toggle-menu="menuOpen = !menuOpen" />
-      <MangaReaderContent />
+      <MangaReaderHeader />
+      <!-- <MangaReaderOverlay /> -->
+      <MangaReaderPages />
       <MangaReaderProgressBar />
     </div>
-    <MangaReaderMenu :open="menuOpen" />
+    <!-- <MangaReaderMenu :open="menuOpen" /> -->
   </div>
 </template>
 <style lang="css" scoped>

@@ -198,14 +198,14 @@ export const useReaderPageManager = defineStore("readerPageManager", {
       const img: ManagedImage = {
         fetching: false,
         loaded: false,
-        blobUrl: null,
+        blobUrl: url, //use direct url for now, needs cors proxy if want to use blob
         spread: false,
         pageNum,
-        pageSrc: useProxy().proxyUrl + '/?destination=' +  url,
+        pageSrc: url,
         w: 0,
         h: 0,
         destroy: () => {
-          if (img.blobUrl) URL.revokeObjectURL(img.blobUrl);
+          // if (img.blobUrl) URL.revokeObjectURL(img.blobUrl);
         },
         retry: () => this._performImageFetch(img, false),
         load: () => this._performImageFetch(img) !== false,

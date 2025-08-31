@@ -1,54 +1,188 @@
 <script setup lang="ts">
-const store = useScrapedReaderStore();
-const settings = useReaderSettingsStore();
-const currentPage = computed(() => store.currentPage);
-const totalPages = computed(() => store.totalPages);
+import { ProgressSideEnum, ReadStyleEnum } from '~/stores/useReaderMenu';
+const props = defineProps<{ disabled?: boolean }>();
+
+const pageSlider = ref<HTMLElement | null>(null)
+const sliderBall = ref<HTMLElement | null>(null);
+const isDragging = ref(false);
+const sliderDirection = ref<ProgressSideEnum>(ProgressSideEnum.Bottom);
+const isAnimationDisabled = ref(false);
+
+const reader = useReaderStore()
+const pageManager = useReaderPageManager()
+const settings = useReaderMenu()
+
+const { 
+  setCurrentPageGroup,
+  setCurrentProgress,
+  setScrolling,
+} = reader;
+
+const {
+  chapterMeta,
+  immersionBreak,
+  currentPageGroup,
+  currentProgress,
+  immersive,
+  scrollbarOffset,
+} = storeToRefs(reader);
+
+const {
+  pageState,
+  pageGroups,
+  pages,
+} = storeToRefs(pageManager)
+
+const {
+  readStyle,
+  showPageNumber,
+  progressMode,
+  progressSide,
+  progressHeight
+} = storeToRefs(settings)
+
+const isLoading = computed(() => pageState.value !== 'loaded')
+const isRTL = computed(() => readStyle.value === ReadStyleEnum.RTL)
+const sliderHeight = computed(() => `${progressHeight}px`)
+
+const totalPages = computed(() => pageGroups.value.length ?? 1);
+const currentProgressPercent = computed(() =>
+  currentPageGroup.value + 1
+);
+
+const sliderFraction = ref((currentProgressPercent.value - 1) / Math.max(1, totalPages.value - 1));
+watch([currentProgressPercent, totalPages], ([progress, total]) => {
+  sliderFraction.value = (progress - 1) / Math.max(1, total - 1);
+});
+
+const sliderBallSize = computed(() => `${100 / Math.max(1, totalPages.value)}%`);
+
+const sliderPosition = computed(() => {
+  const totalLength = `calc(100% - ${sliderBallSize.value})`;
+  const halfBall = `calc(${sliderBallSize.value} / 2)`;
+  let fraction = sliderFraction.value;
+
+  fraction = Math.round(fraction * Math.max(0, totalPages.value - 1)) / Math.max(1, totalPages.value - 1);
+  return `calc(${fraction} * ${totalLength} + ${halfBall})`;
+});
+
+const clamp = (val: number, max: number, min: number) => Math.max(min, Math.min(val, max));
+
+const isMouseEvent = (e: MouseEvent | TouchEvent) => !('touches' in e);
+
+const startDrag = (event: MouseEvent | TouchEvent) => {
+  isDragging.value = true;
+  updateSlider(event);
+
+  if (isMouseEvent(event)) {
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('mouseup', stopDrag);
+  } else {
+    window.addEventListener('touchmove', onDrag, { passive: true });
+    window.addEventListener('touchend', stopDrag);
+  }
+};
+
+const onDrag = (event: MouseEvent | TouchEvent) => updateSlider(event);
+
+const stopDrag = () => {
+  isDragging.value = false;
+
+  window.removeEventListener('mousemove', onDrag);
+  window.removeEventListener('mouseup', stopDrag);
+  window.removeEventListener('touchmove', onDrag);
+  window.removeEventListener('touchend', stopDrag);
+};
+
+const updateSlider = (event: MouseEvent | TouchEvent) => {
+  if (!pageSlider.value) return;
+
+  let clientPos: number;
+  if (event instanceof MouseEvent) {
+    clientPos = (readStyle.value === ReadStyleEnum.RTL) ? (pageSlider.value.getBoundingClientRect().right - event.clientX) : event.clientX;
+  } else {
+    const touch = event.touches[0];
+    if (!touch) return;
+    clientPos = (readStyle.value === ReadStyleEnum.RTL) ? (pageSlider.value.getBoundingClientRect().right - touch.clientX) : touch.clientX;
+  }
+
+  const rect = pageSlider.value.getBoundingClientRect();
+  const totalLength = rect.width;
+  let fraction = clamp(clientPos / totalLength, 1, 0);
+
+  if (isRTL.value) fraction = 1 - fraction;
+
+  sliderFraction.value = fraction;
+
+  const newPage = Math.round(fraction * (totalPages.value - 1));
+  if (newPage !== currentPageGroup.value) {
+    setCurrentPageGroup(newPage);
+  }
+};
+
+onMounted(() => window.addEventListener('blur', stopDrag));
+onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
 </script>
 
 <template>
   <div class="reader-progress-wrap mw--reader-progress" :class="[
-    settings.progressBarStyle === 'normal' ? 'normal' : '',
-    settings.progressBarPosition === 'left' ? 'side left' : '',
-    settings.progressBarPosition === 'right' ? 'side right' : ''
+    {
+      'no-anim': isAnimationDisabled,
+      break: immersionBreak || isDragging,
+      'show-num': showPageNumber
+    },
+    settings.progressSide === ProgressSideEnum.Bottom ? 'normal' : '',
+    settings.progressSide === ProgressSideEnum.Left ? 'side left' : '',
+    settings.progressSide === ProgressSideEnum.Right ? 'side right' : ''
   ]" :style="{
-    '--progress-bar-size': `${settings.progressBarSize}px`,
-    '--slider-ball-left': `calc(${currentPage} * (100% - var(--divider-width)) / max(${totalPages - 1}, 1) + var(--divider-width)/2)`,
+    bottom: `${scrollbarOffset ?? 0}px`,
+    '--progress-bar-size': `${settings.progressHeight}px`,
+    '--slider-ball-left': `calc(${currentPageGroup} * (100% - var(--divider-width)) / max(${totalPages}, 1) + var(--divider-width)/2)`,
     '--slider-borderhuh': '1px',
     '--divider-width': `${100 / totalPages}%`
   }">
-    <div class="progress-wrap">
+    <div class="progress-wrap" :class="{ active: isDragging, rtl: isRTL }">
       <div class="page-number">
-        {{ currentPage + 1 }}
+        <span>{{isLoading ? '?' : pageGroups[currentPageGroup]!.map(p => p.pageNum).join('-')}}</span>
       </div>
-      <div class="page-slider mx-2">
-        <div id="slider-ball" :class="{
-          'side left': settings.progressBarPosition === 'left',
-          'side right': settings.progressBarPosition === 'right'
+      <div class="page-slider" :class="{
+        rtl: isRTL,
+        disabled: props.disabled || isLoading,
+        'mx-2': progressSide === ProgressSideEnum.Bottom,
+        'my-2': progressSide !== ProgressSideEnum.Bottom,
+      }" ref="pageSlider" @mousedown.prevent.stop="startDrag" @touchstart.prevent.stop="startDrag">
+        <div id="slider-ball" ref="sliderBall" :class="{
+          rtl: isRTL,
+          'side left': settings.progressSide === ProgressSideEnum.Left,
+          'side right': settings.progressSide === ProgressSideEnum.Right
+        }" :style="{ left: sliderPosition }">
+          <div class="slider-ball-tooltip" v-if="isDragging" :class="{
+            'side left': settings.progressSide === ProgressSideEnum.Left,
+            'side right': settings.progressSide === ProgressSideEnum.Right
+          }">
+            {{isLoading ? '?' : pageGroups[currentPageGroup]!.map(p => p.pageNum).join('-')}}
+          </div>
+        </div>
+        <div v-if="totalPages > 1 && !isLoading" class="slider-dividers" :class="{
+          'side left': settings.progressSide === ProgressSideEnum.Left,
+          'side right': settings.progressSide === ProgressSideEnum.Right
         }">
-          <div class="slider-ball-tooltip" :class="{
-            'side left': settings.progressBarPosition === 'left',
-            'side right': settings.progressBarPosition === 'right'
-          }" style="display: none;">
-            {{ currentPage + 1 }}
+          <div v-for="(group, idx) in pageGroups" :key="idx" class="prog-divider" :class="{
+            loaded: group.some(p => p.loaded),
+            read: currentPageGroup >= idx,
+            rtl: isRTL,
+            current: currentPageGroup === idx,
+            'side left': settings.progressSide === ProgressSideEnum.Left,
+            'side right': settings.progressSide === ProgressSideEnum.Right
+          }">
+            <div class="prog-divider-label" :class="{
+              current: currentPageGroup === idx
+            }">{{group.map(p => p.pageNum).join('-')}}</div>
           </div>
         </div>
-        <div class="slider-dividers" :class="{
-          'side left': settings.progressBarPosition === 'left',
-          'side right': settings.progressBarPosition === 'right'
-        }" v-if="totalPages > 1">
-          <div v-for="i in totalPages" :key=i class="prog-divider loaded" :class="{
-            read: i - 1 <= currentPage,
-            current: i - 1 === currentPage,
-            'side left': settings.progressBarPosition === 'left',
-            'side right': settings.progressBarPosition === 'right'
-          }" @click="store.currentPage = i - 1">
-            <div class="prog-divider-label">{{ i }}</div>
-          </div>
-        </div>
+        <div class="slider-loading" v-if="isLoading"></div>
       </div>
-      <div class="page-number">
-        {{ totalPages }}
-      </div>
+      <div class="page-number">{{ isLoading ? '?' : pages.length }}</div>
     </div>
   </div>
 </template>
