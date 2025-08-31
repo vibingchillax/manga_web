@@ -1,18 +1,18 @@
 <script setup lang="ts">
+import PageSelector from './PageSelector.vue';
+import ChapterSelector from './ChapterSelector.vue';
+import Options from './Options.vue';
+
 const reader = useReaderStore()
 const settings = storeToRefs(useReaderMenu())
-
-const emit = defineEmits<{ (e: 'update:modelValue', value: boolean): false }>();
-
-function close() {
-  emit('update:modelValue', false);
-}
 
 </script>
 <template>
   <div class="mw--reader-menu">
-    <div class="reader--menu pinned header-hidden" :class="{ open: settings.menuOpen }">
+    <div class="reader--menu pinned header-hidden" :class="{ open: settings.menuOpen.value }">
       <div class="flex justify-between -mx-2 -mt-2">
+        <Icon class="custom-opacity relative md-btn flex items-center overflow-hidden accent text rounded-full !px-0"
+          name="i-lucide-x" @click="settings.menuOpen.value = !settings.menuOpen.value" />
       </div>
       <div class="flex flex-col gap-y-2 mb-2 md:mb-4">
         <div class="flex">
@@ -24,16 +24,8 @@ function close() {
           {{ reader.chapterMeta.chapterTitle }}
         </div>
       </div>
-      <div class="flex">
-        <!-- <UButton icon="i-lucide-arrow-left" @click="store.goToPrevPage()"></UButton>
-        <USelect v-model="store.currentPage" :items="pagesList">
-        </USelect>
-        <UButton icon="i-lucide-arrow-right" @click="store.goToNextPage()"></UButton> -->
-      </div>
-      <div id="chapter-selector" class="flex">
-        <!-- <UButton icon="i-lucide-arrow-left" @click="store.goToPrevChapter()"></UButton>
-        <UButton icon="i-lucide-arrow-right" @click="store.goToNextChapter()"></UButton> -->
-      </div>
+      <PageSelector />
+      <ChapterSelector />
       <hr class="border-1 border-accent-20 !my-2 md:!my-4">
       <div class="flex flex-col gap-y-2">
         <div class="font-medium">Uploaded By</div>
@@ -48,9 +40,7 @@ function close() {
         </div>
       </div>
       <hr class="border-1 border-accent-20 !my-2 md:!my-4">
-      <div class="flex flex-col gap-2">
-
-      </div>
+      <Options />
     </div>
   </div>
   <div id="reader-menu-attach"></div>

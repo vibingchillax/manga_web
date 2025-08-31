@@ -14,9 +14,9 @@ const {
 
 const containerStyles = computed(() => {
   return {
-    paddingTop: `calc(${lockOffset}px + var(--header-padding))`,
-    marginTop: `calc(-${lockOffset}px - var(--header-padding))`,
-    marginBottom: `${longStripMargin}px`
+    paddingTop: `calc(${lockOffset.value}px + var(--header-padding))`,
+    marginTop: `calc(-${lockOffset.value}px - var(--header-padding))`,
+    marginBottom: `${longStripMargin.value}px`
   };
 
 });
@@ -31,15 +31,15 @@ const pageClasses = computed(() => {
     case ViewStyleEnum.DoublePage: classes += 'dp '; break;
   }
 
-  if (limitWidth) classes += 'limit-width ';
-  if (limitHeight) classes += 'limit-height ';
-  if (growPages) classes += 'grow-pages';
+  if (limitWidth.value) classes += 'limit-width ';
+  if (limitHeight.value) classes += 'limit-height ';
+  if (growPages.value) classes += 'grow-pages';
 
   return classes.trim();
 });
 
 const imageStyles = computed(() => {
-  if (limitHeight && limitMaxHeight) {
+  if (limitHeight.value && limitMaxHeight.value) {
     return { maxHeight: maxHeightPixels.value, minHeight: '0' };
   }
   return {};

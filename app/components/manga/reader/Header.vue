@@ -23,11 +23,10 @@ const toggleImmersive = () => {
 const skeletonWidth1 = 50 + Math.round(Math.random() * 30) + '%';
 const skeletonWidth2 = 30 + Math.round(Math.random() * 20) + '%';
 
-// const showHeader = computed(() => (!immersive) && true);
-const showHeader = true;
+const showHeader = computed(() => !immersive.value);
 const hideHeader = computed(() => chapterState.value !== "loaded" ? false : !immersionBreak && (!atTop || viewStyle.value !== ViewStyleEnum.LongStrip));
 
-const { pageItems } = storeToRefs(pageManager);
+const { pages, pageItems } = storeToRefs(pageManager);
 </script>
 
 <template>
@@ -56,7 +55,7 @@ const { pageItems } = storeToRefs(pageManager);
       <div v-else class="reader--meta chapter"></div>
       <div v-if="chapterState === 'waiting'" class="reader--meta page"></div>
       <div v-else-if="chapterState === 'loaded' && pageItems.length > 0" class="reader--meta page">
-        Pg. {{ pageItems[currentPageGroup]?.text ?? '?' }} / {{ pageItems.length ?? '?' }}
+        Pg. {{ pageItems[currentPageGroup]?.text ?? '?' }} / {{ pages.length ?? '?' }}
       </div>
       <div v-else class="reader--meta page">No Pages</div>
       <div class="reader--meta menu" @click="settings.toggleMenuOpen()">

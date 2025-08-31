@@ -1,49 +1,3 @@
-const viewStyles = [
-  { name: "Single Page", icon: "page" },
-  { name: "Double Page", icon: "bookOpen" },
-  { name: "Long Strip", icon: "longStrip" },
-  { name: "Wide Strip", icon: "wideStrip" },
-];
-
-const readStyles = [
-  { name: "Left To Right", icon: "arrowRightCircle" },
-  { name: "Right To Left", icon: "arrowLeftCircle" },
-];
-
-const sizeModes = [
-  [
-    { name: "No Limit", icon: "cancel" },
-    { name: "Fit Height", icon: "arrowUpDown" },
-  ],
-  [
-    { name: "Fit Width", icon: "arrowLeftRight" },
-    { name: "Fit Both", icon: "arrowExpandAll" },
-  ],
-];
-
-const headerStyles = [
-  { name: "Header Hidden", icon: "headerHidden" },
-  { name: "Header Shown", icon: "header" },
-];
-
-const progressModes = [
-  { name: "Progress Hidden", icon: "progressHidden" },
-  { name: "Progress Lightbar", icon: "progressLightbar" },
-  { name: "Normal Progress", icon: "progressNormal" },
-];
-
-const progressSides = [
-  { name: "Bottom", icon: "chevronUp" },
-  { name: "Left", icon: "chevronRight" },
-  { name: "Right", icon: "chevronLeft" },
-];
-
-const cursorHints = [
-  { name: "None", icon: "cancel" },
-  { name: "Overlay", icon: "overlay" },
-  { name: "Cursor", icon: "mousePointer" },
-];
-
 const defaultKeys = {
   toggleMenu: ["KeyM:0"],
   pageForward: ["ArrowRight:0", "KeyD:0", "Numpad6:0"],
@@ -60,25 +14,6 @@ const defaultKeys = {
 const defaultScrollLock = { width: true, height: true, none: true };
 const defaultLongStripMargin = 4;
 
-export const settings = {
-  viewStyle: viewStyles,
-  readStyle: readStyles,
-  sizeMode: sizeModes,
-  headerStyle: headerStyles,
-  progressMode: progressModes,
-  progressSide: progressSides,
-  cursorHint: cursorHints,
-}
-
-const stateKeyMap = {
-  viewStyle: "_viewStyle",
-  readStyle: "readStyle",
-  headerStyle: "headerStyle",
-  progressMode: "_progressMode",
-  progressSide: "_progressSide",
-  cursorHint: "cursorHint",
-} as const;
-
 export enum ViewStyleEnum { SinglePage, DoublePage, LongStrip, WideStrip }
 export enum ReadStyleEnum { LTR, RTL }
 export enum HeaderStyleEnum { Hidden, Shown }
@@ -89,6 +24,61 @@ export enum TurnPagesEnum { Directional, None }
 export enum TurnPagesByScrollingEnum { Disabled, Enabled }
 export enum HistoryModeEnum { Both, ChaptersOnly, PagesOnly }
 
+export const viewStyles = [
+  { label: "Single Page", value: ViewStyleEnum.SinglePage, icon: "i-lucide-sticky-note" },
+  { label: "Double Page", value: ViewStyleEnum.DoublePage, icon: "i-lucide-book-open" },
+  { label: "Long Strip", value: ViewStyleEnum.LongStrip, icon: "i-lucide-stretch-horizontal" },
+  { label: "Wide Strip", value: ViewStyleEnum.WideStrip, icon: "i-lucide-stretch-vertical" },
+];
+
+export const readStyles = [
+  { label: "Left To Right", value: ReadStyleEnum.LTR, icon: "i-lucide-circle-arrow-right" },
+  { label: "Right To Left", value: ReadStyleEnum.RTL, icon: "i-lucide-circle-arrow-left" },
+];
+
+export const sizeModes = [
+  [
+    { name: "No Limit", icon: "i-lucide-ban" },
+    { name: "Fit Height", icon: "i-lucide-move-vertical" },
+  ],
+  [
+    { name: "Fit Width", icon: "i-lucide-move-horizontal" },
+    { name: "Fit Both", icon: "i-lucide-expand" },
+  ],
+];
+
+export const headerStyles = [
+  { label: "Header Hidden", value: HeaderStyleEnum.Hidden, icon: "i-lucide-square" },
+  { label: "Header Shown", value: HeaderStyleEnum.Shown, icon: "i-lucide-panel-top" },
+];
+
+export const progressModes = [
+  { label: "Progress Hidden", value: ProgressModeEnum.None, icon: "i-lucide-minus" },
+  { label: "Progress Lightbar", value: ProgressModeEnum.LightBar, icon: "progressLightbar" },
+  { label: "Normal Progress", value: ProgressModeEnum.Normal, icon: "i-lucide-align-vertical-space-around" },
+];
+
+export const progressSides = [
+  { label: "Bottom", value: ProgressSideEnum.Bottom, icon: "i-lucide-chevron-down" },
+  { label: "Left", value: ProgressSideEnum.Left, icon: "i-lucide-chevron-left" },
+  { label: "Right", value: ProgressSideEnum.Right, icon: "i-lucide-chevron-right" },
+];
+
+export const cursorHints = [
+  { label: "None", value: CursorHintsEnum.None, icon: "i-lucide-ban" },
+  { label: "Overlay", value: CursorHintsEnum.Overlay, icon: "overlay" },
+  { label: "Cursor", value: CursorHintsEnum.Cursor, icon: "i-lucide-mouse-pointer" },
+];
+
+const settings = {
+  viewStyle: viewStyles,
+  readStyle: readStyles,
+  sizeMode: sizeModes,
+  headerStyle: headerStyles,
+  progressMode: progressModes,
+  progressSide: progressSides,
+  cursorHint: cursorHints,
+}
 // --- State Interface ---
 export interface ReaderMenuState {
   readStyle: ReadStyleEnum;
@@ -246,8 +236,8 @@ export const useReaderMenu = defineStore("readerMenu", {
     readStyleLabel: (state) => readStyles[state.readStyle],
     viewStyleLabel: (state) => viewStyles[state._viewStyle],
     headerStyleLabel: (state) => headerStyles[state.headerStyle],
-    progressSide: (state) => useNuxtApp().$isMobileApp ? ProgressSideEnum.Bottom : state._progressSide,
-    progressMode: (state) => useNuxtApp().$isMobileApp ? ProgressModeEnum.None : state._progressMode,
+    progressSide: (state) => state._progressSide,
+    progressMode: (state) => state._progressMode,
     progressModeLabel: (state) => progressModes[state._progressMode],
     progressSideLabel: (state) => progressSides[state._progressSide],
     sizeModeLabel: (state) => settings.sizeMode[+state._limitWidth]?.[+state._limitHeight],

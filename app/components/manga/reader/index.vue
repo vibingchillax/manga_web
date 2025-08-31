@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ProgressSideEnum } from '~/stores/useReaderMenu';
-import Settings from './Settings.vue';
 
 const root = ref<HTMLElement | null>(null);
 const readerChapter = ref<HTMLElement | null>(null);
@@ -42,9 +41,6 @@ const pageTitle = computed(() => {
 
 const router = useRouter()
 const settings = useReaderMenu()
-const overlay = useOverlay();
-
-const settingsModal = overlay.create(Settings);
 
 defineShortcuts({
   arrowleft: () => {
@@ -54,14 +50,8 @@ defineShortcuts({
     readerStore.incrementPageGroup(1, router)
   },
   m: () => {
-    settings.toggleMenuOpen()
+    menuOpen.value = !menuOpen.value
   },
-  i: () => {
-
-  },
-  g: () => {
-    settingsModal.open()
-  }
 })
 
 watch([currentChapter, currentPageNumber], () => {
@@ -89,7 +79,7 @@ watch([currentChapter, currentPageNumber], () => {
       <MangaReaderPages />
       <MangaReaderProgressBar />
     </div>
-    <!-- <MangaReaderMenu :open="menuOpen" /> -->
+    <MangaReaderMenu />
   </div>
 </template>
 <style lang="css" scoped>

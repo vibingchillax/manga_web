@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ProgressSideEnum, ReadStyleEnum } from '~/stores/useReaderMenu';
+import { ProgressModeEnum, ProgressSideEnum, ReadStyleEnum } from '~/stores/useReaderMenu';
 const props = defineProps<{ disabled?: boolean }>();
 
 const pageSlider = ref<HTMLElement | null>(null)
@@ -12,7 +12,7 @@ const reader = useReaderStore()
 const pageManager = useReaderPageManager()
 const settings = useReaderMenu()
 
-const { 
+const {
   setCurrentPageGroup,
   setCurrentProgress,
   setScrolling,
@@ -125,15 +125,18 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
 </script>
 
 <template>
-  <div class="reader-progress-wrap mw--reader-progress" :class="[
+  <div class="reader-progress-wrap" :class="[
+    'mw--reader-progress',
+    {
+      'normal': progressMode === ProgressModeEnum.Normal,
+      'side left': progressSide === ProgressSideEnum.Left,
+      'side right': progressSide === ProgressSideEnum.Right
+    },
     {
       'no-anim': isAnimationDisabled,
       break: immersionBreak || isDragging,
       'show-num': showPageNumber
     },
-    settings.progressSide === ProgressSideEnum.Bottom ? 'normal' : '',
-    settings.progressSide === ProgressSideEnum.Left ? 'side left' : '',
-    settings.progressSide === ProgressSideEnum.Right ? 'side right' : ''
   ]" :style="{
     bottom: `${scrollbarOffset ?? 0}px`,
     '--progress-bar-size': `${settings.progressHeight}px`,
@@ -153,17 +156,18 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
       }" ref="pageSlider" @mousedown.prevent.stop="startDrag" @touchstart.prevent.stop="startDrag">
         <div id="slider-ball" ref="sliderBall" :class="{
           rtl: isRTL,
-          'side left': settings.progressSide === ProgressSideEnum.Left,
-          'side right': settings.progressSide === ProgressSideEnum.Right
+          'side left': progressSide === ProgressSideEnum.Left,
+          'side right': progressSide === ProgressSideEnum.Right
         }" :style="{ left: sliderPosition }">
           <div class="slider-ball-tooltip" v-if="isDragging" :class="{
-            'side left': settings.progressSide === ProgressSideEnum.Left,
-            'side right': settings.progressSide === ProgressSideEnum.Right
+            'side left': progressSide === ProgressSideEnum.Left,
+            'side right': progressSide === ProgressSideEnum.Right
           }">
             {{isLoading ? '?' : pageGroups[currentPageGroup]!.map(p => p.pageNum).join('-')}}
           </div>
         </div>
         <div v-if="totalPages > 1 && !isLoading" class="slider-dividers" :class="{
+          'rtl': isRTL,
           'side left': settings.progressSide === ProgressSideEnum.Left,
           'side right': settings.progressSide === ProgressSideEnum.Right
         }">
@@ -172,8 +176,8 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
             read: currentPageGroup >= idx,
             rtl: isRTL,
             current: currentPageGroup === idx,
-            'side left': settings.progressSide === ProgressSideEnum.Left,
-            'side right': settings.progressSide === ProgressSideEnum.Right
+            'side left': progressSide === ProgressSideEnum.Left,
+            'side right': progressSide === ProgressSideEnum.Right
           }">
             <div class="prog-divider-label" :class="{
               current: currentPageGroup === idx
