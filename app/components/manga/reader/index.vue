@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import { ProgressSideEnum } from '~/stores/useReaderMenu';
+import type { MangaReaderPages } from '#components';
+import { ProgressSideEnum, ReadStyleEnum, TurnPagesEnum } from '~/stores/useReaderMenu';
 
 const root = ref<HTMLElement | null>(null);
 const readerChapter = ref<HTMLElement | null>(null);
-const pageContainer = ref<HTMLElement | null>(null);
+const pageContainer = ref<InstanceType<typeof MangaReaderPages> | null>(null);
+
+const hasInteracted = ref(false);
 const contentWarningVisible = ref(false);
 
-const readerStore = useReaderStore();
-const menuStore = useReaderMenu();
+const reader = useReaderStore();
+const settings = useReaderMenu();
 const pageManager = useReaderPageManager();
+
+const router = useRouter()
 
 const {
   currentChapter,
@@ -20,16 +25,18 @@ const {
   showContentWarning,
   chapterState,
   immersionBreak
-} = storeToRefs(readerStore);
+} = storeToRefs(reader);
 
 const {
   menuOpen,
+  menuPinned,
+  immersiveTap,
   progressSide,
   viewStyle,
   readStyle,
   turnPages,
   turnPagesByScrolling
-} = storeToRefs(menuStore);
+} = storeToRefs(settings);
 
 const is404 = computed(() => !!chapterLoadError && chapterLoadError.value?.status === 404 && useReaderPageManager().pageState === 'error404');
 const pageTitle = computed(() => {
@@ -39,15 +46,88 @@ const pageTitle = computed(() => {
   return `${currentPageNumber} | ${chapterLabel} - ${chapterMeta.value.mangaTitle}`;
 });
 
-const router = useRouter()
-const settings = useReaderMenu()
+function handleClick(e: MouseEvent, isDouble = false) {
+  const noPageTurn = turnPages.value === TurnPagesEnum.None;
+
+  if (
+    menuOpen.value && //  vvvvvv breakpoints.md & immersive
+    (!menuPinned.value || immersive.value)
+  ) {
+    settings.setMenuOpen(false);
+    return;
+  }
+
+  const container = pageContainer.value?.$el;
+  if (!container) return;
+
+  const rect = container.getBoundingClientRect();
+  const relativeX = (e.clientX - rect.left) / rect.width;
+
+  const inLeftZone = relativeX < 0.33;
+  const inRightZone = relativeX > 0.66;
+
+  if (isDouble) {
+    // vvv isMobileApp
+    if ((noPageTurn || (!inLeftZone && !inRightZone)) && immersiveTap) {
+      reader.toggleImmersive();
+    }
+    return;
+  }
+
+  if ((!inLeftZone && !inRightZone) || noPageTurn) {
+    if (
+      immersive.value
+      // ||        // already immersive
+      // !$breakpoints.sm ||          // not on small screen
+      // $isMobileApp                 // or in mobile app
+    ) {
+      // Break immersion
+      reader.toggleImmersionBreak();
+    } else {
+      // Toggle menu instead
+      settings.toggleMenuOpen();
+      e.stopPropagation();
+    }
+  } else {
+    // Clicked **left or right zone**
+    // if ($isMobileApp) {
+    //   // Mobile special handling: break immersion if needed
+    //   settings.setImmersionBreak(false);
+    // }
+
+    if (turnPages.value === TurnPagesEnum.Directional) { //forward only?
+      // Only go forward (webtoon style)
+      // if (reader.isWebtoon) scrollByAmount(1);
+      // else pageManager.incrementPageGroup(1, router, true);
+      // } else {
+      // Normal left/right page turning
+      reader.setIsClickFromPage(true);
+      // if (reader.isWebtoon) {
+      //   const direction =
+      //     (inRightZone ? 1 : -1) * (readStyle.value === ReadStyleEnum.LTR ? 1 : -1);
+      //   scrollByAmount(direction);
+      // } else {
+      reader.incrementPageGroup(inRightZone ? 1 : -1, router);
+      // }
+    }
+  }
+}
+
+/**
+ * Scroll by fixed amount (for webtoon mode).
+ */
+// function scrollByAmount(direction: number) {
+//   const step = reader.isWebtoon ? window.innerHeight : 200;
+//   window.scrollBy({ top: direction * step, behavior: "smooth" });
+// }
+
 
 defineShortcuts({
-  arrowleft: () => {
-    readerStore.incrementPageGroup(-1, router)
+  arrowleft: () => { //todo, use keybinds
+    reader.incrementPageGroup(-1, router)
   },
   arrowright: () => {
-    readerStore.incrementPageGroup(1, router)
+    reader.incrementPageGroup(1, router)
   },
   m: () => {
     menuOpen.value = !menuOpen.value
@@ -70,13 +150,13 @@ watch([currentChapter, currentPageNumber], () => {
     <div v-else-if="is404" class="mw--reader-error">
       Chapter not found
     </div>
-    <div v-else class="mw--reader-chapter" :class="[
+    <div v-else class="mw--reader-chapter" ref="readerChapter" @scroll="" :class="[
       settings.progressSide === ProgressSideEnum.Left ? 'left-progress' : '',
       settings.progressSide === ProgressSideEnum.Right ? 'right-progress' : '',
     ]">
       <MangaReaderHeader />
       <!-- <MangaReaderOverlay /> -->
-      <MangaReaderPages />
+      <MangaReaderPages ref="pageContainer" @click="handleClick"/>
       <MangaReaderProgressBar />
     </div>
     <MangaReaderMenu />
