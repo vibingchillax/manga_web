@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { scrapedChapters } from '~~/shared/prisma/client';
 
-const props = defineProps<{ chapter: scrapedChapters, mangaTitle: string }>();
+const props = defineProps<{ chapter: scrapedChapters }>();
 const chapterUrl = `/chapter/scraped/${props.chapter.id}`;
 
 function isValidDate(date: string | null) {

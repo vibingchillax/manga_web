@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { scrapedChapters } from '~~/shared/prisma/client';
 import ChapterEntry from './ChapterEntry.vue';
-defineProps<{ volume: string, chapters: scrapedChapters[], mangaTitle: string }>();
+defineProps<{ volume: string, chapters: scrapedChapters[] }>();
 
 const isOpen = ref(true);
 const toggle = () => {
@@ -26,7 +26,7 @@ const toggle = () => {
     <Transition enter-active-class="transition-max-height duration-300 ease-out"
       leave-active-class="transition-max-height duration-300 ease-in">
       <div v-show="isOpen" class="rounded flex flex-col gap-2" style="height: auto;">
-        <ChapterEntry v-for="chapter in chapters" :chapter="chapter" :mangaTitle="mangaTitle" />
+        <ChapterEntry v-for="chapter in chapters" :chapter="chapter" />
       </div>
     </Transition>
   </div>

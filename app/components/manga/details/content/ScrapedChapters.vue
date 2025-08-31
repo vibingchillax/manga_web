@@ -127,8 +127,7 @@ const groupedChapters = computed(() => {
     <div class="flex-grow">
       <UProgress v-if="loading" v-model="progressValue" :max="['Fetching mangas...', 'Fetching chapters...']" />
       <div v-if="!loading && hasFetched && scrapedChapters.length > 0">
-        <ChaptersList v-for="([vol, chapters]) in groupedChapters" :key="vol" :volume="vol" :chapters="chapters"
-          :mangaTitle="title" />
+        <ChaptersList v-for="([vol, chapters]) in groupedChapters" :key="vol" :volume="vol" :chapters="chapters" />
       </div>
     </div>
   </div>
