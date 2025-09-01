@@ -58,7 +58,7 @@ const imageStyles = computed(() => {
   </div>
 
   <div v-else-if="managedImage.fetching"
-    class="flex justify-center items-center p-2 text-primary overflow-hidden w-full">
+    class="flex justify-center items-center p-2 text-primary overflow-hidden w-full" v-show="show">
     Loading...
     <!-- <LoadingSpinner size="5rem" /> -->
   </div>
