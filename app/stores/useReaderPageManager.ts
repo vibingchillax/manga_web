@@ -195,7 +195,7 @@ export const useReaderPageManager = defineStore("readerPageManager", {
       );
     },
     _constructManagedImage(url: string, pageNum: string): ManagedImage {
-      const img: ManagedImage = {
+      const img: ManagedImage = reactive({
         fetching: false,
         loaded: false,
         blobUrl: url, //use direct url for now, needs cors proxy if want to use blob
@@ -209,7 +209,7 @@ export const useReaderPageManager = defineStore("readerPageManager", {
         },
         retry: () => this._performImageFetch(img, false),
         load: () => this._performImageFetch(img) !== false,
-      };
+      });
       return img;
     },
 
