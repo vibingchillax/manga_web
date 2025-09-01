@@ -47,7 +47,7 @@ const dynamicPageClasses = computed(() => {
 
 const dimPagesFilter = computed(() => {
   // if (dimPages) return dimWithDark ? (theme.dark ? `brightness(${1 - pageDim})` : undefined) : `brightness(${1 - pageDim})`;
-  if (dimPages) return `brightness(${1 - pageDim.value})`;
+  if (dimPages.value) return `brightness(${1 - pageDim.value})`;
 });
 
 // const visiblePageInGroup = (idx: number) => {
