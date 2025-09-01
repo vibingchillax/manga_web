@@ -246,8 +246,8 @@ export const useReaderMenu = defineStore("readerMenu", {
     limitHeight: (state) => state._limitHeight,
     longStripMargin: (state) => state._longStripMargin,
     scrollLock: (state) => state._scrollLock,
-    shouldAutoScroll() {
-      this.scrollLock.width && this.limitWidth || this.scrollLock.height && this.limitHeight || this.scrollLock.none && !(this.limitHeight || this.limitWidth) || this.viewStyle === ViewStyleEnum.LongStrip || this.viewStyle === ViewStyleEnum.WideStrip
+    shouldAutoScroll(state): boolean {
+      return this.scrollLock.width && this.limitWidth || this.scrollLock.height && this.limitHeight || this.scrollLock.none && !(this.limitHeight || this.limitWidth) || this.viewStyle === ViewStyleEnum.LongStrip || this.viewStyle === ViewStyleEnum.WideStrip
     },
     growPages: (state) => state._growPages && (state._limitWidth || state._limitHeight),
     maxWidthPixels(state) {

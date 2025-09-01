@@ -24,24 +24,28 @@ const { pageGroups, pageItems } = storeToRefs(pageManager)
 
 const rootEl = ref<HTMLElement | null>(null)
 const pagesEl = ref<HTMLElement | null>(null)
-const pageRefs = ref<any[][]>([]) //?!
+const pageRefs = ref<InstanceType<typeof ManagedImage>[][]>([])
 const isAutoScrolling = ref(false)
 const scrollBlock = ref(false)
 const zoomTarget = ref<HTMLElement | null>(null)
 const pageHeight = ref(0);
-const scrollBaseline = ref<number | null>(null)
+const lastScrollY = ref<number | null>(null)
 
 const updateViewportHeight = () => {
   pageHeight.value = window.innerHeight
 }
 
-const resetScrollBaseline = () => {
-  scrollBaseline.value = null
+const resetScroll = () => {
+  lastScrollY.value = null
 }
+
+const scrollToTop = () => {
+  pagesEl?.value?.scrollIntoView({ behavior: "smooth" });
+};
 
 const dynamicPageClasses = computed(() => {
   let classes = '';
-  if (limitWidth || growPages) classes += 'w-full ';
+  if (limitWidth.value || growPages.value) classes += 'w-full ';
   return classes.trim();
 });
 
@@ -50,108 +54,105 @@ const dimPagesFilter = computed(() => {
   if (dimPages.value) return `brightness(${1 - pageDim.value})`;
 });
 
-// const visiblePageInGroup = (idx: number) => {
-//   const group = pageRefs.value[idx]
-//   if (!group || !group.length) return
-//   return group.reduce((biggest, cmp) => {
-//     const h = cmp?.$el.getBoundingClientRect().height ?? 0
-//     const bh = biggest?.$el.getBoundingClientRect().height ?? 0
-//     return h > bh ? cmp : biggest
-//   })
-// }
+const visiblePageInGroup = (idx: number) => {
+  const group = pageRefs.value[idx]
+  if (!group || !group.length) return
+  return group.reduce((biggest, cmp) => {
+    const h = cmp?.$el.getBoundingClientRect().height ?? 0
+    const bh = biggest?.$el.getBoundingClientRect().height ?? 0
+    return h > bh ? cmp : biggest
+  })
+}
 
-// const calcLongStripProgress = () => {
-//   let offset = 0
-//   let containerHeight = pagesEl.value?.getBoundingClientRect().height ?? 0
+const calcLongStripProgress = () => {
+  const container = pagesEl.value;
+  if (!container) return 0;
+  let totalHeight = container.getBoundingClientRect().height
+  const lastEl = visiblePageInGroup(pageGroups.value.length - 1)
+  if (lastEl) totalHeight -= lastEl.$el.getBoundingClientRect().height
+  if (totalHeight === 0) return 0
 
-//   const lastVisible = visiblePageInGroup(pageGroups.value.length - 1)
-//   if (lastVisible) {
-//     containerHeight -= lastVisible.$el.getBoundingClientRect().height
-//   }
-//   if (containerHeight === 0) return 0
+  let accumulatedHeight = 0
+  for (let i = 0; i < pageGroups.value.length; i++) {
+    const groupEl = visiblePageInGroup(i)
+    if (!groupEl) continue
+    const { top, height } = groupEl.$el.getBoundingClientRect()
+    const ratio = accumulatedHeight / totalHeight
+    const viewportHeight = window.innerHeight * ratio
+    accumulatedHeight += height
+    if (top >= 0 && top <= viewportHeight) return i
+    if (top >= viewportHeight) return i - 1
+  }
+  return pageGroups.value.length - 1
+  // let currentIndex = 0;
 
-//   for (let i = 0; i < pageGroups.value.length; i++) {
-//     const cmp = visiblePageInGroup(i)
-//     if (!cmp) continue
+  // for (let i = 0; i < pageRefs.value.length; i++) {
+  //   const page = visiblePageInGroup(i);
+  //   if (!page) continue;
 
-//     const rect = cmp.$el.getBoundingClientRect()
-//     const ratio = offset / containerHeight
-//     const cutoff = window.innerHeight * ratio
+  //   const rect = page.$el.getBoundingClientRect();
+  //   if (rect.top <= window.innerHeight * 0.5) {
+  //     currentIndex = i;
+  //   } else {
+  //     break;
+  //   }
+  // }
+  // return currentIndex;
+}
 
-//     if (rect.top >= 0 && rect.top <= cutoff) return i
-//     if (rect.top >= cutoff) return i - 1
+function handleScroll(e?: Event) {
+  if (scrolling.value) return
+  const container = pagesEl.value;
+  if (!container) return;
 
-//     offset += rect.height
-//   }
-//   return pageGroups.value.length - 1
-// }
+  const rect = container.getBoundingClientRect()
 
-// const handleScroll = (evt: Event) => {
-//   // handleImmersiveScroll(evt)
-//   if (scrolling.value) return
+  if (container.scrollWidth > container.clientWidth) {
+    setScrollbarOffset(Math.min(Math.round(rect.bottom - (container.offsetHeight - container.clientHeight) - window.innerHeight), 0))
+  } else {
+    setScrollbarOffset(0)
+  }
 
-//   const el = pagesEl.value
-//   if (!el) return
+  if (viewStyle.value === ViewStyleEnum.LongStrip) {
+    const scrollTop = Math.max(-(rect.top - Math.min(window.scrollY - rect.top, 0)), 0);
+    const totalHeight = Math.max(rect.height - window.innerHeight, 1);
+    setCurrentProgress(Math.max(0, Math.min(1, scrollTop / totalHeight)));
 
-//   const rect = el.getBoundingClientRect()
-//   if (el.scrollWidth > el.clientWidth) {
-//     setScrollbarOffset(Math.min(Math.round(rect.bottom - (el.offsetHeight - el.clientHeight) - window.innerHeight), 0))
-//   } else {
-//     setScrollbarOffset(0)
-//   }
+    const pageIndex = calcLongStripProgress();
+    if (pageIndex !== currentPageGroup.value) {
+      scrollBlock.value = true; //i dont know why this is here
+      setCurrentPageGroup(Math.max(0, pageIndex));
+    }
+  }
+  // const scrollTop = container.scrollTop;
+  // const scrollHeight = container.scrollHeight - container.clientHeight;
+  // reader.setCurrentProgress(Math.max(0, Math.min(1, scrollTop / scrollHeight)));
 
-//   if (viewStyle.value === ViewStyleEnum.LongStrip) {
-//     const scrolled = Math.max(-(rect.top - Math.min(window.scrollY - rect.top, 0)), 0)
-//     const maxScroll = Math.max(rect.height - window.innerHeight, 1)
-//     const progress = scrolled / maxScroll
-//     setCurrentProgress(Math.max(0, Math.min(1, progress)))
+  // const currentPage = calcLongStripProgress();
+  // if (currentPage) reader.setCurrentPageGroup(currentPage);
+}
 
-//     const groupIdx = calcLongStripProgress()
-//     if (groupIdx !== currentPageGroup.value) {
-//       isAutoScrolling.value = true
-//       setCurrentPageGroup(Math.max(0, groupIdx))
-//     }
-//   }
-// }
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll, { passive: true })
+})
 
-// watch(currentPageGroup, (newVal, oldVal) => {
-//   if (oldVal !== newVal && viewStyle.value !== ViewStyleEnum.WideStrip && viewStyle.value !== ViewStyleEnum.LongStrip) {
-//     // resetZoom()
-//   }
-//   // if (!isWebtoon.value) {
-//   setCurrentPageGroup(newVal) //?
-//   if (isClickFromPage.value) {
-//     setIsClickFromPage(false)
-//   }
-//   // }
-// })
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 
-// watch(currentProgress, (val) => {
-//   if (scrolling.value && viewStyle.value === ViewStyleEnum.LongStrip) {
-//     const rect = pagesEl.value?.getBoundingClientRect()
-//     if (!rect) return
-//     const top = rect.top + window.scrollY
-//     const bottom = rect.height - window.innerHeight - rect.top
-//     // if (immersive.value) {
-//     //   props.immTarget?.scrollTo(0, val * props.immTarget.scrollHeight)
-//     // } else {
-//     //   window.scrollTo(0, top + val * bottom)
-//     // }
-//     window.scrollTo(0, top + val * bottom)
-//   }
-// })
+const scrollToPage = async (index: number) => {
+  await nextTick()
+  const el = pageRefs.value[index]?.[0]?.$el
+  el?.scrollIntoView()
+}
 
-// onMounted(() => {
-//   window.addEventListener("scroll", handleScroll, { passive: true })
-// })
-
-// onBeforeUnmount(() => {
-//   window.removeEventListener("scroll", handleScroll)
-// })
-
-// defineExpose({
-//   handleScroll
-// })
+watch(currentPageGroup, async (newVal, oldVal) => {
+  if (!immersive.value && !scrolling.value && shouldAutoScroll.value) {
+    scrollToPage(newVal)
+    isClickFromPage.value = false
+  }
+  setCurrentProgress(newVal / pageGroups.value.length)
+})
 </script>
 <template>
   <div class="min-w-0 relative pages-wrap mw--reader-pages" :class="{ ls: viewStyle === ViewStyleEnum.LongStrip }"
@@ -160,10 +161,7 @@ const dimPagesFilter = computed(() => {
     <div class="overflow-x-auto flex items-center h-full select-none" :class="{ bw: greyscale }" :style="{
       background: backgroundColor,
       direction: readStyle === ReadStyleEnum.RTL && viewStyle === ViewStyleEnum.WideStrip ? 'rtl' : undefined
-    }" ref="pagesEl" @scroll="viewStyle === ViewStyleEnum.WideStrip ? null : null">
-      <!-- handleScroll -->
-      <!-- @scroll="handleWideStripScroll" -->
-      <!-- @wheel="handleScrollWheel" -->
+    }" ref="pagesEl" @scroll="handleScroll">
       <div ref="zoomTarget" class="mx-auto h-full" v-if="pageGroups.length && pageGroups[currentPageGroup]" :class="{
         'mw--page': viewStyle !== ViewStyleEnum.LongStrip && viewStyle !== ViewStyleEnum.WideStrip,
         'header-shown': headerStyle === HeaderStyleEnum.Shown,
@@ -191,8 +189,15 @@ const dimPagesFilter = computed(() => {
               :class="group.length > 1 ? (pageIndex === 0 ? 'ml-auto' : 'mr-auto') : 'mx-auto'" :style="{
                 maxWidth: limitWidth && viewStyle === ViewStyleEnum.WideStrip ? maxWidthPixels : undefined,
                 objectPosition: group.length > 1 ? (pageIndex === 0 ? 'right' : 'left') : undefined
-              }"
-              ref="el => { if (el) { pageRefs[groupIndex] ? pageRefs[groupIndex].push(el) : pageRefs[groupIndex] = [el]}}" />
+              }" :ref="el => {
+                if (el) {
+                  if (pageRefs[groupIndex]) {
+                    pageRefs[groupIndex].push(el as InstanceType<typeof ManagedImage>)
+                  } else {
+                    pageRefs[groupIndex] = [el as InstanceType<typeof ManagedImage>]
+                  }
+                }
+              }" />
           </template>
         </template>
       </div>
