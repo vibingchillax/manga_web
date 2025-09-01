@@ -13,6 +13,7 @@ const reader = useReaderStore();
 const settings = useReaderMenu();
 const pageManager = useReaderPageManager();
 
+const route = useRoute()
 const router = useRouter()
 
 const {
@@ -137,6 +138,10 @@ defineShortcuts({
 watch([currentChapter, currentPageNumber], () => {
   document.title = pageTitle.value;
 });
+
+callOnce(() => {
+  reader.initializeReader(route.params.chapterId as string)
+})
 </script>
 <template>
   <div ref="root" class="mw--reader-wrap">
@@ -156,7 +161,7 @@ watch([currentChapter, currentPageNumber], () => {
     ]">
       <MangaReaderHeader />
       <!-- <MangaReaderOverlay /> -->
-      <MangaReaderPages ref="pageContainer" @click="handleClick"/>
+      <MangaReaderPages ref="pageContainer" @click="handleClick" @dblclick="(e: any) => handleClick(e, true)" />
       <MangaReaderProgressBar />
     </div>
     <MangaReaderMenu />
