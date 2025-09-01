@@ -163,6 +163,7 @@ callOnce(() => {
       <!-- <MangaReaderOverlay /> -->
       <MangaReaderPages ref="pageContainer" @click="handleClick" @dblclick="(e: any) => handleClick(e, true)" />
       <MangaReaderProgressBar />
+      <MangaReaderLongStripNextChapter />
     </div>
     <MangaReaderMenu />
   </div>
