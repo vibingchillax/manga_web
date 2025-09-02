@@ -11,8 +11,8 @@ const settings = storeToRefs(useReaderMenu())
   <div class="mw--reader-menu">
     <div class="reader--menu pinned header-hidden" :class="{ open: settings.menuOpen.value }">
       <div class="flex justify-between -mx-2 -mt-2">
-        <Icon class="custom-opacity relative md-btn flex items-center overflow-hidden accent text rounded-full !px-0"
-          name="i-lucide-x" @click="settings.menuOpen.value = !settings.menuOpen.value" />
+        <UButton icon="i-lucide-x" @click="settings.menuOpen.value = !settings.menuOpen.value" 
+        variant="ghost"/>
       </div>
       <div class="flex flex-col gap-y-2 mb-2 md:mb-4">
         <div class="flex">

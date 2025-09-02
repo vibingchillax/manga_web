@@ -41,7 +41,7 @@ const { data: mangasList, pending, error } = await useMangadex('/manga', {
       </NuxtLink>
       <NuxtLink class="custom-opacity relative flex items-center overflow-hidden accent text rounded-full !px-0"
         to="/titles/seasonal">
-        <UIcon name="i-lucide-arrow-right" />
+        <UButton icon="i-lucide-arrow-right" variant="ghost"/>
       </NuxtLink>
     </div>
     <ClientOnly>

@@ -42,9 +42,7 @@ const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
 <template>
   <div class="page-container wide">
     <div class="flex items-center mb-6 mt-2">
-      <UIcon name="i-lucide-arrow-left" @click="router.back()">
-
-      </UIcon>
+      <UButton icon="i-lucide-arrow-left" variant="ghost" @click="router.back()" />
       <h2 class="font-header text-2xl font-semibold">
         {{ seasonal }}
       </h2>
@@ -59,8 +57,7 @@ const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
         'grid-cols-2': active === 'normal',
         'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3': active === 'coverOnly'
       }">
-        <MangaCard v-for="(manga, index) in mangasList?.data" :key="manga.id" :manga="manga" 
-        :type="active">
+        <MangaCard v-for="(manga, index) in mangasList?.data" :key="manga.id" :manga="manga" :type="active">
         </MangaCard>
       </div>
     </div>
