@@ -43,6 +43,9 @@ const items = computed<DropdownMenuItem[][]>(() => {
     label: 'Guest',
     avatar: {
       icon: 'i-lucide-user'
+    },
+    to: {
+      path: '/login'
     }
   }]
 
