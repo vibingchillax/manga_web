@@ -1,8 +1,23 @@
 <script setup lang="ts">
+import { HeaderStyleEnum } from '~/stores/useReaderMenu';
 import User from './User.vue';
+
+const route = useRoute()
+const isReader = computed(() => route.name?.toString().startsWith('chapter'))
+const { immersive } = storeToRefs(useReaderStore())
+const { headerStyle, menuPinned, menuOpen } = storeToRefs(useReaderMenu())
+const { menuActive } = storeToRefs(useLayout())
 </script>
 <template>
-  <div class="navbar-wrap flex flex-col transparent fixed top-0 right-0">
+  <div :class="['navbar-wrap flex flex-col',
+    {
+      transparent: true,
+      reader: isReader,
+      'header-hidden': headerStyle === HeaderStyleEnum.Hidden,
+      'shown-pinned': headerStyle === HeaderStyleEnum.Shown && menuPinned,
+      rmo: menuOpen,
+      ma: menuActive,
+    }, 'fixed top-0 right-0']">
     <div class="nav-bar-main flex justify-center">
       <div class="nav-bar flex flex-grow justify-end w-full items-center gap-2">
         <!-- Logo  -->
@@ -10,10 +25,12 @@ import User from './User.vue';
         <SearchBar />
         <User />
       </div>
-      <div class="navbar-background" :style="{ opacity: 0 }"></div>
+      <div v-if="(isReader && headerStyle === HeaderStyleEnum.Shown && !immersive) || !isReader"
+        class="navbar-background" :style="{ opacity: 0 }"></div>
     </div>
   </div>
-  <div class="h-[var(--navbar-height)]"></div>
+  <div v-if="(isReader && headerStyle === HeaderStyleEnum.Shown && !immersive) || !isReader"
+    class="h-[var(--navbar-height)]"></div>
 </template>
 <style lang="css" scoped>
 .navbar-wrap {
@@ -21,6 +38,28 @@ import User from './User.vue';
   transition: margin var(--nav-anim-attr), transform 75ms ease-out;
   width: 100%;
   z-index: 6;
+}
+
+.navbar-wrap:not(.transparent) {
+  background-color: rgb(var(--mw-background));
+}
+
+.navbar-wrap.reader {
+  left: 0;
+  transition: padding-right var(--nav-anim-attr), left var(--nav-anim-attr);
+  width: unset;
+}
+
+.navbar-wrap.reader.header-hidden {
+  position: relative;
+}
+
+.navbar-wrap.reader.shown-pinned {
+  margin-bottom: calc(var(--navbar-height)*-1);
+}
+
+.navbar-wrap.reader.rmo {
+  padding-right: calc(var(--side-margin) + var(--drawer-reader-width));
 }
 
 .nav-bar-main {
