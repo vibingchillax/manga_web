@@ -23,5 +23,8 @@ export default defineNuxtConfig({
         baseURL: 'https://api.mangadex.org'
       }
     }
+  },
+  runtimeConfig: {
+    jwtSecret: process.env.JWT_SECRET
   }
 })
