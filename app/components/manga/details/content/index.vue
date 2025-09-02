@@ -12,9 +12,13 @@ const props = defineProps<{
   manga: Manga
 }>()
 
-const hasRelated = (props.manga.relationships ?? [].some((r: components["schemas"]["Relationship"]) => r.type === "manga"))
+const hasRelated = computed(() =>
+  (props.manga.relationships ?? []).some(
+    (r: components["schemas"]["Relationship"]) => r.type === "manga"
+  )
+)
 
-const items = ref<TabsItem[]>([
+const items = computed<TabsItem[]>(() => [
   {
     label: 'Uploaded Chapters',
     slot: 'uploaded_chapters',
@@ -31,7 +35,7 @@ const items = ref<TabsItem[]>([
     label: 'Art',
     slot: 'covers',
   },
-  ...(hasRelated ? [
+  ...(hasRelated.value ? [
     {
       label: 'Related',
       slot: 'related',
