@@ -1,11 +1,3 @@
-<script setup lang="ts">
-const router = useRouter();
-defineShortcuts({
-  h: () => {
-    router.push('/')
-  }
-})
-</script>
 <template>
   <div class="flex flex-grow">
     <Sidebar />

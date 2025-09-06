@@ -1,6 +1,22 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+#__layout,
+#__nuxt,
+body,
+html {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%
+}
+
+#__nuxt,
+:root,
+body {
+  height: 100%;
+}
+
 :root {
   --mw-background: 25 26 28;
   --mw-status-yellow: 218 117 0;
@@ -35,6 +51,13 @@
 
 body {
   line-height: inherit;
+  margin: 0;
+}
+
+@media (any-pointer: fine) and (min-width: 640px) {
+  body {
+    overflow-y: scroll !important;
+  }
 }
 
 .bg-accent {

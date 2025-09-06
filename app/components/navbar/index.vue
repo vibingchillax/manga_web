@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { HeaderStyleEnum } from '~/stores/useReaderMenu';
+import Logo from './Logo.vue';
 import User from './User.vue';
 
 const route = useRoute()
@@ -17,10 +18,12 @@ const { menuActive } = storeToRefs(useLayout())
       'shown-pinned': headerStyle === HeaderStyleEnum.Shown && menuPinned,
       rmo: menuOpen,
       ma: menuActive,
-    }, 'fixed top-0 right-0']">
+    }, 'fixed top-0 right-0', {
+      'max-w-[calc(100%_-_var(--drawer-menu-width))] ml-auto': menuActive
+    }]">
     <div class="nav-bar-main flex justify-center">
       <div class="nav-bar flex flex-grow justify-end w-full items-center gap-2">
-        <!-- Logo  -->
+        <Logo v-if="!menuActive" />
         <!-- Announcement -->
         <SearchBar />
         <User />
