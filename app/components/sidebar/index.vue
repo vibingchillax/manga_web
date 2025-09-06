@@ -85,13 +85,11 @@ const sections = computed<Section[]>(() => {
   return [home, follows, titles]
 })
 
-const isReader = computed(() => route.name?.toString().startsWith('chapter'))
-
-watch(isReader, (reader) => {
-  if (reader) {
+watch(() => route.name, (newName) => {
+  if (newName?.toString().startsWith('chapter')) {
     layout.setMenu(false)
   }
-})
+}, { immediate: true })
 </script>
 <template>
   <div class="flex flex-col bg-accent h-screen md:h-full z-[7] lg:z-auto">
