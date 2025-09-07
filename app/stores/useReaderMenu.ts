@@ -100,7 +100,7 @@ export interface ReaderMenuState {
   _progressSide: ProgressSideEnum;
   backgroundColor: string;
   cursorHints: CursorHintsEnum;
-  doAutoAdvance: number;
+  doAutoAdvance: boolean;
   _growPages: boolean;
   historyMode: HistoryModeEnum;
   immersiveTap: number;
@@ -137,7 +137,7 @@ export const useReaderMenu = defineStore("readerMenu", {
     _progressSide: ProgressSideEnum.Bottom,
     backgroundColor: "transparent",
     cursorHints: CursorHintsEnum.None,
-    doAutoAdvance: 1,
+    doAutoAdvance: true,
     _growPages: false,
     historyMode: HistoryModeEnum.Both,
     immersiveTap: 1,
@@ -183,7 +183,7 @@ export const useReaderMenu = defineStore("readerMenu", {
     setMaxHeight(val: number) { this.maxHeight = val; },
     setLimitMaxWidth(val: boolean) { this.limitMaxWidth = val; },
     setLimitMaxHeight(val: boolean) { this.limitMaxHeight = val; },
-    setAutoAdvance(val: number) { this.doAutoAdvance = val; },
+    setAutoAdvance(val: boolean) { this.doAutoAdvance = val; },
     setHistoryMode(val: HistoryModeEnum) { this.historyMode = val; },
     setLockOffset(val: number) { this.lockOffset = val; },
     setLongStripMargin(val: number) { this._longStripMargin = Math.max(0, val); },

@@ -36,8 +36,8 @@ const toggleOffset = () => {
   setOffsetDoubles([id, !offsetDoubles.value[id]])
 }
 
-function openSettingsModal() {
-  // settingsModal.open()
+function openSettingsModal(tab: 'pageLayout' | 'imageFit' | 'behaviors' = 'pageLayout') {
+  settingsModal.open({ initialTab: tab })
 }
 </script>
 <template>
@@ -51,7 +51,7 @@ function openSettingsModal() {
     <div class="flex">
       <UButton class="flex-grow mr-2" :icon="sizeModeLabel?.icon" @click="switchSizeMode">{{ sizeModeLabel?.name }}
       </UButton>
-      <UButton icon="i-lucide-cog"></UButton>
+      <UButton icon="i-lucide-cog" @click="openSettingsModal('imageFit')" />
     </div>
     <UButton :icon="readStyleLabel?.icon" @click="switchStyles('readStyle')">
       {{ readStyleLabel?.label }}
@@ -62,9 +62,9 @@ function openSettingsModal() {
     <div class="flex">
       <UButton class="flex-grow mr-2" :icon="progressModeLabel?.icon" @click="switchProgressMode">{{
         progressModeLabel?.label }}</UButton>
-      <UButton icon="i-lucide-cog"></UButton>
+      <UButton icon="i-lucide-cog" @click="openSettingsModal('pageLayout')" />
     </div>
-    <UButton icon="i-lucide-cog" @click="openSettingsModal">
+    <UButton icon="i-lucide-cog" @click="openSettingsModal()">
       Reader Settings
     </UButton>
   </div>

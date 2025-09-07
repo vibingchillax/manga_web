@@ -264,4 +264,8 @@ onBeforeUnmount(() => {
     min-height: calc(100dvh - var(--header-padding) - 3rem)
   }
 }
+
+.bw {
+  filter: grayscale(100%);
+}
 </style>
