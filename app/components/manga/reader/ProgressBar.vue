@@ -43,17 +43,33 @@ const {
 
 const isLoading = computed(() => pageState.value !== 'loaded')
 const isRTL = computed(() => readStyle.value === ReadStyleEnum.RTL)
-const sliderHeight = computed(() => `${progressHeight}px`)
+const sliderHeight = computed(() => `${progressHeight.value}px`)
 
 const totalPages = computed(() => pageGroups.value.length ?? 1);
 const currentProgressPercent = computed(() =>
   currentPageGroup.value + 1
 );
 
+const sideClass = computed(() => {
+  switch (progressSide.value) {
+    case ProgressSideEnum.Right: return 'side right'
+    case ProgressSideEnum.Left: return 'side left'
+  }
+  return ''
+})
+
 const sliderFraction = ref((currentProgressPercent.value - 1) / Math.max(1, totalPages.value - 1));
 watch([currentProgressPercent, totalPages], ([progress, total]) => {
   sliderFraction.value = (progress - 1) / Math.max(1, total - 1);
 });
+
+watch(progressSide, (newSide) => {
+  isAnimationDisabled.value = false
+  setTimeout(() => {
+    isAnimationDisabled.value = true
+    sliderDirection.value = newSide
+  })
+})
 
 const sliderBallSize = computed(() => `${100 / Math.max(1, totalPages.value)}%`);
 
@@ -66,7 +82,13 @@ const sliderPosition = computed(() => {
   return `calc(${fraction} * ${totalLength} + ${halfBall})`;
 });
 
-const clamp = (val: number, max: number, min: number) => Math.max(min, Math.min(val, max));
+const getDividerState = (group: ManagedImage[]) => {
+  return group.some(p => p.fetching || (!p.loaded && !p.fetching && !p.blobUrl))
+    ? "loading"
+    : group.some(p => p.loaded && !p.blobUrl)
+      ? "error"
+      : "loaded"
+}
 
 const isMouseEvent = (e: MouseEvent | TouchEvent) => !('touches' in e);
 
@@ -96,28 +118,27 @@ const stopDrag = () => {
 
 const updateSlider = (event: MouseEvent | TouchEvent) => {
   if (!pageSlider.value) return;
-
+  const rect = pageSlider.value.getBoundingClientRect();
   let clientPos: number;
   if (event instanceof MouseEvent) {
-    clientPos = (readStyle.value === ReadStyleEnum.RTL) ? (pageSlider.value.getBoundingClientRect().right - event.clientX) : event.clientX;
+    clientPos = event.clientX - rect.left;
   } else {
     const touch = event.touches[0];
     if (!touch) return;
-    clientPos = (readStyle.value === ReadStyleEnum.RTL) ? (pageSlider.value.getBoundingClientRect().right - touch.clientX) : touch.clientX;
+    clientPos = touch.clientX - rect.left;
   }
+  const dividerWidth = rect.width / totalPages.value
+  const halfDivider = dividerWidth / 2
+  const effectiveWidth = rect.width - dividerWidth
 
-  const rect = pageSlider.value.getBoundingClientRect();
-  const totalLength = rect.width;
-  let fraction = clamp(clientPos / totalLength, 1, 0);
+  let relativePos = clientPos - halfDivider
+  let fraction = relativePos / effectiveWidth
 
-  if (isRTL.value) fraction = 1 - fraction;
-
-  sliderFraction.value = fraction;
+  if (isRTL.value) fraction = 1 - fraction
+  sliderFraction.value = Math.max(0, Math.min(fraction, 1))
 
   const newPage = Math.round(fraction * (totalPages.value - 1));
-  if (newPage !== currentPageGroup.value) {
-    setCurrentPageGroup(newPage);
-  }
+  if (newPage !== currentPageGroup.value) setCurrentPageGroup(newPage);
 };
 
 onMounted(() => window.addEventListener('blur', stopDrag));
@@ -129,20 +150,17 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
     'mw--reader-progress',
     {
       'normal': progressMode === ProgressModeEnum.Normal,
-      'side left': progressSide === ProgressSideEnum.Left,
-      'side right': progressSide === ProgressSideEnum.Right
-    },
-    {
+      [sideClass]: true,
       'no-anim': isAnimationDisabled,
       break: immersionBreak || isDragging,
       'show-num': showPageNumber
     },
   ]" :style="{
     bottom: `${scrollbarOffset ?? 0}px`,
-    '--progress-bar-size': `${settings.progressHeight}px`,
-    '--slider-ball-left': `calc(${currentPageGroup} * (100% - var(--divider-width)) / max(${totalPages}, 1) + var(--divider-width)/2)`,
+    '--progress-bar-size': sliderHeight,
+    '--slider-ball-left': sliderPosition,
     '--slider-borderhuh': '1px',
-    '--divider-width': `${100 / totalPages}%`
+    '--divider-width': sliderBallSize
   }">
     <div class="progress-wrap" :class="{ active: isDragging, rtl: isRTL }">
       <div class="page-number">
@@ -156,28 +174,24 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
       }" ref="pageSlider" @mousedown.prevent.stop="startDrag" @touchstart.prevent.stop="startDrag">
         <div id="slider-ball" ref="sliderBall" :class="{
           rtl: isRTL,
-          'side left': progressSide === ProgressSideEnum.Left,
-          'side right': progressSide === ProgressSideEnum.Right
-        }" :style="{ left: sliderPosition }">
-          <div class="slider-ball-tooltip" v-if="isDragging" :class="{
-            'side left': progressSide === ProgressSideEnum.Left,
-            'side right': progressSide === ProgressSideEnum.Right
-          }">
+          [sideClass]: true
+        }" @mousedown.prevent.stop="startDrag" @touchstart.prevent.stop="startDrag">
+          <div class="slider-ball-tooltip" :class="{
+            [sideClass]: true
+          }" style="display: none;">
             {{isLoading ? '?' : pageGroups[currentPageGroup]!.map(p => p.pageNum).join('-')}}
           </div>
         </div>
         <div v-if="totalPages > 1 && !isLoading" class="slider-dividers" :class="{
           'rtl': isRTL,
-          'side left': settings.progressSide === ProgressSideEnum.Left,
-          'side right': settings.progressSide === ProgressSideEnum.Right
+          [sideClass]: true
         }">
           <div v-for="(group, idx) in pageGroups" :key="idx" class="prog-divider" :class="{
-            loaded: group.some(p => p.loaded),
+            [getDividerState(group)]: true,
             read: currentPageGroup >= idx,
             rtl: isRTL,
             current: currentPageGroup === idx,
-            'side left': progressSide === ProgressSideEnum.Left,
-            'side right': progressSide === ProgressSideEnum.Right
+            [sideClass]: true
           }">
             <div class="prog-divider-label" :class="{
               current: currentPageGroup === idx
@@ -472,7 +486,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
 
 #slider-ball:not(.side).rtl {
   left: unset;
-  right: var(--slider-borderhuh);
+  right: var(--slider-ball-left);
   transform: translate(50%)
 }
 
