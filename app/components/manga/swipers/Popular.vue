@@ -8,22 +8,33 @@ const swiper = useSwiper(swiperContainerRef);
 const currentSlideIndex = ref(0);
 
 const onSlideChange = () => {
-  currentSlideIndex.value = swiper.realIndex.value
+  currentSlideIndex.value = swiperContainerRef.value?.swiper.realIndex ?? 1
 }
 
-const isoLocal = dayjs().subtract(31, 'day').hour(17).minute(0).second(0).format('YYYY-MM-DDTHH:mm:ss');
 const preferences = usePreferencesStore();
+const { contentRating } = storeToRefs(preferences)
+
+const isoLocal = dayjs().subtract(31, 'day').hour(17).minute(0).second(0).format('YYYY-MM-DDTHH:mm:ss');
 const { data, pending, error } = await useMangadex("/manga", {
   query: {
     'includes[]': ['cover_art', 'author', 'artist'],
-    'contentRating[]': preferences.contentRating,
+    'contentRating[]': contentRating.value,
     'order[followedCount]': 'desc', //it's all because of this line
     hasAvailableChapters: 'true',
     createdAtSince: isoLocal,
     limit: 10
-  } as any, //💀,
+  } as any, //💀
+  watch: [contentRating],
+  key: 'popular'
 })
 
+onMounted(() => {
+  nextTick(() => {
+    if (swiperContainerRef.value) {
+      swiperContainerRef.value.addEventListener('swiperslidechange', onSlideChange)
+    }
+  })
+})
 </script>
 <template>
   <div class="relative !p-0 !m-0 -top-16 left-0 w-full">
@@ -32,11 +43,18 @@ const { data, pending, error } = await useMangadex("/manga", {
         <h2 class="font-header sm:text-2xl text-xl font-semibold"> Popular New Titles </h2>
       </div>
     </div>
-    <div>
+    <div v-if="pending">
+      Loading popular titles...
+    </div>
+    <div v-else-if="error">
+      {{ error.message }}
+    </div>
+    <div v-else>
       <ClientOnly>
-        <swiper-container ref="swiperContainerRef" @swiperrealindexchange="onSlideChange" :autoplay="{
-          delay: 8000
-        }" :loop="true">
+        <swiper-container ref="swiperContainerRef" :autoplay="{
+          delay: 1e4,
+          disableOnInteraction: false
+        }" :loop="true" :initial-slide="Math.ceil(Math.random() * 10)">
           <swiper-slide v-for="(manga, index) in data?.data" :key="index">
             <MangaPopularSlide :manga="manga" />
           </swiper-slide>
