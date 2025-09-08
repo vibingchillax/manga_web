@@ -6,6 +6,8 @@ const swiperContainerRef = ref<SwiperContainer | null>(null);
 const swiper = useSwiper(swiperContainerRef);
 
 const preferences = usePreferencesStore();
+const { contentRating } = storeToRefs(preferences)
+
 const { data } = await useMangadex('/list/{id}', {
   path: {
     id: '68ab4f4e-6f01-4898-9038-c5eee066be27' //list gets changed or list gets updated?
@@ -25,9 +27,11 @@ const { data: mangasList, pending, error } = await useMangadex('/manga', {
     "includes[]": ["cover_art"],
     "order[createdAt]": "desc",
     "order[followedCount]": "desc",
-    "contentRating[]": preferences.contentRating,
+    "contentRating[]": contentRating.value,
     "ids[]": idList.value
   } as any,
+  watch: [contentRating],
+  key: 'seasonal'
 })
 
 </script>
@@ -41,7 +45,7 @@ const { data: mangasList, pending, error } = await useMangadex('/manga', {
       </NuxtLink>
       <NuxtLink class="custom-opacity relative flex items-center overflow-hidden accent text rounded-full !px-0"
         to="/titles/seasonal">
-        <UButton icon="i-lucide-arrow-right" variant="ghost"/>
+        <UButton icon="i-lucide-arrow-right" variant="ghost" />
       </NuxtLink>
     </div>
     <ClientOnly>

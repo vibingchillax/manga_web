@@ -48,6 +48,7 @@ const relatedOrder = [
 
 export const useRelatedMangas = async (manga: Manga) => {
   const pref = usePreferencesStore()
+  const { contentRating } = storeToRefs(pref)
 
   const relatedMangas = manga.relationships?.filter(isManga) ?? []
   const grouped = relatedMangas.reduce<Record<string, Relationship[]>>((acc, r) => {
@@ -70,9 +71,11 @@ export const useRelatedMangas = async (manga: Manga) => {
     query: {
       "ids[]": ids,
       "includes[]": ["cover_art"],
-      "contentRating[]": pref.contentRating,
+      "contentRating[]": contentRating.value,
       limit: 100
     },
+    watch: [contentRating],
+    key: `manga-related-${manga.id}`
   })
 
   const mangaMap = new Map<string, Manga>()

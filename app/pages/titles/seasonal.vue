@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const router = useRouter();
 const preferences = usePreferencesStore();
+const { contentRating } = storeToRefs(preferences);
 const { data } = await useMangadex('/list/{id}', {
   path: {
     id: '68ab4f4e-6f01-4898-9038-c5eee066be27'
@@ -18,9 +19,11 @@ const { data: mangasList, pending, error } = await useMangadex('/manga', {
     limit: 32,
     offset: 0,
     "includes[]": ["cover_art"],
-    "contentRating[]": preferences.contentRating,
+    "contentRating[]": contentRating.value,
     "ids[]": idList.value
   } as any,
+  watch: [contentRating],
+  key: 'seasonalPage'
 })
 
 const items = ref([
