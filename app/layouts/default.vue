@@ -12,7 +12,7 @@
 <style lang="css">
 .content>* {
   margin-bottom: 2rem;
-  margin-bottom: calc(var(--bottom-nav-area) + var(--botton-margin));
+  margin-bottom: calc(var(--bottom-nav-area) + var(--bottom-margin));
   margin-top: 0;
   margin-top: var(--top-margin);
   padding-left: var(--side-margin);
