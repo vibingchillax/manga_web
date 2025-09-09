@@ -44,11 +44,7 @@ const groupedChapters = computed(() => {
 
 </script>
 <template>
-  <div class="page-container wide">
-    <div class="flex items-center mb-6 mt-2">
-      <UButton class="mr-4" icon="i-lucide-arrow-left" variant="ghost" @click="router.back()" />
-      <h2 class="font-header text-2xl font-semibold">Reading History</h2>
-    </div>
+  <Page title="Reading History" wide>
     <div>
       <div class="relative flex justify-between gap-2 items-center mb-6">
         <div>
@@ -60,5 +56,5 @@ const groupedChapters = computed(() => {
           class="mb-4" :chapter-list="group.chapters" :manga="group.manga!" />
       </div>
     </div>
-  </div>
+  </Page>
 </template>

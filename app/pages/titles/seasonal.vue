@@ -43,13 +43,7 @@ const items = ref([
 const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
 </script>
 <template>
-  <div class="page-container wide">
-    <div class="flex items-center mb-6 mt-2">
-      <UButton class="mr-4" icon="i-lucide-arrow-left" variant="ghost" @click="router.back()" />
-      <h2 class="font-header text-2xl font-semibold">
-        {{ seasonal }}
-      </h2>
-    </div>
+  <Page :title="seasonal ?? 'Seasonal'" wide>
     <div>
       <div class="flex my-6 flex-row justify-between gap-6">
         <div>
@@ -64,5 +58,5 @@ const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
         </MangaCard>
       </div>
     </div>
-  </div>
+  </Page>
 </template>

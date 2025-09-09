@@ -27,11 +27,7 @@ watch(() => route.query.q, async (q) => {
 
 </script>
 <template>
-  <div class="page-container wide">
-    <div class="flex items-center mb-6 mt-2">
-      <UButton class="mr-4" icon="i-lucide-arrow-left" @click="router.back()" variant="ghost"/>
-      <h2 class="font-header text-2xl font-semibold">Search</h2>
-    </div>
+  <Page title="Search" wide>
     <div>
       <div v-if="loading"> Loading... </div>
       <div v-else-if="mangasList" class="grid gap-2">
@@ -41,5 +37,5 @@ watch(() => route.query.q, async (q) => {
         {{ error }}
       </div>
     </div>
-  </div>
+  </Page>
 </template>
