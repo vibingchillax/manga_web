@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
 import type { SwiperContainer } from 'swiper/element'
+import Slide from './Slide.vue';
 
 const swiperContainerRef = ref<SwiperContainer | null>(null);
 const swiper = useSwiper(swiperContainerRef);
@@ -56,7 +57,7 @@ onMounted(() => {
           disableOnInteraction: false
         }" :loop="true" :initial-slide="Math.ceil(Math.random() * 10)">
           <swiper-slide v-for="(manga, index) in data?.data" :key="index">
-            <MangaPopularSlide :manga="manga" />
+            <Slide :manga="manga" />
           </swiper-slide>
         </swiper-container>
       </ClientOnly>

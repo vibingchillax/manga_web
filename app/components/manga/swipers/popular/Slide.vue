@@ -17,17 +17,15 @@ const { authors, artists, samePeople } = useMangaAuthor(manga);
 
 <template>
   <NuxtLink class="flex relative h-full overflow-hidden shadow banner-bg"
-    :href="`/title/${manga.id}/${toKebabCase(title!)}`" style="height: 400px;">
-    <!-- dont do var! lol this is temp-->
+    :href="`/title/${manga.id}/${toKebabCase(title)}`" style="height: 400px;">
     <NuxtImg class="absolute left-0 top-0 w-[100%] h-[150%] object-cover select-none" :src="coverUrl" alt=""
-      loading="lazy" style="object-position: 0px 30%;" />
+      loading="lazy" style="object-position: 0px 30%;" placeholder />
     <div class="absolute banner-bg inset-0"></div>
     <div
       class="p-4 mb-6 md:mb-0 md:py-4 md:px-4 grid grid-rows-[1fr_1rem] md:grid-rows-1 gap-2 md:h-[77%] sm:h-[65%] h-[70%] mt-auto xl:max-w-[1440px] w-full mx-auto">
       <div class="h-full relative z-20 flex gap-4">
-        <NuxtLink :href="`/title/${manga.id}/${toKebabCase(title!)}`"
+        <NuxtLink :href="`/title/${manga.id}/${toKebabCase(title)}`"
           class="group flex items-start relative mb-auto select-none !h-[10rem] md:!h-full aspect-[7/10] !w-auto object-top object-cover rounded sm:shadow-lg bg-transparent">
-          <!----><!---->
           <NuxtImg class="rounded shadow-md w-full h-full" :src="coverUrl" alt="Cover image" />
           <!-- <img class="inline-block select-none absolute right-2 bottom-1.5" title="English"
                         src="/img/flags/gb.svg" alt="English flag icon" width="24" height="24" style="z-index: 1;">-->
