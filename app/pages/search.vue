@@ -29,7 +29,7 @@ watch(() => route.query.q, async (q) => {
 <template>
   <div class="page-container wide">
     <div class="flex items-center mb-6 mt-2">
-      <UButton icon="i-lucide-arrow-left" @click="router.back()" variant="ghost"/>
+      <UButton class="mr-4" icon="i-lucide-arrow-left" @click="router.back()" variant="ghost"/>
       <h2 class="font-header text-2xl font-semibold">Search</h2>
     </div>
     <div>
