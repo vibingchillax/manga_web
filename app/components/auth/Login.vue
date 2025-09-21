@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 const router = useRouter()
 const toast = useToast()
+const redirect = useAuthRedirect()
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -31,7 +32,7 @@ async function onSubmit(event: FormSubmitEvent<LoginSchema>) {
       description: "You are now logged in",
       color: 'success'
     })
-    router.push("/")
+    router.push(redirect.value ?? "/")
 
   } else {
     toast.add({
