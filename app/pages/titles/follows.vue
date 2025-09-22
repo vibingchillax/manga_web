@@ -1,1 +1,100 @@
-<template></template>
+<script setup lang="ts">
+import type { MangaFollowStatus } from '~~/shared/prisma/enums';
+
+const preferences = usePreferencesStore();
+const { contentRating } = storeToRefs(preferences)
+const items = ref([
+  {
+    icon: 'i-lucide-list',
+    value: 'dense'
+  },
+  {
+    icon: 'i-lucide-rows-2',
+    value: 'normal'
+  },
+  {
+    icon: 'i-lucide-grid-2x2',
+    value: 'coverOnly'
+  }
+]);
+
+const tabs = ref([
+  {
+    label: 'Reading',
+    value: 'reading'
+  },
+  {
+    label: 'Plan To Read',
+    value: 'planToRead',
+  },
+  {
+    label: 'Completed',
+    value: 'completed',
+  },
+  {
+    label: 'On Hold',
+    value: 'onHold',
+  },
+  {
+    label: 'Re-reading',
+    value: 'rereading',
+  },
+  {
+    label: 'Dropped',
+    value: 'dropped',
+  },
+])
+
+const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
+const activeTab = ref<'reading' | 'planToRead' | 'completed' | 'onHold' | 'rereading' | 'dropped'>('reading')
+
+const { data: followsList } = await useFetch('/user/follows/manga', {
+  key: 'followsList'
+})
+
+const idsList = computed(() => followsList.value?.map(m => m.mangaId) ?? [])
+
+const { data: mangasList, pending, error } = await useMangadex('/manga', {
+  query: {
+    limit: 32,
+    offset: 0,
+    "ids[]": idsList.value,
+    "includes[]": ['cover_art'],
+  },
+  key: 'follows'
+})
+
+const followsMap = computed(() => {
+  const map = new Map<string, MangaFollowStatus>()
+  followsList.value?.forEach(f => map.set(f.mangaId, f.status))
+  return map
+})
+
+const filteredMangas = computed(() => {
+  if (!mangasList.value?.data) return []
+  const map = followsMap.value
+  return mangasList.value.data.filter(manga => map.get(manga.id!) === activeTab.value)
+})
+
+</script>
+<template>
+  <Page title="Library" wide require-auth>
+    <UTabs v-model="activeTab" :items="tabs" />
+    <!-- <div class="flex my-4 items-center"> -->
+    <div class="flex my-4 flex-row justify-between gap-6">
+      <div class="text-lg">
+        {{ filteredMangas.length }} title(s)
+      </div>
+      <UTabs v-model="active" :items="items" />
+    </div>
+    <div>
+      <div class="grid gap-2" :class="{
+        'grid-cols-2': active === 'normal',
+        'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3': active === 'coverOnly'
+      }">
+        <MangaCard v-for="(manga, index) in filteredMangas" :key="manga.id" :manga="manga" :type="active">
+        </MangaCard>
+      </div>
+    </div>
+  </Page>
+</template>
