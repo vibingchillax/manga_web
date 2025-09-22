@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { useScroll } from '@vueuse/core'
 import { HeaderStyleEnum } from '~/stores/useReaderMenu';
 import Logo from './Logo.vue';
 import User from './User.vue';
 
 const route = useRoute()
+const { y } = useScroll(window)
+const navbarOpacity = computed(() => Math.min(y.value / 56, 1))
 const isReader = computed(() => route.name?.toString().startsWith('chapter'))
 const { immersive } = storeToRefs(useReaderStore())
 const { headerStyle, menuPinned, menuOpen } = storeToRefs(useReaderMenu())
@@ -29,7 +32,7 @@ const { menuActive } = storeToRefs(useLayout())
         <User />
       </div>
       <div v-if="(isReader && headerStyle === HeaderStyleEnum.Shown && !immersive) || !isReader"
-        class="navbar-background" :style="{ opacity: 0 }"></div>
+        class="navbar-background" :style="{ opacity: navbarOpacity }"></div>
     </div>
   </div>
   <div v-if="(isReader && headerStyle === HeaderStyleEnum.Shown && !immersive) || !isReader"
