@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MangaFollowStatus } from '~~/shared/prisma/enums';
 
+const auth = useAuth()
 const preferences = usePreferencesStore();
 const { contentRating } = storeToRefs(preferences)
 const items = ref([
@@ -48,21 +49,30 @@ const tabs = ref([
 const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
 const activeTab = ref<'reading' | 'planToRead' | 'completed' | 'onHold' | 'rereading' | 'dropped'>('reading')
 
-const { data: followsList } = await useFetch('/user/follows/manga', {
-  key: 'followsList'
-})
+let followsList = ref<{mangaId: string, status: MangaFollowStatus}[] | undefined>()
+let mangasList = ref<{result: string, response: string, data?: Manga[]} | undefined>()
 
-const idsList = computed(() => followsList.value?.map(m => m.mangaId) ?? [])
+if (auth.session.value?.isAuthenticated) {
+  const { data: fList } = await useFetch('/user/follows/manga', {
+    key: 'followsList'
+  })
 
-const { data: mangasList, pending, error } = await useMangadex('/manga', {
-  query: {
-    limit: 32,
-    offset: 0,
-    "ids[]": idsList.value,
-    "includes[]": ['cover_art'],
-  },
-  key: 'follows'
-})
+  followsList.value = fList.value
+
+  const idsList = computed(() => followsList.value?.map(m => m.mangaId) ?? [])
+
+  const { data: mList } = await useMangadex('/manga', {
+    query: {
+      limit: 32,
+      offset: 0,
+      "ids[]": idsList.value,
+      "includes[]": ['cover_art'],
+    },
+    key: 'follows'
+  })
+  mangasList.value = mList.value
+}
+
 
 const followsMap = computed(() => {
   const map = new Map<string, MangaFollowStatus>()
