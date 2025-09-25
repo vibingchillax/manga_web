@@ -23,7 +23,7 @@ const hasFetched = ref(false);
 const loading = ref(false);
 const progressValue = ref(0);
 
-const { data, refresh, status } = await useLazyFetch('/sources', { immediate: false });
+const { data, status } = await useFetch('/sources');
 
 async function selectSource(source: SourceLabel) {
   loading.value = true;
@@ -107,23 +107,25 @@ const groupedChapters = computed(() => {
 </script>
 
 <template>
-  <div class="flex gap-6 items-start mt-6">
-    <USelectMenu placeholder="Select reading source" :loading="status === 'pending'" v-model="selectedSource"
-      :items="data" :ui="{ content: 'min-w-fit' }" @update:model-value="selectSource" @update:open="() => refresh()">
-      <template #item-label="{ item }">
-        {{ item.label }}
-        <span class="px-4 text-muted">{{ item.url }}</span>
-        <span class="px-4 text-muted">{{ item.flags }}</span>
-      </template>
-    </USelectMenu>
-    <USelectMenu v-if="hasFetched && scrapedMangas.length > 0 && scrapedChapters.length > 0" class="mx-4"
-      placeholder="Incorrect match?" v-model="selectedManga" :items="scrapedMangas" :ui="{ content: 'min-w-fit' }"
-      @update:model-value="selectManga">
-      <template #item-label="{ item }">
-        {{ item.title }}
-        <NuxtLink :to="item.url" style="color: yellow">{{ item.url }}</NuxtLink>
-      </template>
-    </USelectMenu>
+  <div class="flex gap-6 items-start">
+    <div class="mt-6">
+      <USelectMenu placeholder="Select reading source" :loading="status === 'pending'" v-model="selectedSource"
+        :items="data" :ui="{ content: 'min-w-fit' }" @update:model-value="selectSource">
+        <template #item-label="{ item }">
+          {{ item.label }}
+          <span class="px-4 text-muted">{{ item.url }}</span>
+          <span class="px-4 text-muted">{{ item.flags }}</span>
+        </template>
+      </USelectMenu>
+      <USelectMenu v-if="hasFetched && scrapedMangas.length > 0 && scrapedChapters.length > 0" class="mx-4"
+        placeholder="Incorrect match?" v-model="selectedManga" :items="scrapedMangas" :ui="{ content: 'min-w-fit' }"
+        @update:model-value="selectManga">
+        <template #item-label="{ item }">
+          {{ item.title }}
+          <NuxtLink :to="item.url" style="color: yellow">{{ item.url }}</NuxtLink>
+        </template>
+      </USelectMenu>
+    </div>
     <div class="flex-grow">
       <UProgress v-if="loading" v-model="progressValue" :max="['Fetching mangas...', 'Fetching chapters...']" />
       <div v-if="!loading && hasFetched && scrapedChapters.length > 0">
