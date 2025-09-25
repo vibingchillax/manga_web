@@ -7,45 +7,33 @@ const router = useRouter()
 const { loggedIn, redirect } = useAuth()
 const toast = useToast()
 
-const selected = ref('none')
+const key = `follow-${props.manga.id}`
+const { data: followStatus, pending } = await useFetch(`/manga/${props.manga.id}/follow`, {
+  key,
+})
 
-const { data: followStatus, error, pending } = await useFetch(`/manga/${props.manga.id}/follow`)
+const selected = ref(followStatus.value?.status)
 
-const items = ref([
-  {
-    label: 'None',
-    value: 'none'
-  },
-  {
-    label: 'Reading',
-    value: 'reading'
-  },
-  {
-    label: 'On Hold',
-    value: 'onHold'
-  },
-  {
-    label: 'Dropped',
-    value: 'dropped'
-  },
-  {
-    label: 'Plan to Read',
-    value: 'planToRead'
-  },
-  {
-    label: 'Completed',
-    value: 'completed'
-  },
-  {
-    label: 'Re-Reading',
-    value: 'rereading'
-  }
-])
+const items = [
+  { label: 'None', value: 'none' },
+  { label: 'Reading', value: 'reading' },
+  { label: 'On Hold', value: 'onHold' },
+  { label: 'Dropped', value: 'dropped' },
+  { label: 'Plan to Read', value: 'planToRead' },
+  { label: 'Completed', value: 'completed' },
+  { label: 'Re-Reading', value: 'rereading' },
+]
 
 const followLabel = computed(() => {
-  const status = selected.value ?? 'none'
-  const item = items.value.find(i => i.value === status)
-  return item?.label === 'None' ? 'Add to Library' : item?.label
+  const item = items.find(i => i.value === followStatus.value?.status)
+  return item?.label === 'None' ? 'Add to Library' : item?.label ?? 'Add to Library'
+})
+
+const icon = computed(() => {
+  const status = followStatus.value?.status
+  if (!status) return ''
+  if (status === 'none') return ''
+  return 'i-lucide-check'
 })
 
 function openModal() {
@@ -57,52 +45,27 @@ function openModal() {
   modalOpen.value = true
 }
 
-function successToast() {
-  toast.add({
-    description: 'Manga updated successfully'
-  })
-  modalOpen.value = false
-}
-
 async function update() {
-  if (selected.value === 'none') {
-    const del = await $fetch(`/manga/${props.manga.id}/follow`, {
-      method: "DELETE",
-    })
-    if (del.status === 'ok') {
-      successToast()
+  try {
+    if (selected.value === 'none') {
+      await $fetch(`/manga/${props.manga.id}/follow`, { method: "DELETE" })
     } else {
-      toast.add({
-        description: 'Request failed'
+      await $fetch(`/manga/${props.manga.id}/follow`, {
+        method: "POST",
+        body: { status: selected.value }
       })
     }
-    return
-  }
-
-  const add = await $fetch(`/manga/${props.manga.id}/follow`, {
-    method: "POST", body: {
-      status: selected.value as string
-    }
-  })
-
-  if (add.status === 'ok') {
-    successToast()
-  } else {
-    toast.add({
-      description: 'Request failed'
-    })
+    await refreshNuxtData(key)
+    toast.add({ description: 'Manga updated successfully' })
+    modalOpen.value = false
+  } catch {
+    toast.add({ description: 'Request failed' })
   }
 }
-
-watchEffect(() => {
-  if (followStatus.value?.status) {
-    selected.value = followStatus.value.status
-  }
-})
 </script>
 <template>
   <UButton :label="followLabel" @click="openModal" :loading="pending"
-    :icon="selected === 'none' ? '' : 'i-lucide-check'" />
+    :icon="icon" />
   <UModal v-model:open="modalOpen" title="Add to Library" :ui="{ content: 'preview-modal' }">
     <template #body>
       <div class="text-sm pb-5 first:pt-4 px-4">
