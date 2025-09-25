@@ -63,4 +63,8 @@ const props = defineProps<{
 .tag.dot:not(.no-wrapper) {
   padding-left: .25rem;
 }
+
+.tag:hover {
+  background-color: var(--ui-primary);
+}
 </style>
