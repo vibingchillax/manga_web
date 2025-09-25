@@ -4,9 +4,7 @@ const props = defineProps<{ manga: Manga }>()
 const modalOpen = ref(false)
 const route = useRoute()
 const router = useRouter()
-const auth = useAuth()
-const redirect = useAuthRedirect()
-
+const { loggedIn, redirect } = useAuth()
 const toast = useToast()
 
 const selected = ref('none')
@@ -51,7 +49,7 @@ const followLabel = computed(() => {
 })
 
 function openModal() {
-  if (!auth.session.value?.isAuthenticated) {
+  if (!loggedIn.value) {
     redirect.value = route.path
     router.push("/login")
     return
@@ -103,7 +101,8 @@ watchEffect(() => {
 })
 </script>
 <template>
-  <UButton :label="followLabel" @click="openModal" :loading="pending" :icon="selected === 'none' ? '' : 'i-lucide-check'" />
+  <UButton :label="followLabel" @click="openModal" :loading="pending"
+    :icon="selected === 'none' ? '' : 'i-lucide-check'" />
   <UModal v-model:open="modalOpen" title="Add to Library" :ui="{ content: 'preview-modal' }">
     <template #body>
       <div class="text-sm pb-5 first:pt-4 px-4">

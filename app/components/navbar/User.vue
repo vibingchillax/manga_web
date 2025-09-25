@@ -2,11 +2,13 @@
 import type { DropdownMenuItem } from '@nuxt/ui';
 import LanguageFilter from '../modal/LanguageFilter.vue';
 
-const overlay = useOverlay();
-const toast = useToast();
-const chapterFilterModal = overlay.create(LanguageFilter);
+const overlay = useOverlay()
+const toast = useToast()
+const route = useRoute()
+const router = useRouter()
+const chapterFilterModal = overlay.create(LanguageFilter)
 
-const { session, logout } = useAuth()
+const { loggedIn, session, redirect, logout } = useAuth()
 
 const items = computed<DropdownMenuItem[][]>(() => {
   const common: DropdownMenuItem[] = [
@@ -29,9 +31,9 @@ const items = computed<DropdownMenuItem[][]>(() => {
     }
   ]
   
-  const userProfile: DropdownMenuItem[] = session.value?.isAuthenticated ? [
+  const userProfile: DropdownMenuItem[] = loggedIn.value ? [
     {
-      label: session.value.user?.username ?? session.value.user?.email,
+      label: session.value?.username ?? session.value?.email,
       avatar: {
         icon: 'i-lucide-user'
       },
@@ -43,13 +45,10 @@ const items = computed<DropdownMenuItem[][]>(() => {
     label: 'Guest',
     avatar: {
       icon: 'i-lucide-user'
-    },
-    to: {
-      path: '/login'
     }
   }]
 
-  const authItems: DropdownMenuItem[] = session.value?.isAuthenticated
+  const authItems: DropdownMenuItem[] = loggedIn.value
     ? [
       {
         label: 'Log out',
@@ -69,12 +68,18 @@ const items = computed<DropdownMenuItem[][]>(() => {
         label: 'Log in',
         icon: 'i-lucide-log-in',
         color: 'primary',
-        to: '/login'
+        onSelect() {
+          redirect.value = route.fullPath
+          router.push('/login')
+        }
       },
       {
         label: 'Register',
         icon: 'i-lucide-user-round-plus',
-        to: '/register'
+        onSelect() {
+          redirect.value = route.fullPath
+          router.push('/register')
+        }
       }
     ]
 

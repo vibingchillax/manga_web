@@ -2,14 +2,21 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { H3Event } from 'h3';
 import { prisma } from './prisma';
-import { Users } from '~~/shared/prisma/client';
 
-export async function getUserFromToken(token: string): Promise<Users | null> {
+export async function getUserFromToken(token: string) {
   try {
     const decoded = jwt.verify(token, useRuntimeConfig().jwtSecret) as { userId: string };
     return prisma.users.findUnique({
       where: {
         id: decoded.userId
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true
       }
     });
   } catch {

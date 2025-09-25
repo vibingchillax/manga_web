@@ -1,1 +1,0 @@
-export const useAuthRedirect = () => useState<string | null>('authRedirect', () => null)

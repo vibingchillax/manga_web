@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 const router = useRouter()
 const toast = useToast()
-const redirect = useAuthRedirect()
+const { redirect } = useAuth()
 
 const fields = [{
   name: 'email',
@@ -55,6 +55,7 @@ async function onSubmit(event: FormSubmitEvent<RegisterSchema>) {
       description: "You are now logged in",
       color: 'success'
     })
+    await useAuth().fetch()
     router.push(redirect.value ?? "/")
 
   } else {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MangaFollowStatus } from '~~/shared/prisma/enums';
 
-const auth = useAuth()
+const { loggedIn } = useAuth()
 const preferences = usePreferencesStore();
 const { contentRating } = storeToRefs(preferences)
 const items = ref([
@@ -49,10 +49,10 @@ const tabs = ref([
 const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
 const activeTab = ref<'reading' | 'planToRead' | 'completed' | 'onHold' | 'rereading' | 'dropped'>('reading')
 
-let followsList = ref<{mangaId: string, status: MangaFollowStatus}[] | undefined>()
-let mangasList = ref<{result: string, response: string, data?: Manga[]} | undefined>()
+let followsList = ref<{ mangaId: string, status: MangaFollowStatus }[] | undefined>()
+let mangasList = ref<{ result: string, response: string, data?: Manga[] } | undefined>()
 
-if (auth.session.value?.isAuthenticated) {
+if (loggedIn.value) {
   const { data: fList } = await useFetch('/user/follows/manga', {
     key: 'followsList'
   })
