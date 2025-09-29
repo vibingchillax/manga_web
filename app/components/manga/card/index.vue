@@ -4,9 +4,10 @@ import { useMangaCover } from '~/composables/useMangaCover';
 import type { Manga } from '~~/shared/types';
 
 const props = defineProps<{
-  manga: Manga,
+  manga: Manga
   type: 'normal' | 'dense' | 'coverOnly'
   use512?: boolean
+  noLink?: boolean
 }>()
 const manga = props.manga
 const title = useMangaTitle(manga);
@@ -29,7 +30,7 @@ const tags = manga.attributes?.tags!
     <span class="author">
     </span>
     <div class="manga-card-cover" style="grid-area: art;">
-      <NuxtLink class="group flex items-start relative mb-auto select-none aspect cover" :href="detailsUrl">
+      <NuxtLink class="group flex items-start relative mb-auto select-none aspect cover" :href="noLink ? undefined : detailsUrl">
         <NuxtImg class="rounded shadow-md w-full h-auto" :src="use512 ? coverUrl512 : coverUrl256"></NuxtImg>
       </NuxtLink>
     </div>

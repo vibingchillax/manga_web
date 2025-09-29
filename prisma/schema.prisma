@@ -61,14 +61,53 @@ model scrapedPages {
 }
 
 model Users {
-  id           String         @id @db.Uuid
-  email        String         @unique
-  password     String
-  username     String?
-  role         UserRole       @default(user)
-  createdAt    DateTime       @default(now()) @db.Timestamp(6)
-  updatedAt    DateTime       @default(now()) @updatedAt @db.Timestamp(6)
-  MangaFollows MangaFollows[]
+  id                    String                  @id @db.Uuid
+  email                 String                  @unique
+  password              String
+  username              String?
+  role                  UserRole                @default(user)
+  createdAt             DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt             DateTime                @default(now()) @updatedAt @db.Timestamp(6)
+  MangaFollows          MangaFollows[]
+  uploadedChapters      UploadedChapter[]
+  uploadSession         UploadSession?
+  ScanlationGroupMember ScanlationGroupMember[]
+}
+
+model ScanlationGroup {
+  id                    String                  @id @db.Uuid
+  name                  String
+  altNames              Json?
+  website               String?
+  ircServer             String?
+  ircChannel            String?
+  discord               String?
+  contactEmail          String?
+  description           String?
+  twitter               String?
+  mangaUpdates          String?
+  focusedLanguage       String[]
+  locked                Boolean
+  official              Boolean
+  verified              Boolean
+  inactive              Boolean
+  exLicensed            Boolean
+  version               Int                     @default(1)
+  createdAt             DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt             DateTime                @default(now()) @updatedAt @db.Timestamp(6)
+  ScanlationGroupMember ScanlationGroupMember[]
+  UploadSessionGroup    UploadSessionGroup[]
+  UploadedChapterGroup  UploadedChapterGroup[]
+}
+
+model ScanlationGroupMember {
+  userId  String          @db.Uuid
+  groupId String          @db.Uuid
+  role    GroupRole
+  user    Users           @relation(fields: [userId], references: [id])
+  group   ScanlationGroup @relation(fields: [groupId], references: [id])
+
+  @@id([userId, groupId])
 }
 
 model MangaFollows {
@@ -78,6 +117,71 @@ model MangaFollows {
   user    Users             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, mangaId])
+}
+
+model UploadSession {
+  id                String               @id @db.Uuid
+  userId            String               @unique @db.Uuid
+  mangaId           String               @db.Uuid
+  data              Json?
+  isCommitted       Boolean              @default(false)
+  isProcessed       Boolean              @default(false)
+  isDeleted         Boolean              @default(false)
+  version           Int                  @default(1)
+  createdAt         DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime             @default(now()) @updatedAt @db.Timestamp(6)
+  user              Users                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groups            UploadSessionGroup[]
+  UploadSessionFile UploadSessionFile[]
+}
+
+model UploadSessionFile {
+  id               String        @id @db.Uuid
+  sessionId        String        @db.Uuid
+  originalFileName String
+  cid              String
+  fileSize         Int
+  mimeType         String
+  source           String
+  version          Int           @default(1)
+  session          UploadSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model UploadSessionGroup {
+  sessionId String          @db.Uuid
+  groupId   String          @db.Uuid
+  session   UploadSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  group     ScanlationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, groupId])
+}
+
+model UploadedChapter {
+  id                 String                 @id @db.Uuid
+  mangaId            String                 @db.Uuid
+  title              String?
+  volume             String?
+  chapter            String?
+  translatedLanguage String
+  uploader           String                 @db.Uuid
+  pages              Json
+  version            Int                    @default(1)
+  createdAt          DateTime               @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime               @default(now()) @updatedAt @db.Timestamp(6)
+  publishAt          DateTime               @default(now())
+  readableAt         DateTime               @default(now())
+  user               Users                  @relation(fields: [uploader], references: [id])
+  groups             UploadedChapterGroup[]
+}
+
+model UploadedChapterGroup {
+  chapterId String @db.Uuid
+  groupId   String @db.Uuid
+
+  chapter UploadedChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  group   ScanlationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([chapterId, groupId])
 }
 
 enum UserRole {
@@ -113,4 +217,9 @@ enum MangaFollowStatus {
   planToRead
   completed
   rereading
+}
+
+enum GroupRole {
+  leader
+  member
 }

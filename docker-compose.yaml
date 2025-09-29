@@ -1,9 +1,11 @@
 services:
-  frontend:
+  app:
     build:
       context: .
     ports:
       - "80:3000"
+    depends_on:
+      - db
     restart: unless-stopped
   db:
     image: postgres
@@ -23,6 +25,19 @@ services:
       - db:/var/lib/postgresql/data
     env_file:
       - .env
+  kubo:
+    image: ipfs/kubo
+    restart: unless-stopped
+    ports:
+      - "${KUBO_TRANSPORT_PORT}:4001"
+      - "${KUBO_TRANSPORT_PORT}:4001/udp"
+      - "127.0.0.1:${KUBO_GATEWAY_PORT}:8080"
+      - "127.0.0.1:${KUBO_API_PORT}:5001"
+    volumes:
+      - ipfs_staging:/export
+      - ipfs_data:/data/ipfs
+    env_file:
+      - .env
   pgadmin:
     image: dpage/pgadmin4
     restart: unless-stopped
@@ -40,3 +55,5 @@ services:
       - .env
 volumes:
   db:
+  ipfs_staging:
+  ipfs_data:

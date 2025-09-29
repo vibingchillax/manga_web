@@ -31,3 +31,12 @@ export type {
 } from "@manga_web/sources"
 
 export type SourceLabel = { label: string, id: string, url: string, flags: Flags[] };
+
+export enum UploadState {
+  Pending,
+  Uploading,
+  Success,
+  Fail,
+  PendingRemoval,
+  Removed,
+}
