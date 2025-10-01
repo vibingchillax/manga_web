@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { H3Event } from 'h3';
 import { prisma } from './prisma';
+import { randomBytes, randomUUID } from 'crypto'
 
 export async function getUserFromToken(token: string) {
   try {
@@ -39,8 +40,22 @@ export async function comparePasswords(password: string, hash: string): Promise<
   return bcrypt.compare(password, hash);
 }
 
-export async function generateToken(userId: string): Promise<string> {
-  return jwt.sign({ userId }, useRuntimeConfig().jwtSecret, {
+export async function generateToken(userId: string) {
+
+  const accessToken = jwt.sign({ userId }, useRuntimeConfig().jwtSecret, {
     expiresIn: '1h'
   });
+
+  const refreshToken = randomBytes(40).toString('hex')
+
+  await prisma.refreshToken.create({
+    data: {
+      id: randomUUID(),
+      token: refreshToken,
+      userId: userId,
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
+    }
+  })
+
+  return { accessToken, refreshToken }
 }

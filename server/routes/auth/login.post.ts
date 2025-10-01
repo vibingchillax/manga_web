@@ -36,15 +36,23 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const token = await generateToken(user.id);
+  const { accessToken, refreshToken } = await generateToken(user.id);
 
-  setCookie(event, 'access_token', token, {
+  setCookie(event, 'access_token', accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 60 * 60 * 24 * 14,
-    path: '/',
+    maxAge: 60 * 60,
+    path: '/'
   });
+
+  setCookie(event, 'refresh_token', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 60 * 60 * 24 * 30,
+    path: '/'
+  })
 
   return {
     result: "ok",

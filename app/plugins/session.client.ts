@@ -1,3 +1,7 @@
 export default defineNuxtPlugin(async () => {
-  await useAuth().fetch()
+  const auth = useAuth()
+  await auth.refresh()
+  setInterval(() => {
+    auth.refresh()
+  }, 55 * 60 * 1000)
 })

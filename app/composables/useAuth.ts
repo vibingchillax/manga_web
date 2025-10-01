@@ -16,10 +16,22 @@ export const useAuth = () => {
     session.value = await $fetch('/auth/session', { method: "GET" })
   }
 
+  const refresh = async () => {
+    try {
+      console.log('Attempting to refresh token')
+      await $fetch('/auth/refresh')
+      await fetch()
+      console.log('Successfully refreshed access token for user')
+    } catch (e) {
+      console.error('Failed to refresh access token', e)
+      await logout()
+    }
+  }
+
   const logout = async () => {
     await $fetch('/auth/signout', { method: "POST" })
     session.value = null
   }
 
-  return { loggedIn, session, redirect, fetch, logout }
+  return { loggedIn, session, redirect, fetch, refresh, logout }
 }

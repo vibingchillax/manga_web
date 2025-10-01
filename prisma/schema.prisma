@@ -71,7 +71,17 @@ model Users {
   MangaFollows          MangaFollows[]
   uploadedChapters      UploadedChapter[]
   uploadSession         UploadSession?
+  RefreshToken          RefreshToken[]
   ScanlationGroupMember ScanlationGroupMember[]
+}
+
+model RefreshToken {
+  id        String   @id @db.Uuid
+  token     String   @unique
+  userId    String   @db.Uuid
+  expiresAt DateTime
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ScanlationGroup {

@@ -1,11 +1,16 @@
 export default defineEventHandler(async (event) => {
-  setCookie(event, 'access_token', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 0,
-    path: '/'
-  })
+  const user = await getAuthenticatedUser(event)
+
+  if (user) {
+    await prisma.refreshToken.deleteMany({
+      where: {
+        userId: user.id
+      }
+    })
+  }
+
+  deleteCookie(event, 'access_token')
+  deleteCookie(event, 'refresh_token')
 
   return 'User signed out successfully'
 })
