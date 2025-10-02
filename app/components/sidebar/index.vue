@@ -82,7 +82,18 @@ const sections = computed<Section[]>(() => {
     { title: 'Random', link: '/title/random' }
   ]
 
-  return [home, follows, titles]
+  const communitySection: ItemHeader = {
+    title: 'Community',
+    icon: 'i-lucide-users',
+  }
+
+  const community: Section = [
+    communitySection,
+    { title: 'Groups', link: '/groups' },
+    { title: 'Users', link: '/users' }
+  ]
+
+  return [home, follows, titles, community]
 })
 
 watch(() => route.name, (newName) => {
