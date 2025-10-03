@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const data = register.data
-  const existingUser = await prisma.users.findUnique({
+  const existingUser = await prisma.user.findUnique({
     where: {
       email: data.email
     }
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     result: "error",
     message: "Email already registered"
   }
-  const user = await prisma.users.create({
+  const user = await prisma.user.create({
     data: {
       id: randomUUID(),
       email: data.email,

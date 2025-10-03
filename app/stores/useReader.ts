@@ -1,5 +1,5 @@
 import type { Router } from "vue-router"
-import type { scrapedChapters, scrapedMangas } from "~~/shared/prisma/client"
+import type { ScrapedChapter, ScrapedManga } from "~~/shared/prisma/client"
 import { ReadStyleEnum, ViewStyleEnum } from "./useReaderMenu"
 
 function debug(...e: any[]) {
@@ -28,11 +28,11 @@ export interface ReaderState {
   serverLoadError: any | null
   currentPageGroup: number
   currentProgress: number
-  manga: scrapedMangas | null
+  manga: ScrapedManga | null
   aggregate: MangaAggregateResponse | null
   chapterMeta: {
-    nextChapter: scrapedChapters | null
-    prevChapter: scrapedChapters | null
+    nextChapter: ScrapedChapter | null
+    prevChapter: ScrapedChapter | null
     mangaTitle: string
     mangaLink: string
     chapterNo: string | null
@@ -136,7 +136,7 @@ export const useReaderStore = defineStore("reader", {
 
         this._markChapterRead(chapter)
 
-        if (chapter.scrapedMangas.contentRating && !preferences.contentRating.includes(chapter.scrapedMangas.contentRating)) {
+        if (chapter.manga.contentRating && !preferences.contentRating.includes(chapter.manga.contentRating)) {
           this.showContentWarning = contentWarn
         }
       } catch (error: any) {
@@ -154,7 +154,7 @@ export const useReaderStore = defineStore("reader", {
       }
 
       if (this.currentChapter) {
-        if (!this.manga) this.manga = this.currentChapter.scrapedMangas
+        if (!this.manga) this.manga = this.currentChapter.manga
         if (this.manga) this.refreshAggregate()
         this.chapterMeta = useScrapedChapterMeta()
       }
@@ -320,7 +320,7 @@ export const useReaderStore = defineStore("reader", {
 
       this.setCurrentPageGroup(groupIndex)
     },
-    async _markChapterRead(chapter: scrapedChapters) {
+    async _markChapterRead(chapter: ScrapedChapter) {
       const history = useReadingHistoryStore()
       debug(`Marking C:${chapter.id} read`)
       history.pushChapterRead({ chapterId: chapter.id, type: "scraped" })

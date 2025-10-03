@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   }
   
   try {
-    const manga = await prisma.scrapedMangas.findUnique({
+    const manga = await prisma.scrapedManga.findUnique({
       where: {
         id
       }
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Manga not found'
     })
 
-    const result = await prisma.scrapedChapters.findMany({
+    const result = await prisma.scrapedChapter.findMany({
       where: {
         mangaId: id
       }
