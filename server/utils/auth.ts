@@ -7,7 +7,7 @@ import { randomBytes, randomUUID } from 'crypto'
 export async function getUserFromToken(token: string) {
   try {
     const decoded = jwt.verify(token, useRuntimeConfig().jwtSecret) as { userId: string };
-    return prisma.users.findUnique({
+    return prisma.user.findUnique({
       where: {
         id: decoded.userId
       },
