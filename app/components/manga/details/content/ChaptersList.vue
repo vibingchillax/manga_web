@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { scrapedChapters } from '~~/shared/prisma/client';
 import ChapterEntry from './ChapterEntry.vue';
-defineProps<{ volume: string, chapters: scrapedChapters[] }>();
+defineProps<{ volume: string, chapters: ScrapedChapter[] }>();
 
 const isOpen = ref(true);
 const toggle = () => {

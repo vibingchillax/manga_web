@@ -20,9 +20,9 @@ export default defineEventHandler(async (event) => {
     ? [query['includes[]']]
     : [];
 
-  const chapters = await prisma.scrapedChapters.findMany({
+  const chapters = await prisma.scrapedChapter.findMany({
     where: { id: { in: ids } },
-    include: { scrapedMangas: includes.includes('manga') },
+    include: { ScrapedManga: includes.includes('manga') },
   });
 
   if (chapters.length === 0) {

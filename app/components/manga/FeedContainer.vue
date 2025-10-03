@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { scrapedChapters, scrapedMangas } from '~~/shared/prisma/client';
+import type { ScrapedChapter, ScrapedManga } from '~~/shared/prisma/client';
 import ChapterEntry from './details/content/ChapterEntry.vue';
 
 const props = defineProps<{
-  manga: scrapedMangas;
-  chapterList: scrapedChapters[];
+  manga: ScrapedManga;
+  chapterList: ScrapedChapter[];
   chapterStats?: Record<string, any>;
   statsLoading?: boolean;
 }>();

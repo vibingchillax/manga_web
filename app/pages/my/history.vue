@@ -33,11 +33,11 @@ for (const c of result) {
 }
 
 const groupedChapters = computed(() => {
-  const uniqueMangaIds = [...new Set(chapters.value.map(c => c.scrapedMangas.mangaDexId))];
+  const uniqueMangaIds = [...new Set(chapters.value.map(c => c.manga.mangaDexId))];
   return uniqueMangaIds.map(id => {
-    const manga = chapters.value.find(c => c.scrapedMangas.mangaDexId === id)?.scrapedMangas
+    const manga = chapters.value.find(c => c.manga.mangaDexId === id)?.manga
 
-    const mangaChapters = chapters.value.filter(c => c.scrapedMangas.mangaDexId === id).map(({ scrapedMangas, ...rest }) => rest);
+    const mangaChapters = chapters.value.filter(c => c.manga.mangaDexId === id).map(({ manga, ...rest }) => rest);
     return { manga, chapters: mangaChapters };
   });
 })

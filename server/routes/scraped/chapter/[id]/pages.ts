@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   try {
-    const pages = await prisma.scrapedPages.findFirst({
+    const pages = await prisma.scrapedPage.findFirst({
       where: {
         chapterId: id
       }
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
     if (pages?.data && pages.data.length > 0) return pages;
 
-    const chapter = await prisma.scrapedChapters.findUnique({
+    const chapter = await prisma.scrapedChapter.findUnique({
       where: {
         id
       }
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Pages not found'
     })
 
-    const created = await prisma.scrapedPages.create({
+    const created = await prisma.scrapedPage.create({
       data: {
         id: randomUUID(),
         chapterId: chapter.id,

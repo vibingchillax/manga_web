@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const param = getQuery(event);
   const translatedLanguage = Array.isArray(param['translatedLanguage[]']) ? param['translatedLanguage[]'] : param['translatedLanguage[]'] ? [param['translatedLanguage[]']] : []
 
-  const chapters = await prisma.scrapedChapters.findMany({
+  const chapters = await prisma.scrapedChapter.findMany({
     where: {
       mangaId: id,
       ...(translatedLanguage.length > 0 && {

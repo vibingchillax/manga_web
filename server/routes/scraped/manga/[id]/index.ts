@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
-  const manga = await prisma.scrapedMangas.findUnique({
+  const manga = await prisma.scrapedManga.findUnique({
     where: {
       id
     }

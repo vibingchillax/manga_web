@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   const data = body.data
 
   try {
-    const result = await prisma.scrapedMangas.findMany({
+    const result = await prisma.scrapedManga.findMany({
       where: {
         sourceId: data.sourceId,
         mangaDexId: data.mangadexId

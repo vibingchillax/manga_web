@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type Manga } from '~~/shared/types';
 import ChaptersList from './ChaptersList.vue';
-import type { scrapedChapters, scrapedMangas } from '~~/shared/prisma/client';
+import type { ScrapedChapter, ScrapedManga } from '~~/shared/prisma/client';
 
 const toast = useToast();
 
@@ -15,9 +15,9 @@ const manga = props.manga;
 const title = ref<string>(useMangaTitle(manga));
 
 const selectedSource = ref<SourceLabel>();
-const scrapedMangas = ref<scrapedMangas[]>([]);
-const scrapedChapters = ref<scrapedChapters[]>([]);
-const selectedManga = ref<scrapedMangas>();
+const scrapedMangas = ref<ScrapedManga[]>([]);
+const scrapedChapters = ref<ScrapedChapter[]>([]);
+const selectedManga = ref<ScrapedManga>();
 const hasFetched = ref(false);
 
 const loading = ref(false);
@@ -28,14 +28,14 @@ const { data, status } = await useFetch('/sources');
 async function selectSource(source: SourceLabel) {
   loading.value = true;
   try {
-    const mangas = await $fetch<scrapedMangas[]>('/scrape/mangas', {
+    const mangas = await $fetch<ScrapedManga[]>('/scrape/mangas', {
       method: 'POST',
       body: { title: title.value, sourceId: source.id, mangadexId: manga.id }
     });
     if (!mangas || !(mangas.length > 0)) throw new Error('Nothing found');
     scrapedMangas.value = mangas;
     progressValue.value = 1;
-    const chapters = await $fetch<scrapedChapters[]>(`/scraped/manga/${mangas[0]!.id}/feed`);
+    const chapters = await $fetch<ScrapedChapter[]>(`/scraped/manga/${mangas[0]!.id}/feed`);
     if (!chapters || !(chapters.length > 0)) throw new Error('Nothing found');
     scrapedChapters.value = chapters;
     progressValue.value = 2;
@@ -53,13 +53,13 @@ async function selectSource(source: SourceLabel) {
   }
 }
 
-async function selectManga(manga: scrapedMangas) {
+async function selectManga(manga: ScrapedManga) {
   selectedManga.value = manga;
   loading.value = true;
   title.value = selectedManga.value.title;
   progressValue.value = 1;
   try {
-    const chapters = await $fetch<scrapedChapters[]>(`/scraped/manga/${manga.id}/feed`);
+    const chapters = await $fetch<ScrapedChapter[]>(`/scraped/manga/${manga.id}/feed`);
     if (!chapters || !(chapters.length > 0)) throw new Error('Nothing found');
     scrapedChapters.value = chapters;
     progressValue.value = 2;
@@ -77,7 +77,7 @@ async function selectManga(manga: scrapedMangas) {
 }
 
 const groupedChapters = computed(() => {
-  const groups = new Map<string, scrapedChapters[]>();
+  const groups = new Map<string, ScrapedChapter[]>();
   const filteredChapters = scrapedChapters.value.filter(ch =>
     preferences.filteredLanguages.length === 0 || preferences.filteredLanguages.includes(ch.translatedLanguage || 'en')
   )

@@ -19,7 +19,7 @@ export async function refreshMangas(mangaInput: MangaRequestBody) {
       statusMessage: `No manga found from ${mangaInput.sourceId} for ${mangaInput.title}`
     })
 
-    const created = await prisma.scrapedMangas.createManyAndReturn({
+    const created = await prisma.scrapedManga.createManyAndReturn({
       data: scrapeNew.map(manga => ({
         id: randomUUID(),
         mangaDexId: mangaInput.mangadexId,

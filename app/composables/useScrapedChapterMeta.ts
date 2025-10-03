@@ -1,5 +1,3 @@
-import type { scrapedChapters } from "~~/shared/prisma/client"
-
 export const useScrapedChapterMeta = () => {
   const reader = useReaderStore()
   const readerCache = useReaderCache()
@@ -39,7 +37,7 @@ export const useScrapedChapterMeta = () => {
   const chapterPageCount = reader.currentChapter ?
     readerPageManager.imageData?.data.length : null
 
-  const nextChapter: scrapedChapters | null = (() => {
+  const nextChapter: ScrapedChapter | null = (() => {
     const translatedLanguage = (reader.currentChapter == null ? void 0 : reader.currentChapter.translatedLanguage) ?? "en"
 
     if (!reader._nextChapter) return null
@@ -65,7 +63,7 @@ export const useScrapedChapterMeta = () => {
     }
   })()
 
-  const prevChapter: scrapedChapters | null = (() => {
+  const prevChapter: ScrapedChapter | null = (() => {
     const translatedLanguage = (reader.currentChapter == null ? void 0 : reader.currentChapter.translatedLanguage) ?? "en"
 
     if (!reader._prevChapter) return null

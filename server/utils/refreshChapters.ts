@@ -1,7 +1,6 @@
 import { randomUUID } from 'crypto';
-import { scrapedMangas } from '~~/shared/prisma/client';
 
-export async function refreshChapters(manga: scrapedMangas) {
+export async function refreshChapters(manga: ScrapedManga) {
 
   const result = await sourcesInstance.runSourceForChapters({
     manga: {
@@ -16,7 +15,7 @@ export async function refreshChapters(manga: scrapedMangas) {
     statusMessage: `No chapters found from ${manga.sourceId} for ${manga.title}`
   })
 
-  const created = await prisma.scrapedChapters.createManyAndReturn({
+  const created = await prisma.scrapedChapter.createManyAndReturn({
     data: result.map(chapter => ({
       id: randomUUID(),
       mangaId: manga.id,
