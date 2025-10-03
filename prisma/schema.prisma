@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model scrapedMangas {
+model ScrapedManga {
   id                     String                  @id @db.Uuid
   mangaDexId             String                  @db.Uuid
   sourceId               String
@@ -29,10 +29,10 @@ model scrapedMangas {
   version                Int                     @default(1)
   createdAt              DateTime                @default(now()) @db.Timestamp(6)
   updatedAt              DateTime                @default(now()) @updatedAt @db.Timestamp(6)
-  scrapedChapters        scrapedChapters[]
+  ScrapedChapter         ScrapedChapter[]
 }
 
-model scrapedChapters {
+model ScrapedChapter {
   id                 String         @id @db.Uuid
   mangaId            String         @db.Uuid
   sourceId           String
@@ -47,20 +47,20 @@ model scrapedChapters {
   publishedAt        String?
   createdAt          DateTime       @default(now()) @db.Timestamp(6)
   updatedAt          DateTime       @default(now()) @updatedAt @db.Timestamp(6)
-  scrapedMangas      scrapedMangas  @relation(fields: [mangaId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  scrapedPages       scrapedPages[]
+  ScrapedManga       ScrapedManga   @relation(fields: [mangaId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  ScrapedPage        ScrapedPage[]
 }
 
-model scrapedPages {
+model ScrapedPage {
   id              String          @id @db.Uuid
   chapterId       String          @db.Uuid
   data            String[]
   createdAt       DateTime        @default(now()) @db.Timestamp(6)
   updatedAt       DateTime        @default(now()) @updatedAt @db.Timestamp(6)
-  scrapedChapters scrapedChapters @relation(fields: [chapterId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  ScrapedChapter  ScrapedChapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-model Users {
+model User {
   id                    String                  @id @db.Uuid
   email                 String                  @unique
   password              String
@@ -81,7 +81,7 @@ model RefreshToken {
   userId    String   @db.Uuid
   expiresAt DateTime
   createdAt DateTime @default(now()) @db.Timestamp(6)
-  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ScanlationGroup {
@@ -114,7 +114,7 @@ model ScanlationGroupMember {
   userId  String          @db.Uuid
   groupId String          @db.Uuid
   role    GroupRole
-  user    Users           @relation(fields: [userId], references: [id])
+  user    User            @relation(fields: [userId], references: [id])
   group   ScanlationGroup @relation(fields: [groupId], references: [id])
 
   @@id([userId, groupId])
@@ -124,7 +124,7 @@ model MangaFollows {
   userId  String            @db.Uuid
   mangaId String            @db.Uuid
   status  MangaFollowStatus
-  user    Users             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, mangaId])
 }
@@ -140,7 +140,7 @@ model UploadSession {
   version           Int                  @default(1)
   createdAt         DateTime             @default(now()) @db.Timestamp(6)
   updatedAt         DateTime             @default(now()) @updatedAt @db.Timestamp(6)
-  user              Users                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   groups            UploadSessionGroup[]
   UploadSessionFile UploadSessionFile[]
 }
@@ -180,7 +180,7 @@ model UploadedChapter {
   updatedAt          DateTime               @default(now()) @updatedAt @db.Timestamp(6)
   publishAt          DateTime               @default(now())
   readableAt         DateTime               @default(now())
-  user               Users                  @relation(fields: [uploader], references: [id])
+  user               User                   @relation(fields: [uploader], references: [id])
   groups             UploadedChapterGroup[]
 }
 

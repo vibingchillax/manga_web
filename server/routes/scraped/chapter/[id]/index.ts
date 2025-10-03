@@ -4,12 +4,12 @@ export default defineEventHandler(async (event) => {
 
   const includes = Array.isArray(param['includes[]']) ? param['includes[]'] : param['includes[]'] ? [param['includes[]']] : []
 
-  const chapter = await prisma.scrapedChapters.findUnique({
+  const chapter = await prisma.scrapedChapter.findUnique({
     where: {
       id
     },
     include: {
-      scrapedMangas: includes.includes('manga')
+      ScrapedManga: includes.includes('manga')
     }
   })
 
