@@ -12,7 +12,8 @@ const props = defineProps<{
 const preferences = usePreferencesStore();
 
 const manga = props.manga;
-const title = ref<string>(useMangaTitle(manga));
+const originalTitle = useManga(manga).title.value as string
+const title = ref<string>(originalTitle);
 
 const selectedSource = ref<SourceLabel>();
 const scrapedMangas = ref<ScrapedManga[]>([]);

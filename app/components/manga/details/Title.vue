@@ -1,24 +1,22 @@
 <script setup lang="ts">
-import { useMangaAuthor } from '~/composables/useMangaAuthor';
 import type { Manga } from '~~/shared/types';
 const props = defineProps<{
   manga: Manga
 }>()
 const manga = props.manga
-const title = useMangaTitle(manga);
-const altTitles = manga.attributes?.altTitles
+const { title, altTitles, author } = useManga(manga)
+
 const preferredAltTitle = computed(() => {
   const priority = ['en', 'ja', 'kr']; // TODO user preferences
 
   for (const key of priority) {
-    const match = altTitles?.find(title => key in title);
+    const match = altTitles.value?.find(title => key in title);
     if (match) return match[key];
   }
 
-  const first = altTitles?.find(title => Object.values(title)[0]);
+  const first = altTitles.value?.find(title => Object.values(title)[0]);
   return first ? Object.values(first)[0] : null;
 });
-const { authors, artists, samePeople } = useMangaAuthor(manga);
 </script>
 
 <template>
@@ -34,12 +32,12 @@ const { authors, artists, samePeople } = useMangaAuthor(manga);
     <div class="flex-grow hidden sm:block"></div>
     <div class="flex flex-grow gap-2">
       <div class="font-normal text-xs sm:text-base truncate">
-        <template v-if="samePeople">
-          {{authors.map(a => a.attributes?.name).join(', ')}}
+        <template v-if="author.samePeople">
+          {{author.authors.map(a => a.attributes?.name).join(', ')}}
         </template>
         <template v-else>
-          {{authors.map(a => a.attributes?.name).join(', ')}},
-          {{artists.map(a => a.attributes?.name).join(', ')}}
+          {{author.authors.map(a => a.attributes?.name).join(', ')}},
+          {{author.artists.map(a => a.attributes?.name).join(', ')}}
         </template>
       </div>
     </div>

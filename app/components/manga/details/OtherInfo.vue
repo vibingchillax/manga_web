@@ -1,30 +1,26 @@
 <script setup lang="ts">
-import { useMangaAuthor } from '~/composables/useMangaAuthor';
 import type { Manga } from '~~/shared/types';
 import type { Tag } from '~~/shared/types';
 const props = defineProps<{
   manga: Manga
 }>()
+
 const manga = props.manga
-const altTitles = manga.attributes?.altTitles
+
+const { altTitles, publicationDemographic, links, tags, author } = useManga(manga)
+
 const altTitlesList = computed(() => {
-  return altTitles?.flatMap(obj =>
+  return altTitles.value?.flatMap(obj =>
     Object.entries(obj) // converts { en: "Title" } into [ ["en", "Title"] ]
   ) ?? []
 })
-
-const demographic = manga.attributes?.publicationDemographic
-const links = manga.attributes?.links
-const tags = manga.attributes?.tags
-
-const { authors, artists } = useMangaAuthor(manga);
 
 const genres: Tag[] = []
 const themes: Tag[] = []
 const format: Tag[] = []
 const content: Tag[] = []
 
-for (const tag of tags!) {
+for (const tag of tags.value) {
   const group = tag.attributes?.group
   if (!group) continue
 
@@ -40,7 +36,7 @@ for (const tag of tags!) {
     <div class="mb-2">
       <div class="font-bold mb-2">Author</div>
       <div class="flex gap-2 flex-wrap">
-        <MangaTag v-for="author in authors"
+        <MangaTag v-for="author in author.authors"
           :href="`/author/${author.id}/${toKebabCase(author.attributes?.name!)}`">
           {{ author.attributes?.name }}
         </MangaTag>
@@ -49,7 +45,7 @@ for (const tag of tags!) {
     <div class="mb-2">
       <div class="font-bold mb-2">Artist</div>
       <div class="flex gap-2 flex-wrap">
-        <MangaTag v-for="artist in artists"
+        <MangaTag v-for="artist in author.artists"
           :href="`/author/${artist.id}/${toKebabCase(artist.attributes?.name!)}`">
           {{ artist.attributes?.name }}
         </MangaTag>
@@ -63,11 +59,11 @@ for (const tag of tags!) {
         </MangaTag>
       </div>
     </div>
-    <div v-if="demographic" class="mb-2">
+    <div v-if="publicationDemographic" class="mb-2">
       <div class="font-bold mb-2">Demographic</div>
       <div class="flex gap-2 flex-wrap">
         <MangaTag>
-          {{ demographic }}
+          {{ publicationDemographic }}
         </MangaTag>
       </div>
     </div>

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useMangaAuthor } from '~/composables/useMangaAuthor';
-import { useMangaCover } from '~/composables/useMangaCover';
 import type { Manga } from '~~/shared/types';
 
 const props = defineProps<{
@@ -10,13 +8,15 @@ const props = defineProps<{
   noLink?: boolean
 }>()
 const manga = props.manga
-const title = useMangaTitle(manga);
-const detailsUrl = `/title/${manga.id}/${toKebabCase(title)}`
-const { coverUrl256, coverUrl512 } = useMangaCover(manga);
-// const { authors, artists, samePeople } = useMangaAuthor(manga);
-const publicationStatus = manga.attributes?.status
-const contentRating = manga.attributes?.contentRating
-const tags = manga.attributes?.tags!
+const {
+  title,
+  detailsUrl,
+  cover,
+  author,
+  publicationStatus,
+  contentRating,
+  tags
+} = useManga(manga);
 </script>
 
 <template>
@@ -31,7 +31,7 @@ const tags = manga.attributes?.tags!
     </span>
     <div class="manga-card-cover" style="grid-area: art;">
       <NuxtLink class="group flex items-start relative mb-auto select-none aspect cover" :href="noLink ? undefined : detailsUrl">
-        <NuxtImg class="rounded shadow-md w-full h-auto" :src="use512 ? coverUrl512 : coverUrl256"></NuxtImg>
+        <NuxtImg class="rounded shadow-md w-full h-auto" :src="use512 ? cover.coverUrl512 : cover.coverUrl256"></NuxtImg>
       </NuxtLink>
     </div>
     <div style="grid-area: status;" class="flex flex-wrap status mb-auto">
