@@ -1,15 +1,16 @@
 import { randomUUID } from "crypto"
+import * as z from 'zod'
 
-type Body = {
-  chapterDraft: {
-    volume?: string | null
-    chapter?: string | null
-    title?: string | null
-    translatedLanguage: string
-    publishAt: Date
-  }
-  pageOrder: string[]
-}
+const commitSchema = z.object({
+  chapterDraft: z.object({
+    volume: z.string().optional(),
+    chapter: z.string().optional(),
+    title: z.string().optional(),
+    translatedLanguage: z.string().min(2).max(6),
+    publishAt: z.string().transform((val) => new Date(val))
+  }),
+  pageOrder: z.array(z.string().uuid())
+}) 
 
 export default defineEventHandler(async (event) => {
   const kuboUrl = useAppConfig().kuboUrl
@@ -28,16 +29,20 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'No sessionId provided'
   })
 
-  const body: Body = await readBody(event)
+  const body = commitSchema.safeParse(await readBody(event))
 
-  if (!body.chapterDraft || !body.pageOrder) throw createError({
+  if (!body.success) throw createError({
     statusCode: 400,
-    statusMessage: 'Missing chapterDraft or pageOrder in body'
+    statusMessage: "Invalid request body",
+    data: body.error.flatten()
   })
+
+  const data = body.data
 
   const session = await prisma.uploadSession.findUnique({
     where: {
-      id: id
+      id: id,
+      userId: user.id
     },
     include: {
       UploadSessionFile: true
@@ -54,7 +59,7 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'No files uploaded yet'
   })
 
-  const orderedFiles = body.pageOrder.map(idOrName => {
+  const orderedFiles = data.pageOrder.map(idOrName => {
     const file = session.UploadSessionFile.find(f => f.id === idOrName || f.originalFileName === idOrName)
     if (!file) throw createError({ statusCode: 400, statusMessage: `File ${idOrName} not found in session` })
     return file
@@ -64,10 +69,10 @@ export default defineEventHandler(async (event) => {
     data: {
       id: randomUUID(),
       mangaId: session.mangaId,
-      title: body.chapterDraft.title,
-      volume: body.chapterDraft.volume,
-      chapter: body.chapterDraft.chapter,
-      translatedLanguage: body.chapterDraft.translatedLanguage,
+      title: data.chapterDraft.title,
+      volume: data.chapterDraft.volume,
+      chapter: data.chapterDraft.chapter,
+      translatedLanguage: data.chapterDraft.translatedLanguage,
       uploader: user.id,
       pages: {
         originalUrl: kuboUrl as string,
@@ -78,7 +83,7 @@ export default defineEventHandler(async (event) => {
           mimeType: f.mimeType
         }))
       },
-      publishAt: body.chapterDraft.publishAt
+      publishAt: data.chapterDraft.publishAt
     }
   })
 

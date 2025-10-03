@@ -1,3 +1,5 @@
+import * as z from 'zod'
+
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
 
@@ -13,16 +15,20 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'No sessionId provided'
   })
 
-  const body: string[] = await readBody(event)
+  const body = z.array(z.string().uuid()).safeParse(await readBody(event))
 
-  if (!body || body.length === 0) throw createError({
+  if (!body.success) throw createError({
     statusCode: 400,
-    statusMessage: 'No file id list given'
+    statusMessage: 'Invalid request body',
+    data: body.error.flatten()
   })
+
+  const data = body.data
 
   await prisma.uploadSessionFile.deleteMany({
     where: {
-      id: { in: body}
+      id: { in: data },
+      sessionId
     }
   })
 

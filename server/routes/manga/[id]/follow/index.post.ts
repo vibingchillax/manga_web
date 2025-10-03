@@ -1,18 +1,34 @@
 import { MangaFollowStatus } from "~~/shared/prisma/enums"
+import * as z from 'zod'
+
+const schema = z.object({
+  status: z.nativeEnum(MangaFollowStatus)
+})
 
 export default defineEventHandler(async (event) => {
-  const mangaId = getRouterParam(event, 'id')
-  const body: {status: MangaFollowStatus} = await readBody(event)
   const user = await getAuthenticatedUser(event)
+
+  if (!user) throw createError({
+    statusCode: 401,
+    statusMessage: 'Not logged in'
+  })
+
+  const mangaId = getRouterParam(event, 'id')
 
   if (!mangaId) throw createError({
     statusCode: 400,
     statusMessage: 'No manga id'
   })
-  if (!user) throw createError({
-    statusCode: 401,
-    statusMessage: 'Not logged in'
+
+  const body = schema.safeParse(await readBody(event))
+
+  if (!body.success) throw createError({
+    statusCode: 400,
+    statusMessage: 'Invalid request data',
+    data: body.error.flatten()
   })
+
+  const status = body.data.status
 
   await prisma.mangaFollows.upsert({
     where: {
@@ -22,12 +38,12 @@ export default defineEventHandler(async (event) => {
       }
     },
     update: {
-      status: body.status ?? 'reading'
+      status: status ?? 'reading'
     },
     create: {
       userId: user.id,
       mangaId,
-      status: body.status ?? 'reading'
+      status: status ?? 'reading'
     }
   })
 

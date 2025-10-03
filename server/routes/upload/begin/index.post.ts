@@ -1,30 +1,40 @@
 import { randomUUID } from 'crypto'
+import * as z from 'zod'
 
-type Body = {
-  groups: string[]
-  manga: string
-}
+const beginSchema = z.object({
+  groups: z.array(z.string().uuid({ message: "Group ID must be a valid UUID" }))
+  .refine((arr) => new Set(arr).size === arr.length, {
+    message: "Duplicate group IDs are not allowed"
+  })
+  ,
+  manga: z.string().uuid({ message: "Manga ID must be a valid UUID" })
+})
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
+
   if (!user) throw createError({
     statusCode: 401,
     statusMessage: "Not authenticated"
   })
-  const body: Body = await readBody(event)
-  
-  if (!body.manga || !body.groups) throw createError({
+
+  const body = beginSchema.safeParse(await readBody(event))
+
+  if (!body.success) throw createError({
     statusCode: 400,
-    statusMessage: 'No manga or groups in body'
+    statusMessage: "Invalid request data",
+    data: body.error.flatten()
   })
+
+  const data = body.data
 
   const session = await prisma.uploadSession.create({
     data: {
       id: randomUUID(),
-      mangaId: body.manga,
+      mangaId: data.manga,
       userId: user.id,
       groups: {
-        create: body.groups.map((gid) => ({
+        create: data.groups.map((gid) => ({
           group: {
             connect: { id: gid }
           }
