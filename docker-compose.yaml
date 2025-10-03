@@ -6,6 +6,7 @@ services:
       - "80:3000"
     depends_on:
       - db
+      - redis
     restart: unless-stopped
   db:
     image: postgres
@@ -38,6 +39,14 @@ services:
       - ipfs_data:/data/ipfs
     env_file:
       - .env
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   pgadmin:
     image: dpage/pgadmin4
     restart: unless-stopped
