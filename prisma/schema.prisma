@@ -96,11 +96,12 @@ model ScanlationGroup {
   description           String?
   twitter               String?
   mangaUpdates          String?
+  inactive              Boolean
+  publishDelay          Int                     @default(0)
   focusedLanguage       String[]
   locked                Boolean
   official              Boolean
   verified              Boolean
-  inactive              Boolean
   exLicensed            Boolean
   version               Int                     @default(1)
   createdAt             DateTime                @default(now()) @db.Timestamp(6)
