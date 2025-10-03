@@ -58,13 +58,13 @@ const { data: mangasList, pending, error } = await useMangadex('/manga', {
         <swiper-slide v-for="(manga, index) in mangasList?.data" :key="index" style="max-width: 192px; flex: 0 0 auto;">
           <div>
             <NuxtLink class="group flex items-start relative mb-auto select-none w-full h-full aspect-[5/7]"
-              :to="`/title/${manga.id}/${toKebabCase(useMangaTitle(manga))}`">
-              <NuxtImg class="rounded shadow-md w-full h-full" :src="useMangaCover(manga).coverUrl256">
+              :to="useManga(manga).detailsUrl.value">
+              <NuxtImg class="rounded shadow-md w-full h-full" :src="useManga(manga).cover.value.coverUrl256">
               </NuxtImg>
             </NuxtLink>
-            <NuxtLink :to="`/title/${manga.id}/${toKebabCase(useMangaTitle(manga))}`">
+            <NuxtLink :to="useManga(manga).detailsUrl.value">
               <h6 class="mt-2 text-sm line-clamp-2">
-                {{ useMangaTitle(manga) }}
+                {{ useManga(manga).title }}
               </h6>
             </NuxtLink>
           </div>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useMangaCover } from '~/composables/useMangaCover';
 import type { Manga } from '~~/shared/types';
 
 const props = defineProps<{
@@ -7,18 +6,18 @@ const props = defineProps<{
 }>()
 const manga = props.manga
 const coverUrlOriginal = ""
-const coverUrl = useMangaCover(manga).coverUrl512;
+const { cover } = useManga(manga)
 </script>
 
 <template>
   <div class="layout-container manga has-gradient px-4">
     <div class="absolute top-0 left-0 z-[-2] w-full h-[640px] blur-xl" :style="{
       background: `radial-gradient(circle at top, rgb(var(--mw-background) / 0.8), 
-    rgb(var(--mw-background)) 75%), no-repeat top 35% center / 100% url('${coverUrl}') 
+    rgb(var(--mw-background)) 75%), no-repeat top 35% center / 100% url('${cover.coverUrl512}') 
     `}"></div>
     <div class="banner-container block">
       <div class="banner-image" :style="{
-        backgroundImage: `url(${coverUrl})`
+        backgroundImage: `url(${cover.coverUrl512})`
       }" style="width: 100%;"></div>
       <div class="banner-shade"></div>
     </div>

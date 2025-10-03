@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{ manga: Manga }>()
 
+const { title, cover } = useManga(props.manga)
 const modalOpen = ref(false)
 const route = useRoute()
 const router = useRouter()
@@ -71,10 +72,10 @@ async function update() {
       <div class="text-sm pb-5 first:pt-4 px-4">
         <div class="preview-grid">
           <NuxtImg class="rounded shadow-lg width-limit self-start" style="grid-area: cover;"
-            :src="useMangaCover(manga).coverUrl256" :alt="useMangaTitle(manga)" />
+            :src="cover.coverUrl256" :alt="title" />
           <div style="grid-area: options;">
             <div class="font-bold text-xl self-start mb-2" style="grid-area: title; word-break: break-word;">
-              {{ useMangaTitle(manga) }}
+              {{ title }}
             </div>
             <div class="self-start" style="grid-area: options;">
               <USelect v-model="selected" :items="items" :ui="{ content: 'min-w-fit' }" />
