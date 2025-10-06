@@ -1,11 +1,15 @@
-import { randomUUID } from 'crypto';
+import * as z from 'zod'
+import { randomUUID } from 'crypto'
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
+  const params = await getValidatedRouterParams(event, z.object({
+    id: z.string().uuid()
+  }).parse)
+
   try {
     const pages = await prisma.scrapedPage.findFirst({
       where: {
-        chapterId: id
+        chapterId: params.id
       }
     })
 
@@ -13,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
     const chapter = await prisma.scrapedChapter.findUnique({
       where: {
-        id
+        id: params.id
       }
     })
 

@@ -8,12 +8,9 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const sessionId = getRouterParam(event, 'sessionId')
-
-  if (!sessionId) throw createError({
-    statusCode: 400,
-    statusMessage: 'No sessionId provided'
-  })
+  const params = await getValidatedRouterParams(event, z.object({
+    sessionId: z.string().uuid()
+  }).parse)
 
   const body = z.array(z.string().uuid()).safeParse(await readBody(event))
 
@@ -28,7 +25,7 @@ export default defineEventHandler(async (event) => {
   await prisma.uploadSessionFile.deleteMany({
     where: {
       id: { in: data },
-      sessionId
+      sessionId: params.sessionId
     }
   })
 

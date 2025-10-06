@@ -1,16 +1,23 @@
+import * as z from 'zod'
+
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  const param = getQuery(event);
-  const translatedLanguage = Array.isArray(param['translatedLanguage[]']) ? param['translatedLanguage[]'] : param['translatedLanguage[]'] ? [param['translatedLanguage[]']] : []
+  const params = await getValidatedRouterParams(event, z.object({
+    id: z.string().uuid()
+  }).parse)
+
+  const query = await getValidatedQuery(event, z.object({
+    'translatedLanguage[]': z.union([z.string(), z.array(z.string())]).optional()
+      .transform(val => {
+        if (!val) return undefined
+        return Array.isArray(val) ? val : [val]
+      })
+  }).safeParse)
 
   const chapters = await prisma.scrapedChapter.findMany({
     where: {
-      mangaId: id,
-      ...(translatedLanguage.length > 0 && {
-        translatedLanguage: {
-          in: translatedLanguage
-        }
-      })
+      mangaId: params.id,
+      translatedLanguage: query.data?.['translatedLanguage[]'] ? { in: query.data['translatedLanguage[]'] }
+        : undefined
     },
     orderBy: {
       chapter: 'desc'

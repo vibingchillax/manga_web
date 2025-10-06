@@ -3,9 +3,9 @@ import * as z from 'zod'
 
 const commitSchema = z.object({
   chapterDraft: z.object({
-    volume: z.string().optional(),
-    chapter: z.string().optional(),
-    title: z.string().optional(),
+    volume: z.string().optional().nullable(),
+    chapter: z.string().optional().nullable(),
+    title: z.string().optional().nullable(),
     translatedLanguage: z.string().min(2).max(6),
     publishAt: z.string().transform((val) => new Date(val))
   }),
@@ -22,12 +22,9 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const id = getRouterParam(event, 'sessionId')
-
-  if (!id) throw createError({
-    statusCode: 400,
-    statusMessage: 'No sessionId provided'
-  })
+  const params = await getValidatedRouterParams(event, z.object({
+    sessionId: z.string().uuid()
+  }).parse)
 
   const body = commitSchema.safeParse(await readBody(event))
 
@@ -41,7 +38,7 @@ export default defineEventHandler(async (event) => {
 
   const session = await prisma.uploadSession.findUnique({
     where: {
-      id: id,
+      id: params.sessionId,
       userId: user.id
     },
     include: {
@@ -89,7 +86,7 @@ export default defineEventHandler(async (event) => {
 
   const deleted = await prisma.uploadSession.delete({
     where: {
-      id: id,
+      id: session.id,
       userId: user.id
     }
   })

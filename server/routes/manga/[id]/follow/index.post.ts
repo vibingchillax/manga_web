@@ -13,12 +13,9 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const mangaId = getRouterParam(event, 'id')
-
-  if (!mangaId) throw createError({
-    statusCode: 400,
-    statusMessage: 'No manga id'
-  })
+  const params = await getValidatedRouterParams(event, z.object({
+    id: z.string().uuid()
+  }).parse)
 
   const body = schema.safeParse(await readBody(event))
 
@@ -34,7 +31,7 @@ export default defineEventHandler(async (event) => {
     where: {
       userId_mangaId: {
         userId: user.id,
-        mangaId: mangaId
+        mangaId: params.id
       }
     },
     update: {
@@ -42,7 +39,7 @@ export default defineEventHandler(async (event) => {
     },
     create: {
       userId: user.id,
-      mangaId,
+      mangaId: params.id,
       status: status ?? 'reading'
     }
   })

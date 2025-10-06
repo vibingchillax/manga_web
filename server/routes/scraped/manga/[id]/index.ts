@@ -1,8 +1,13 @@
+import * as z from 'zod'
+
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
+  const params = await getValidatedRouterParams(event, z.object({
+    id: z.string().uuid()
+  }).parse)
+
   const manga = await prisma.scrapedManga.findUnique({
     where: {
-      id
+      id: params.id
     }
   })
 

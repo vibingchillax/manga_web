@@ -1,3 +1,5 @@
+import * as z from 'zod'
+
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
 
@@ -6,16 +8,13 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const id = getRouterParam(event, 'sessionId')
-
-  if (!id) throw createError({
-    statusCode: 400,
-    statusMessage: 'No sessionId provided'
-  })
+  const params = await getValidatedRouterParams(event, z.object({
+    sessionId: z.string().uuid()
+  }).parse)
 
   const session = await prisma.uploadSession.delete({
     where: {
-      id: id,
+      id: params.sessionId,
       userId: user.id
     }
   })

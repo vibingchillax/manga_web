@@ -1,17 +1,14 @@
-export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
+import * as z from 'zod'
 
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Missing required parameter: id'
-    })
-  }
+export default defineEventHandler(async (event) => {
+  const params = await getValidatedRouterParams(event, z.object({
+    id: z.string().uuid()
+  }).parse)
   
   try {
     const manga = await prisma.scrapedManga.findUnique({
       where: {
-        id
+        id: params.id
       }
     })
 
@@ -22,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
     const result = await prisma.scrapedChapter.findMany({
       where: {
-        mangaId: id
+        mangaId: params.id
       }
     })
 
@@ -35,7 +32,7 @@ export default defineEventHandler(async (event) => {
 
     if (stale) {
       refreshChapters(manga).catch((err: any)=> {
-        console.error(`Background refresh failed for manga ${id}`, err)
+        console.error(`Background refresh failed for manga ${params.id}`, err)
       })
     }
 

@@ -1,5 +1,6 @@
 import { kubo } from "~~/server/utils/kubo"
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'crypto'
+import * as z from 'zod'
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
@@ -9,7 +10,9 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const id = getRouterParam(event, 'sessionId')
+  const params = await getValidatedRouterParams(event, z.object({
+    sessionId: z.string().uuid()
+  }).parse)
 
   const data = await readMultipartFormData(event)
 
@@ -20,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   const session = await prisma.uploadSession.findUnique({
     where: {
-      id: id,
+      id: params.sessionId,
       userId: user.id
     }
   })

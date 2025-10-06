@@ -1,15 +1,23 @@
-export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  const param = getQuery(event)
+import * as z from 'zod'
 
-  const includes = Array.isArray(param['includes[]']) ? param['includes[]'] : param['includes[]'] ? [param['includes[]']] : []
+export default defineEventHandler(async (event) => {
+  const params = await getValidatedRouterParams(event, z.object({
+    id: z.string().uuid()
+  }).parse)
+
+  const query = await getValidatedQuery(event, z.object({
+    'includes[]': z.union([z.string(), z.array(z.string())]).optional().transform(val => {
+      if (!val) return undefined
+      return Array.isArray(val) ? val : [val]
+    })
+  }).safeParse)
 
   const chapter = await prisma.scrapedChapter.findUnique({
     where: {
-      id
+      id: params.id
     },
     include: {
-      manga: includes.includes('manga')
+      manga: query.data?.['includes[]']?.includes("manga")
     }
   })
 
