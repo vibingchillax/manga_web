@@ -1,7 +1,7 @@
 <script setup lang="ts">
+const toast = useToast()
+const history = useReadingHistoryStore()
 
-const router = useRouter();
-const history = useReadingHistoryStore();
 const items = ref([
   {
     icon: 'i-lucide-list',
@@ -15,45 +15,63 @@ const items = ref([
 const active = ref<'dense' | 'normal'>('dense');
 
 const chapters = ref<ScrapedChapterWithManga[]>([])
-const chapterIds = ref<string[]>([])
 
-chapterIds.value = history._readingHistory.map(h => h.chapterId)
+watch(
+  () => history._readingHistory,
+  async (newHistory) => {
+    const chapterIds = newHistory.map(h => h.chapterId)
 
-const result = await $fetch<ScrapedChapterWithManga[]>('/scraped/chapter', {
-  query: {
-    'ids[]': chapterIds.value,
-    'includes[]': ['manga']
-  }
-})
-chapters.value = result
-const mangaMap = new Map()
-for (const c of result) {
-  const manga = c
-  mangaMap.set(c.id, manga)
-}
+    if (chapterIds.length > 0) {
+      const result = await $fetch<ScrapedChapterWithManga[]>('/scraped/chapter', {
+        query: {
+          'ids[]': chapterIds,
+          'includes[]': ['manga']
+        }
+      })
+      chapters.value = result
+    } else {
+      chapters.value = []
+    }
+  },
+  { immediate: true, deep: true }
+)
 
 const groupedChapters = computed(() => {
-  const uniqueMangaIds = [...new Set(chapters.value.map(c => c.manga.mangaDexId))];
+  const uniqueMangaIds = [...new Set(chapters.value.map(c => c.manga.mangaDexId))]
   return uniqueMangaIds.map(id => {
     const manga = chapters.value.find(c => c.manga.mangaDexId === id)?.manga
-
-    const mangaChapters = chapters.value.filter(c => c.manga.mangaDexId === id).map(({ manga, ...rest }) => rest);
-    return { manga, chapters: mangaChapters };
-  });
+    const mangaChapters = chapters.value
+      .filter(c => c.manga.mangaDexId === id)
+      .map(({ manga, ...rest }) => rest)
+    return { manga, chapters: mangaChapters }
+  })
 })
 
+function clearHistory() {
+  history.$reset()
+  toast.add({
+    title: 'History cleared',
+    description: 'Your reading history has been cleared.',
+    color: 'success'
+  })
+}
 </script>
+
 <template>
   <Page title="Reading History" wide>
     <div>
       <div class="relative flex justify-between gap-2 items-center mb-6">
-        <div>
-        </div>
+        <UButton @click="clearHistory" icon="i-lucide-trash" label="Clear history" color="error" variant="outline" />
         <UTabs v-model="active" :items="items" />
       </div>
       <div :start="new Date().toISOString()">
-        <MangaFeedContainer v-for="group in groupedChapters" :key="group.manga!.mangaDexId + group.chapters[0]?.id"
-          class="mb-4" :chapter-list="group.chapters" :manga="group.manga!" />
+        <MangaFeedContainer v-if="groupedChapters.length > 0" v-for="group in groupedChapters"
+          :key="group.manga!.mangaDexId + group.chapters[0]?.id" class="mb-4"
+          :chapter-list="group.chapters"
+          :manga="group.manga!" />
+        <div v-else class="text-center text-muted-foreground mt-20">
+          Nothing here yet! Start reading something...
+        </div>
       </div>
     </div>
   </Page>
