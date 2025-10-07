@@ -1,6 +1,6 @@
 import type { components } from "#open-fetch-schemas/mangadex";
 import type { Flags } from "@manga_web/sources";
-import type { ScrapedChapter, ScrapedManga } from "../prisma/client";
+import type { ScrapedChapter, ScrapedManga, ScanlationGroup as Group, UserRole } from "../prisma/client";
 
 export type Manga = components["schemas"]["Manga"]
 export type MangaList = components["schemas"]["MangaList"]
@@ -34,4 +34,14 @@ export enum UploadState {
   Fail,
   PendingRemoval,
   Removed,
+}
+
+export type ScanlationGroup = Group & {
+  leader: string
+}
+
+export type User = {
+  id: string
+  username: string
+  role: UserRole
 }
