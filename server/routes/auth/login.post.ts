@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  identifier: z.string().min(1, "Please provide your email or username"),
   password: z.string().min(8, "Password must be at least 8 characters long")
 });
 
@@ -15,24 +15,36 @@ export default defineEventHandler(async (event) => {
       message: login.error.errors[0]?.message || "Invalid body"
     }
   }
-  const data = login.data;
-  const user = await prisma.user.findUnique({
-    where: {
-      email: data.email
-    }
-  });
+
+  const { identifier, password } = login.data;
+
+  let user = null;
+  if (identifier.includes('@')) {
+    user = await prisma.user.findUnique({ where: { email: identifier } });
+  }
+
+  if (!user) {
+    user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: identifier },
+          { email: identifier }
+        ]
+      }
+    });
+  }
 
   if (!user) {
     return {
       result: "error",
-      message: 'Email or password is incorrect'
+      message: 'Email/username or password is incorrect'
     }
   }
 
-  if (!await comparePasswords(data.password, user.password)) {
+  if (!await comparePasswords(password, user.password)) {
     return {
       result: "error",
-      message: 'Email or password is incorrect'
+      message: 'Email/username or password is incorrect'
     }
   }
 

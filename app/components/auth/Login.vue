@@ -7,9 +7,9 @@ const toast = useToast()
 const { redirect } = useAuth()
 
 const fields = [{
-  name: 'email',
+  name: 'identifier',
   type: 'text' as const,
-  label: 'Email',
+  label: 'Email or Username',
   required: true
 }, {
   name: 'password',
@@ -19,7 +19,7 @@ const fields = [{
 }]
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  identifier: z.string().min(1, "Please enter your email or username"),
   password: z.string().min(8, "Password must be at least 8 characters long")
 })
 
@@ -29,7 +29,7 @@ async function onSubmit(event: FormSubmitEvent<LoginSchema>) {
   const response = await $fetch('/auth/login', {
     method: "POST",
     body: {
-      email: event.data.email,
+      identifier: event.data.identifier,
       password: event.data.password
     }
   })
