@@ -4,7 +4,8 @@ import { generateToken, hashPassword } from '~~/server/utils/auth';
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
-  username: z.string().optional(),
+  username: z.string().min(1, "Username must be at least 1 character long")
+    .max(60, "Username must be at most 60 characters long"),
   password: z.string().min(8, "Password must be at least 8 characters long")
 })
 
@@ -30,11 +31,23 @@ export default defineEventHandler(async (event) => {
     result: "error",
     message: "Email already registered"
   }
+
+  const existingUsername = await prisma.user.findUnique({
+    where: {
+      username: data.username
+    }
+  })
+
+  if (existingUsername) return {
+    result: "error",
+    message: "Username already taken"
+  }
+
   const user = await prisma.user.create({
     data: {
       id: randomUUID(),
       email: data.email,
-      username: data.username ?? null,
+      username: data.username,
       password: await hashPassword(data.password)
     }
   })

@@ -33,7 +33,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
   
   const userProfile: DropdownMenuItem[] = loggedIn.value ? [
     {
-      label: session.value?.username ?? session.value?.email,
+      label: session.value?.username,
       avatar: {
         icon: 'i-lucide-user'
       },
