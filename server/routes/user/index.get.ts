@@ -1,8 +1,8 @@
 import * as z from 'zod'
 
 const querySchema = z.object({
-  limit: z.number().min(0).max(100).optional(),
-  offset: z.number().optional(),
+  limit: z.coerce.number().min(0).max(100).optional(),
+  offset: z.coerce.number().optional(),
   'ids[]': z.
     union([z.string().uuid(), z.array(z.string().uuid())])
     .optional()
