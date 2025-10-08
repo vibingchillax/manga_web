@@ -48,10 +48,35 @@ const { setMenu } = useLayout()
   height: 1.75rem;
 }
 
+.menu__item--hover-highlight:hover {
+  background-color:rgb(var(--mw-accent-10))
+}
+
+.menu__item--hover-highlight:active {
+  background-color:rgb(var(--mw-accent-20))
+}
+
+.menu__item--active-highlight:hover {
+  background-color:var(--ui-color-primary-600)
+}
+
 .menu__item--active-highlight {
   background-color: var(--ui-primary);
   font-weight: 500;
   --tw-text-opacity: 1;
   color: rgb(255 255 255/var(--tw-text-opacity, 1));
+}
+
+.list__item {
+  align-items:center;
+  border-radius:4px;
+  display:flex;
+  flex-shrink:0;
+  font-size:.875rem;
+  font-weight:500;
+  height:2rem;
+  height:32px;
+  padding-left:.5rem;
+  padding-right:.5rem
 }
 </style>
