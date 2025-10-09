@@ -1,10 +1,25 @@
 <script setup lang="ts">
 import type { Tag } from '~~/shared/types'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   tags: Tag[],
   contentRating: 'safe' | 'suggestive' | 'erotica' | 'pornographic' | undefined
-}>()
+  rows: number
+}>(), { rows: 1 })
+
+const rowRef = useTemplateRef('rowRef')
+const hasOverflow = ref(false)
+const expanded = ref(false)
+const observer = ref<ResizeObserver | null>(null)
+
+const checkOverflow = () => {
+  if (!rowRef.value) return
+  rowRef.value.style.padding = '0'
+  hasOverflow.value =
+    Math.floor(rowRef.value.scrollHeight) >
+    Math.floor(rowRef.value.getBoundingClientRect().height + 1)
+  rowRef.value.style.padding = ''
+}
 
 const priorityOrder = ['doujinshi', 'gore', 'sexual violence']
 
@@ -61,10 +76,22 @@ function contentClass(rating: string | undefined) {
   return contentRatingStyleMap[rating.toLowerCase()] ?? ''
 }
 
+onMounted(() => {
+  observer.value = new ResizeObserver(checkOverflow)
+  if (rowRef.value) observer.value.observe(rowRef.value)
+  checkOverflow()
+})
+
+onBeforeUnmount(() => {
+  observer.value?.disconnect()
+})
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-1 tags-row" style="max-height: calc(1em + 0rem);">
+  <div ref="rowRef" class="flex flex-wrap gap-1 tags-row" :class="{ 'overflow-y-hidden': hasOverflow && !expanded }"
+    :style="{
+      maxHeight: expanded ? 'unset' : `calc(${rows} * 1em + ${(rows - 1) * 0.25}rem)`,
+    }" @click="expanded = true">
     <span v-if="contentRating !== 'safe'"
       class="inline-flex items-center gap-1 rounded uppercase text-[0.625rem] font-bold px-[0.375rem] leading-[1.5em] my-auto bg-accented"
       :class="contentClass(contentRating)">
@@ -81,7 +108,7 @@ function contentClass(rating: string | undefined) {
 </template>
 
 
-<style scoped>
+<style lang="css" scoped>
 .bg-status-yellow {
   background-color: rgb(var(--mw-status-yellow));
 }
@@ -92,5 +119,23 @@ function contentClass(rating: string | undefined) {
 
 .bg-status-purple {
   background-color: rgb(var(--mw-status-purple));
+}
+
+.tags-row.overflow-y-hidden {
+  cursor: pointer;
+  padding-right: 2.5rem;
+  position: relative;
+}
+
+.tags-row.overflow-y-hidden:after {
+  bottom: 0;
+  color: var(--ui-primary);
+  content: "MORE";
+  display: block;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1rem;
+  position: absolute;
+  right: .125rem
 }
 </style>
