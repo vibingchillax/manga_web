@@ -18,16 +18,16 @@ body {
 }
 
 :root {
-  --mw-background: 25 26 28;
+  --mw-background: 15 23 43;
   --mw-status-yellow: 218 117 0;
   --mw-status-red: 255 64 64;
   --mw-status-purple: 125 64 255;
 }
 
 .dark {
-  --mw-accent: 44 44 44;
-  --mw-accent-10: 61 61 61;
-  --mw-accent-20: 79 79 79;
+  --mw-accent: 29 41 61;
+  --mw-accent-10: 53 62 80;
+  --mw-accent-20: 76 84 100;
 }
 
 :root {
