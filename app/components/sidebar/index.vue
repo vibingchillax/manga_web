@@ -4,7 +4,7 @@ const route = useRoute()
 const layout = useLayout()
 
 const { menuActive } = storeToRefs(layout)
-const { session } = useAuth()
+const { loggedIn } = useAuth()
 
 const animating = ref(false)
 const menuEl = ref<HTMLElement | null>(null)
@@ -82,7 +82,22 @@ const sections = computed<Section[]>(() => {
     { title: 'Random', link: '/title/random' }
   ]
 
-  return [home, follows, titles]
+  const communitySection: ItemHeader = {
+    title: 'Community',
+    icon: 'i-lucide-users',
+  }
+
+  const community: Section = [
+    communitySection,
+    loggedIn.value ?
+      { title: 'Groups', link: '/groups', 
+        rightIcon: 'i-lucide-plus', rightIconLink: '/create/group'
+      } :
+      { title: 'Groups', link: '/groups' },
+    { title: 'Users', link: '/users' }
+  ]
+
+  return [home, follows, titles, community]
 })
 
 watch(() => route.name, (newName) => {

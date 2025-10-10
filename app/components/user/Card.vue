@@ -6,6 +6,7 @@ defineProps<{ user: User, noLink: boolean }>()
   <NuxtLink class="user-card" :to="noLink ?
     undefined : `/user/${user.id}/${toKebabCase(user.username)}`">
     <div class="user-head">
+      <slot name="prepend"></slot>
       <!-- <NuxtImg class="user-avatar" alt="Avatar" :src="undefined"
         style="width: 32px; height: 32px;" /> -->
       <UIcon name="i-lucide-user" style="width: 32px; height: 32px;" />
@@ -16,6 +17,7 @@ defineProps<{ user: User, noLink: boolean }>()
         </div>
       </div>
     </div>
+    <slot name="append"></slot>
   </NuxtLink>
 </template>
 <style lang="css" scoped>

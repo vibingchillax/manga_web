@@ -96,18 +96,19 @@ model ScanlationGroup {
   description           String?
   twitter               String?
   mangaUpdates          String?
-  focusedLanguage       String[]
-  locked                Boolean
-  official              Boolean
-  verified              Boolean
-  inactive              Boolean
-  exLicensed            Boolean
+  inactive              Boolean                 @default(false)
+  publishDelay          String                  @default("P0D")
+  focusedLanguages      String[]
+  locked                Boolean                 @default(false)
+  official              Boolean                 @default(false) 
+  verified              Boolean                 @default(false)
+  exLicensed            Boolean                 @default(false)
   version               Int                     @default(1)
   createdAt             DateTime                @default(now()) @db.Timestamp(6)
   updatedAt             DateTime                @default(now()) @updatedAt @db.Timestamp(6)
-  ScanlationGroupMember ScanlationGroupMember[]
-  UploadSessionGroup    UploadSessionGroup[]
-  UploadedChapterGroup  UploadedChapterGroup[]
+  members               ScanlationGroupMember[]
+  uploadSessions        UploadSessionGroup[]
+  uploadedChapters      UploadedChapterGroup[]
 }
 
 model ScanlationGroupMember {

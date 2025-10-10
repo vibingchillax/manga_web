@@ -38,6 +38,7 @@ export enum UploadState {
 
 export type ScanlationGroup = Group & {
   leader: string
+  members: string[]
 }
 
 export type User = {
