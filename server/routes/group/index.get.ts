@@ -2,8 +2,8 @@ import * as z from 'zod'
 
 export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(event, z.object({
-    limit: z.number().min(0).max(100).optional(),
-    offset: z.number().optional(),
+    limit: z.coerce.number().min(0).max(100).optional(),
+    offset: z.coerce.number().optional(),
     'ids[]': z.union([z.string().uuid(), z.array(z.string().uuid())]).optional()
       .transform(val => {
         if (!val) return undefined
@@ -18,18 +18,33 @@ export default defineEventHandler(async (event) => {
       })
   }).safeParse)
 
-  const groups = await prisma.scanlationGroup.findMany({
-    take: query.data?.limit ?? 10,
-    skip: query.data?.offset ?? 0,
-    where: {
-      id: query.data?.['ids[]'] ? { in: query.data['ids[]'] } : undefined,
-      name: query.data?.name ? { contains: query.data.name } : undefined,
-      focusedLanguages: query.data?.focusedLanguage ? { has: query.data.focusedLanguage } : undefined
-    },
-    include: {
-      members: query.data?.['includes[]']?.includes('member')
-    }
-  })
+  const filters = {
+    id: query.data?.['ids[]'] ? { in: query.data['ids[]'] } : undefined,
+    name: query.data?.name ? { contains: query.data.name } : undefined,
+    focusedLanguages: query.data?.focusedLanguage
+      ? { has: query.data.focusedLanguage }
+      : undefined
+  }
 
-  return groups
+  const [groups, total] = await Promise.all([
+    await prisma.scanlationGroup.findMany({
+      take: query.data?.limit ?? 10,
+      skip: query.data?.offset ?? 0,
+      where: filters,
+      include: {
+        members: query.data?.['includes[]']?.includes('member')
+      }
+    }),
+
+    await prisma.scanlationGroup.count({
+      where: filters
+    })])
+
+  return {
+    result: 'ok',
+    data: groups,
+    limit: query.data?.limit ?? 10,
+    offset: query.data?.offset ?? 0,
+    count: total
+  }
 })
