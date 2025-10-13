@@ -5,5 +5,4 @@ const props = defineProps<{
 }>()
 </script>
 <template>
-  <div class="sm:mx-2 mt-auto sm:mt-0" style="grid-area: stats;"></div>
 </template>

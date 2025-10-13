@@ -43,23 +43,21 @@ const items = computed<TabsItem[]>(() => [
 ])
 </script>
 <template>
-  <div class="min-w-0" style="grid-area: content;">
-    <u-tabs :items="items" :unmount-on-hide="false">
-      <template #uploaded_chapters="{ item }">
-        <UploadedChapters :manga="manga" />
-      </template>
-      <template #scraped_chapters="{ item }">
-        <ScrapedChapters :manga="manga" />
-      </template>
-      <template #comments="{ item }">
-        <Comments :manga="manga" />
-      </template>
-      <template #covers="{ item }">
-        <Covers :manga="manga" />
-      </template>
-      <template #related="{ item }">
-        <Related :manga="manga" />
-      </template>
-    </u-tabs>
-  </div>
+  <u-tabs :items="items" :unmount-on-hide="false">
+    <template #uploaded_chapters="{ item }">
+      <UploadedChapters :manga="manga" />
+    </template>
+    <template #scraped_chapters="{ item }">
+      <ScrapedChapters :manga="manga" />
+    </template>
+    <template #comments="{ item }">
+      <Comments :manga="manga" />
+    </template>
+    <template #covers="{ item }">
+      <Covers :manga="manga" />
+    </template>
+    <template #related="{ item }">
+      <Related :manga="manga" />
+    </template>
+  </u-tabs>
 </template>
