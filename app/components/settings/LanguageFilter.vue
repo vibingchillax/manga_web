@@ -22,7 +22,14 @@ const selectedLangs = computed({
     <div class="flex md:flex-row flex-col justify-between gap-4 mt-4">
       <div class="text-sm opacity-80 md:max-w-1/2">The default language the filter for chapter list is set to.
       </div>
-      <UInputMenu v-model="selectedLangs" multiple :items="items" />
+      <UInputMenu v-model="selectedLangs" multiple :items="items">
+        <template #item-label="{ item }">
+          <div class="flex flex-row items-center gap-2">
+            <LangFlag :lang="item.value" />
+            {{ item.label }}
+          </div>
+        </template>
+      </UInputMenu>
     </div>
   </div>
 </template>

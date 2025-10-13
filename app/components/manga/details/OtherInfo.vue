@@ -102,8 +102,7 @@ for (const tag of tags.value) {
       <div class="font-bold mb-1">Alternative Titles</div>
       <div class="mb-1 flex flex-col gap-1 alt-title">
         <div v-for="[lang, title] in altTitlesList" :key="lang" class="flex items-center gap-2">
-          <!-- <img :src="`://mangadex.org/img/flags/${lang}.svg`" :alt="`${lang} flag icon`" :title="lang.toUpperCase()" width="24"
-            height="24" class="select-none" /> -->
+          <LangFlag :lang="lang" :display-scripts="true"/>
           <span>{{ title }}</span>
         </div>
       </div>

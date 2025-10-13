@@ -17,7 +17,14 @@ const selectedLangs = computed<string[]>({
 <template>
   <UModal title="Chapter Language Filter">
     <template #body>
-      <UCheckboxGroup v-model="selectedLangs" :items="items" />
+      <UCheckboxGroup v-model="selectedLangs" :items="items" :ui="{ item: 'items-center' }">
+        <template #label="{ item }">
+          <div class="flex flex-row items-center gap-2">
+            <LangFlag :lang="item.value" />
+            {{ item.label }}
+          </div>
+        </template>
+      </UCheckboxGroup>
     </template>
   </UModal>
 </template>

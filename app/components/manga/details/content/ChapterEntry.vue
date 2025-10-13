@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ScrapedChapter } from '~~/shared/prisma/client';
+
 const props = defineProps<{ chapter: ScrapedChapter }>();
 const chapterUrl = `/chapter/scraped/${props.chapter.id}`;
 
@@ -15,10 +17,14 @@ function isValidDate(date: string | null) {
         <div class="flex">
           <NuxtLink class="chapter-grid flex-grow" :to="chapterUrl">
             <NuxtLink class="flex flex-grow items-center" style="grid-area: title;">
-              {{ chapter.translatedLanguage ? chapter.translatedLanguage : 'en' }}
+              <LangFlag
+                :lang="chapter.translatedLanguage ? chapter.translatedLanguage.toLowerCase() : 'en'"
+                />
               <span class="chapter-link ml-2 font-bold my-auto flex items-center space-x-1 break-all">
                 <span v-if="chapter.title === 'Oneshot'" class="line-clamp-1">Oneshot</span>
-                <span v-else-if="chapter.title" class="line-clamp-1">Ch. {{ chapter.chapter }} - {{ chapter.title }}</span>
+                <span v-else-if="chapter.title" class="line-clamp-1">
+                  Ch. {{ chapter.chapter }} - {{ chapter.title }}
+                </span>
                 <span v-else class="line-clamp-1">Ch. {{ chapter.chapter }}</span>
               </span>
             </NuxtLink>
