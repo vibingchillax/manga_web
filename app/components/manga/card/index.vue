@@ -30,9 +30,7 @@ const {
     <span class="author">
     </span>
     <div class="manga-card-cover" style="grid-area: art;">
-      <NuxtLink class="group flex items-start relative mb-auto select-none aspect cover" :href="noLink ? undefined : detailsUrl">
-        <NuxtImg class="rounded shadow-md w-full h-auto" :src="use512 ? cover.coverUrl512 : cover.coverUrl256"></NuxtImg>
-      </NuxtLink>
+      <MangaCover class="cover" :manga="manga" noTitle fillHeight fixedAspect :use256="!use512" />
     </div>
     <div style="grid-area: status;" class="flex flex-wrap status mb-auto">
       <MangaTag class="lift dot" mode="status" :status="publicationStatus" />

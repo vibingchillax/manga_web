@@ -31,25 +31,13 @@ const coverUrlBase = `https://uploads.mangadex.org/covers/${manga.id}/`
   <div class="font-bold mb-6">Covers</div>
   <div class="">
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
-      <a v-for="cover in sortedCovers" class="group flex items-start relative mb-auto select-none">
-        <NuxtImg :src="coverUrlBase + cover.attributes?.fileName + '.512.jpg'" class="rounded shadow-md w-full h-auto"
-          alt="Cover Image" />
-        <span class="subtitle rounded-b">Volume {{ cover.attributes?.volume }}</span>
-      </a>
+      <MangaCover
+        v-for="cover in sortedCovers"
+        :src="coverUrlBase + cover.attributes?.fileName + '.512.jpg'"
+        :label="cover.attributes?.volume ? `Volume ${cover.attributes?.volume}` : 'No volume'"
+        :noTitle="false"
+        lightbox
+      />
     </div>
   </div>
 </template>
-<style lang="css" scoped>
-.subtitle {
-  left: 0;
-  position: absolute;
-  width: 100%;
-}
-
-.subtitle {
-  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, .8));
-  bottom: 0;
-  color: #fff;
-  padding: 1rem .5rem .5rem
-}
-</style>

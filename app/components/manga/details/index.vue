@@ -30,14 +30,14 @@ const authors = computed(() => {
 
 <template>
   <PageSeparator
-    :background="cover.coverUrl512"
+    :background="cover.url512"
     :isManga="true"
     :title="title"
     :altTitle="preferredAltTitle"
     :subTitle="authors"
   >
   <template #icon>
-    <MangaDetailsCover :manga="manga" />
+    <MangaCover :manga="manga" noTitle showFlag lightbox :use256="false"/>
   </template>
   <template #buttons>
     <MangaDetailsButtons :manga="manga" />

@@ -72,10 +72,3 @@ body {
   padding-left: var(--side-margin);
   padding-right: var(--side-margin);
 }
-
-img {
-  -o-object-fit: cover;
-  object-fit: cover;
-  -o-object-position: center center;
-  object-position: center center;
-}

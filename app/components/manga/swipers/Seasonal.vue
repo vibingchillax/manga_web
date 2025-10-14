@@ -57,11 +57,7 @@ const { data: mangasList, pending, error } = await useMangadex('/manga', {
       }" :mousewheel="true">
         <swiper-slide v-for="(manga, index) in mangasList?.data" :key="index" style="max-width: 192px; flex: 0 0 auto;">
           <div>
-            <NuxtLink class="group flex items-start relative mb-auto select-none w-full h-full aspect-[5/7]"
-              :to="useManga(manga).detailsUrl.value">
-              <NuxtImg class="rounded shadow-md w-full h-full" :src="useManga(manga).cover.value.coverUrl256">
-              </NuxtImg>
-            </NuxtLink>
+            <MangaCover :manga="manga" noTitle showFlag fillHeight use256 class="aspect-[5/7]"/>
             <NuxtLink :to="useManga(manga).detailsUrl.value">
               <h6 class="mt-2 text-sm line-clamp-2">
                 {{ useManga(manga).title }}
