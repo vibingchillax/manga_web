@@ -15,7 +15,7 @@ const halfSize = computed(() => Math.floor(props.size / 2))
 const flag = computed(() => languages.get(props.lang) || languages.get('NULL'))
 </script>
 <template>
-  <div
+  <Wrap
     :is="'div'"
     class="select-none"
     :wrap="displayScripts"
@@ -45,5 +45,5 @@ const flag = computed(() => languages.get(props.lang) || languages.get('NULL'))
       :height="halfSize"
       style="margin-top: -12px; margin-left: auto; margin-right: -2px;"
     />
-  </div>
+  </Wrap>
 </template>
