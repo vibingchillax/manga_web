@@ -24,7 +24,7 @@ const fetchUsers = async () => {
   pending.value = true
   error.value = null
   try {
-    const res = await $fetch('/user', {
+    const res = await $fetch('/api/user', {
       query: {
         limit: 20,
         offset: (page.value - 1) * 20,

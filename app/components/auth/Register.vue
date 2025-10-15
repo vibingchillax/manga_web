@@ -42,7 +42,7 @@ const registerSchema = z.object({
 type RegisterSchema = z.output<typeof registerSchema>
 
 async function onSubmit(event: FormSubmitEvent<RegisterSchema>) {
-  const response = await $fetch('/auth/register', {
+  const response = await $fetch('/api/auth/register', {
     method: "POST",
     body: {
       email: event.data.email,

@@ -24,19 +24,19 @@ const hasFetched = ref(false);
 const loading = ref(false);
 const progressValue = ref(0);
 
-const { data, status } = await useFetch('/sources');
+const { data, status } = await useFetch('/api/sources');
 
 async function selectSource(source: SourceLabel) {
   loading.value = true;
   try {
-    const mangas = await $fetch<ScrapedManga[]>('/scrape/mangas', {
+    const mangas = await $fetch<ScrapedManga[]>('/api/scrape/mangas', {
       method: 'POST',
       body: { title: title.value, sourceId: source.id, mangadexId: manga.id }
     });
     if (!mangas || !(mangas.length > 0)) throw new Error('Nothing found');
     scrapedMangas.value = mangas;
     progressValue.value = 1;
-    const chapters = await $fetch<ScrapedChapter[]>(`/scraped/manga/${mangas[0]!.id}/feed`);
+    const chapters = await $fetch<ScrapedChapter[]>(`/api/scraped/manga/${mangas[0]!.id}/feed`);
     if (!chapters || !(chapters.length > 0)) throw new Error('Nothing found');
     scrapedChapters.value = chapters;
     progressValue.value = 2;
@@ -60,7 +60,7 @@ async function selectManga(manga: ScrapedManga) {
   title.value = selectedManga.value.title;
   progressValue.value = 1;
   try {
-    const chapters = await $fetch<ScrapedChapter[]>(`/scraped/manga/${manga.id}/feed`);
+    const chapters = await $fetch<ScrapedChapter[]>(`/api/scraped/manga/${manga.id}/feed`);
     if (!chapters || !(chapters.length > 0)) throw new Error('Nothing found');
     scrapedChapters.value = chapters;
     progressValue.value = 2;

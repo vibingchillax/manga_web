@@ -246,13 +246,13 @@ async function removeFiles(pages: UploadPage[]): Promise<void> {
 };
 
 async function existingSession() {
-  return await $fetch('/upload', {
+  return await $fetch('/api/upload', {
     method: "GET"
   })
 }
 
 async function beginSession(manga: string, groups: string[]) {
-  return await $fetch('/upload/begin', {
+  return await $fetch('/api/upload/begin', {
     method: "POST",
     body: {
       manga: manga,
@@ -292,7 +292,7 @@ async function uploadFiles(files: File[], onProgress: (progressEvent: any) => vo
       source: string;
     }[]
     // @ts-ignore
-  } = await $fetch(`/upload/${sessionId}`, {
+  } = await $fetch(`/api/upload/${sessionId}`, {
     signal,
     body: formData,
     method: "POST"
@@ -345,14 +345,14 @@ async function uploadFiles(files: File[], onProgress: (progressEvent: any) => vo
 }
 
 async function deletePages(sessionId: string, ids: string[]) {
-  return await $fetch(`/upload/${sessionId}/batch`, {
+  return await $fetch(`/api/upload/${sessionId}/batch`, {
     method: "DELETE",
     body: JSON.stringify(ids)
   })
 }
 
 async function deleteSession(sessionId: string) {
-  return await $fetch(`/upload/${sessionId}`, {
+  return await $fetch(`/api/upload/${sessionId}`, {
     method: "DELETE"
   })
 }
@@ -362,7 +362,7 @@ async function uploadChapter(addAnother = false) {
   submitting.value = true
   formLocked.value = true
   try {
-    await $fetch(`/upload/${session.value}/commit`, {
+    await $fetch(`/api/upload/${session.value}/commit`, {
       method: "POST",
       body: {
         chapterDraft: oneshot.value ? {

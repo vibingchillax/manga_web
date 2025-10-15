@@ -26,7 +26,7 @@ const loginSchema = z.object({
 type LoginSchema = z.output<typeof loginSchema>
 
 async function onSubmit(event: FormSubmitEvent<LoginSchema>) {
-  const response = await $fetch('/auth/login', {
+  const response = await $fetch('/api/auth/login', {
     method: "POST",
     body: {
       identifier: event.data.identifier,

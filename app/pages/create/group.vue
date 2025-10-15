@@ -8,7 +8,7 @@ const toast = useToast()
 async function submit(e: Partial<GroupSchema>) {
   loading.value = true
   try {
-    const result = await $fetch('/group', {
+    const result = await $fetch('/api/group', {
       method: "POST",
       body: {
         ...e

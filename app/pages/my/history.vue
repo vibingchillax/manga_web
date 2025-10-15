@@ -22,7 +22,7 @@ watch(
     const chapterIds = newHistory.map(h => h.chapterId)
 
     if (chapterIds.length > 0) {
-      const result = await $fetch<ScrapedChapterWithManga[]>('/scraped/chapter', {
+      const result = await $fetch<ScrapedChapterWithManga[]>('/api/scraped/chapter', {
         query: {
           'ids[]': chapterIds,
           'includes[]': ['manga']

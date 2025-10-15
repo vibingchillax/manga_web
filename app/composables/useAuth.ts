@@ -17,13 +17,13 @@ export const useAuth = () => {
   const loggedIn = computed(() => Boolean(session.value))
 
   const fetch = async () => {
-    session.value = await $fetch('/auth/session', { method: "GET" })
+    session.value = await $fetch('/api/auth/session', { method: "GET" })
   }
 
   const refresh = async () => {
     try {
       console.log('Attempting to refresh token')
-      await $fetch('/auth/refresh')
+      await $fetch('/api/auth/refresh', { method: "POST" })
       await fetch()
       console.log('Successfully refreshed access token for user')
     } catch (e) {
@@ -38,7 +38,7 @@ export const useAuth = () => {
   const isStaff = hasRole(STAFF_ROLES)
 
   const logout = async () => {
-    await $fetch('/auth/signout', { method: "POST" })
+    await $fetch('/api/auth/logout', { method: "POST" })
     session.value = null
   }
 

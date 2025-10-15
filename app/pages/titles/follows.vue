@@ -53,7 +53,7 @@ let followsList = ref<{ mangaId: string, status: MangaFollowStatus }[] | undefin
 let mangasList = ref<{ result: string, response: string, data?: Manga[] } | undefined>()
 
 if (loggedIn.value) {
-  const { data: fList } = await useFetch('/user/follows/manga', {
+  const { data: fList } = await useFetch('/api/user/follows/manga', {
     key: 'followsList'
   })
 

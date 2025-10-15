@@ -9,7 +9,7 @@ const { loggedIn, redirect } = useAuth()
 const toast = useToast()
 
 const key = `follow-${props.manga.id}`
-const { data: followStatus, pending } = await useFetch(`/manga/${props.manga.id}/follow`, {
+const { data: followStatus, pending } = await useFetch(`/api/manga/${props.manga.id}/follow`, {
   key,
 })
 
@@ -49,9 +49,9 @@ function openModal() {
 async function update() {
   try {
     if (selected.value === 'none') {
-      await $fetch(`/manga/${props.manga.id}/follow`, { method: "DELETE" })
+      await $fetch(`/api/manga/${props.manga.id}/follow`, { method: "DELETE" })
     } else {
-      await $fetch(`/manga/${props.manga.id}/follow`, {
+      await $fetch(`/api/manga/${props.manga.id}/follow`, {
         method: "POST",
         body: { status: selected.value }
       })
