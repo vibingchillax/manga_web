@@ -8,6 +8,7 @@ const props = withDefaults(defineProps<{
   maxLength?: number
   noLink?: boolean
   openInNewTab?: boolean
+  coverFile?: string
   noTitle?: boolean
   contain?: boolean
   showFlag?: boolean
@@ -38,14 +39,18 @@ const displayLabel = computed(() => {
   return truncated.substring(0, Math.min(truncated.length, truncated.lastIndexOf(' '))) + '...'
 })
 
+const suffix = computed(() => (props.use256 ? '.256.jpg' : '.512.jpg'))
+
 const computedSrc = computed(() => {
   if (!props.manga) return ''
-  return props.use256 ? cover.value.url256 : cover.value.url512
+  return props.coverFile
+    ? props.coverFile + suffix.value
+    : props.use256 ? cover.value.url256 : cover.value.url512
 })
 
 const fullResSrc = computed(() => {
   if (!props.manga) return ''
-  return cover.value.urlOriginal
+  return props.coverFile ? props.coverFile : cover.value.urlOriginal
 })
 
 function onClick(e: MouseEvent) {
@@ -84,12 +89,6 @@ function onClick(e: MouseEvent) {
       {{ displayLabel }}
     </span>
 
-    <!-- <VueEasyLightbox
-      v-if="lightbox"
-      :visible="lightboxVisible"
-      :src="src"
-      :full-res="cover.urlOriginal"
-    /> -->
   </component>
 </template>
 <style lang="css" scoped>
