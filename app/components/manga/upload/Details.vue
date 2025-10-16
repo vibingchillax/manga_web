@@ -29,7 +29,14 @@ const chName = defineModel<string>('chName', { default: '' })
       class="col-span-6 sm:col-span-3 md:col-span-2" :disabled="formLocked || oneshot" />
     <USelect v-model="tlLang" size="xl" :items="LANGUAGE_OPTIONS.ENGLISH_FIRST.WITHOUT_SCRIPTS"
       placeholder="Translation Language" class="col-span-6 md:col-span-2" :required="true"
-      :disabled="formLocked" />
+      :disabled="formLocked">
+      <template #item-label="{ item }">
+        <div class="flex flex-row items-center gap-2">
+          <LangFlag :lang="item.value" />
+          {{ item.label }}
+        </div>
+      </template>
+    </USelect>
     <UInput v-model="chName" size="xl" placeholder="Chapter Name" class="col-span-6"
       :disabled="formLocked || oneshot" />
   </div>
