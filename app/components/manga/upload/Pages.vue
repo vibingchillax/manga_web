@@ -78,7 +78,7 @@ function handleDragOver(e: DragEvent) {
     e.dataTransfer.items[0]!.kind === "file"
   ) {
     if (dragTimeout.value) clearTimeout(dragTimeout.value)
-    dragTimeout.value = setTimeout(() => (dragTimeout.value = null), 250)
+    dragTimeout.value = setTimeout(() => (dragTimeout.value = null), 500)
     e.preventDefault()
   }
 }
@@ -177,10 +177,10 @@ onBeforeUnmount(() => {
       :accept="accept.join(',')" :disabled="disabled"
       @change="handleEditFile" style="display:none" />
 
-    <UModal v-if="dragTimeout">
+    <Overlay v-if="dragTimeout" attach="body">
       <UTooltip>
         Drop files anywhere to upload!
       </UTooltip>
-    </UModal>
+    </Overlay>
   </div>
 </template>
