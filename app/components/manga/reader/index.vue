@@ -139,9 +139,6 @@ watch([currentChapter, currentPageNumber], () => {
   document.title = pageTitle.value;
 });
 
-callOnce(() => {
-  reader.initializeReader(route.params.chapterId as string)
-})
 </script>
 <template>
   <div ref="root" class="mw--reader-wrap">
