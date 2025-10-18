@@ -33,7 +33,9 @@ const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
         'grid-cols-2': active === 'normal',
         'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3': active === 'coverOnly'
       }">
-        <manga-card v-for="m in r.mangas" :key="m?.id" :manga="m!" :type="active" />
+        <MangaCard v-for="m in r.mangas" :key="m?.id" :manga="m!" :dense="active === 'dense'"
+          :coverOnly="active === 'coverOnly'"
+        />
       </div>
     </div>
   </div>

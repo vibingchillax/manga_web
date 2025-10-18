@@ -31,7 +31,7 @@ watch(() => route.query.q, async (q) => {
     <div>
       <div v-if="loading"> Loading... </div>
       <div v-else-if="mangasList" class="grid gap-2">
-        <manga-card v-for="manga in mangasList.data" :manga="manga" :type="'dense'"></manga-card>
+        <MangaCard v-for="manga in mangasList.data" :manga="manga" dense />
       </div>
       <div v-else>
         {{ error }}

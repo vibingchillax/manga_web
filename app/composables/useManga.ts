@@ -49,6 +49,7 @@ export const useManga = (manga: Manga | undefined) => {
   const contentRating = computed(() => manga?.attributes?.contentRating)
   const links = computed(() => manga?.attributes?.links ?? {})
   const tags = computed(() => manga?.attributes?.tags ?? [])
+  const originalLanguage = computed(() => manga?.attributes?.originalLanguage)
 
   return {
     title,
@@ -61,6 +62,7 @@ export const useManga = (manga: Manga | undefined) => {
     publicationDemographic,
     contentRating,
     links,
-    tags
+    tags,
+    originalLanguage
   }
 }

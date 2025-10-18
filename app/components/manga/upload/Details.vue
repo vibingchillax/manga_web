@@ -17,8 +17,7 @@ const chName = defineModel<string>('chName', { default: '' })
   <h4 class="my-4 font-medium">Title</h4>
   <div class="grid grid-cols-6 gap-2">
     <div class="col-span-6">
-      <!-- supposed to be mangacard class=dense -->
-      <MangaCardDense :manga="props.manga" />
+      <MangaCard :manga="props.manga" dense overview noLink />
     </div>
     <USeparator class="my-4 col-span-6" />
     <UCheckbox v-model="oneshot" size="xl" label="This is a Oneshot"
