@@ -9,8 +9,12 @@ const { title, detailsUrl, cover, publicationStatus } = useManga(manga)
   <NuxtLink class="manga-card-dense" :href="detailsUrl">
     <div class="dense-manga-container">
       <MangaCover class="cover" :manga="manga" noTitle fillHeight :use256="true" />
-      <div class="font-bold text-lg line-clamp-1 break-all">{{ title }}</div>
-      <MangaTag class="lift small dot mr-auto" mode="status" :status="publicationStatus" style="grid-area: status;" />
+      <div class="font-bold text-lg line-clamp-1 break-all" style="grid-area: title;">
+        {{ title }}
+      </div>
+      <MangaStatus :status="publicationStatus ?? 'ongoing'" small class="mr-auto" 
+        style="grid-area: status;"
+      />
     </div>
   </NuxtLink>
 </template>

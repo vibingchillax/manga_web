@@ -18,12 +18,11 @@ const {
   detailsUrl,
   description,
   publicationStatus,
-  contentRating,
   tags,
+  contentRating,
   originalLanguage
 } = useManga(manga);
 </script>
-
 <template>
   <div :class="[
     'manga-card',
@@ -40,10 +39,17 @@ const {
       <MangaCover class="cover" :manga="manga" :noLink="noLink" :openInNewTab="openInNewTab" fillHeight fixedAspect
         :use256="use256" noTitle />
     </div>
-    <div style="grid-area: status;" class="flex flex-wrap status mb-auto">
-      <MangaTag class="lift dot" mode="status" :status="publicationStatus" />
+    <div style="grid-area: status;" class="flex flex-wrap status mb-auto"> <!-- breakpoints: sm-->
+      <MangaStatus :status="publicationStatus ?? 'ongoing'" />
     </div>
-    <MangaTagsRow class="tags" :tags="tags" :contentRating="contentRating"></MangaTagsRow>
+    <TagsRow class="self-start tags" :rows="1"> <!-- sm ? 1 : 2-->
+      <!-- <MangaStatus content :status="publicationStatus ?? 'ongoing'" />  breakpoints: sm-->
+      <MangaTag v-if="contentRating" :value="contentRating" /> 
+      <MangaTag v-for="tag in sortedTags(tags)" :key="tag.id" 
+        :value="tag.attributes?.name?.en!"
+        :to="noLink ? undefined : routeToTag(tag)"
+      />
+    </TagsRow>
     <div class="stats" style="grid-area: stats;"></div>
     <div class="description !py-0" style="grid-area: description;">
       <MDC class="md-container dense" v-if="description && description.en" :value="description.en" />

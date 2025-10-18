@@ -23,7 +23,14 @@ const { title, description, detailsUrl, author, cover, contentRating, tags } = u
           style="min-height: 0px; grid-template-rows: max-content min-content auto max-content;">
           <h2 class="font-bold text-xl line-clamp-5 sm:line-clamp-2 lg:text-4xl overflow-hidden"
             style="line-height: 2.75rem;">{{ title }}</h2>
-          <MangaTagsRow class="overflow-hidden" :tags="tags" :contentRating="contentRating"></MangaTagsRow>
+          <TagsRow :rows="1" class="overflow-hidden"> <!-- bp ? 1 : 2-->
+            <MangaTag v-if="contentRating" :value="contentRating" /> 
+            <MangaTag v-for="tag in sortedTags(tags)" :key="tag.id" 
+              :value="tag.attributes?.name?.en!"
+              :to="routeToTag(tag)"
+              class="bg-accent"
+            />
+          </TagsRow>
           <div class="preview-description">
             <div class="relative overflow-hidden py-0">
               <div class="mw-container dense noEmptyLines">

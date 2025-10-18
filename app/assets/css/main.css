@@ -63,3 +63,15 @@ body {
 .bg-accent {
   background-color: rgb(var(--mw-accent));
 }
+
+.bg-status-yellow {
+  background-color: rgb(var(--mw-status-yellow));
+}
+
+.bg-status-red {
+  background-color: rgb(var(--mw-status-red));
+}
+
+.bg-status-purple {
+  background-color: rgb(var(--mw-status-purple));
+}

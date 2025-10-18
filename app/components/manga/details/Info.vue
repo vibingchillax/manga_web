@@ -4,16 +4,33 @@ const props = defineProps<{
   manga: Manga
 }>()
 const manga = props.manga
-const contentRating = manga.attributes?.contentRating
-const tags: Tag[] = manga.attributes?.tags!
-const publicationYear = manga.attributes?.year
-const publicationStatus = manga.attributes?.status
+
+const { contentRating, tags, publicationStatus, publicationYear } = useManga(manga)
+
+const colorMap = {
+  completed: 'secondary',
+  ongoing: 'primary',
+  cancelled: 'error',
+  hiatus: 'warning'
+} as const
 </script>
 <template>
   <div class="flex gap-1 flex-wrap items-center">
-    <MangaTagsRow :tags="tags" :content-rating="contentRating"></MangaTagsRow>
-    <MangaTag class="dot no-wrapper sm:font-bold uppercase" mode="status" :status="publicationStatus"
-      :year="publicationYear">
-    </MangaTag>
+    <TagsRow :rows="1"> <!-- bp ? 1 : 2-->
+      <MangaTag v-if="contentRating" :value="contentRating" /> 
+      <MangaTag v-for="tag in sortedTags(tags)" :key="tag.id" 
+        :value="tag.attributes?.name?.en!"
+        :to="routeToTag(tag)"
+        class="bg-accent"
+      />
+    </TagsRow>
+    <Tag noWrapper :color="colorMap[publicationStatus ?? 'ongoing']" class="sm:font-bold uppercase">
+      <template v-if="publicationYear">
+        Publication: {{ publicationYear }}, {{ publicationStatus }}
+      </template>
+      <template v-else>
+        {{ publicationStatus }}
+      </template>
+    </Tag>
   </div>
 </template>

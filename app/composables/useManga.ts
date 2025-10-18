@@ -45,6 +45,7 @@ export const useManga = (manga: Manga | undefined) => {
   })
 
   const publicationStatus = computed(() => manga?.attributes?.status)
+  const publicationYear = computed(() => manga?.attributes?.year)
   const publicationDemographic = computed(() => manga?.attributes?.publicationDemographic)
   const contentRating = computed(() => manga?.attributes?.contentRating)
   const links = computed(() => manga?.attributes?.links ?? {})
@@ -59,6 +60,7 @@ export const useManga = (manga: Manga | undefined) => {
     author,
     cover,
     publicationStatus,
+    publicationYear,
     publicationDemographic,
     contentRating,
     links,
