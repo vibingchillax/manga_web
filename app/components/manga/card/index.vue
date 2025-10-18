@@ -336,8 +336,8 @@ const {
   width: 100%
 }
 
-.manga-card-cover-only .manga-card .cover img,
-.manga-card.cover-only .cover img {
+.manga-card-cover-only .manga-card >>>.cover img,
+.manga-card.cover-only >>>.cover img {
   height: 100%;
   left: 0;
   position: absolute;
