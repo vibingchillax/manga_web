@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { GroupRole, UserRole } from '~~/shared/prisma/enums'
 
 const ScanlationGroupUpdateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -7,12 +8,25 @@ const ScanlationGroupUpdateSchema = z.object({
   website: z.string().url().optional(),
   ircServer: z.string().max(100).optional(),
   ircChannel: z.string().max(100).optional(),
-  discord: z.string().url().max(100).optional(),
+  discord: z.string()
+    .regex(/^((https?:\/\/)?(www\.)?(discord\.(gg|com)\/(invite\/)?[A-Za-z0-9-]+))$/, {
+    })
+    .max(200).optional(),
   contactEmail: z.string().email().optional(),
   description: z.string().max(500).optional(),
-  twitter: z.string().max(15).optional(),
-  mangaUpdates: z.string().max(100).optional()
-    .refine((url) => !url || url?.includes("mangaupdates.com")),
+  twitter: z.string()
+    .regex(
+      /^(?:@)?(?:https?:\/\/(?:www\.)?twitter\.com\/)?([A-Za-z0-9_]{1,15})$/,
+    )
+    .transform(v => {
+      const match = v.match(/([A-Za-z0-9_]{1,15})$/)
+      return match ? match[1] : undefined
+    }).optional(),
+  mangaUpdates: z.string()
+    .url()
+    .regex(/^https?:\/\/(www\.)?mangaupdates\.com\//, {
+    })
+    .max(200).optional(),
   focusedLanguages: z.array(z.string().min(2).max(6)).optional(),
   inactive: z.boolean().optional(),
   locked: z.boolean().optional(),
@@ -46,6 +60,14 @@ export default defineEventHandler(async (event) => {
   })
   if (!currentGroup) throw createError({ statusCode: 404, statusMessage: 'Group not found' })
 
+  if (!(user.roles.includes(UserRole.admin)
+    || user.id === currentGroup.members?.find(m => m.role === GroupRole.leader)?.userId)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Forbidden'
+    })
+  }
+
   const { members, leader, ...scalarUpdate } = data
   await prisma.scanlationGroup.update({
     where: { id: params.id },
@@ -61,7 +83,7 @@ export default defineEventHandler(async (event) => {
       data: { role: 'member' }
     })
     await prisma.scanlationGroupMember.upsert({
-      where: { userId_groupId: { groupId: params.id, userId: leader }},
+      where: { userId_groupId: { groupId: params.id, userId: leader } },
       update: { role: 'leader' },
       create: { groupId: params.id, userId: leader, role: 'leader' }
     })

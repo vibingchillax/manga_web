@@ -1,4 +1,5 @@
 import * as z from "zod"
+import { UserRole } from "~~/shared/prisma/enums"
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
@@ -8,7 +9,7 @@ export default defineEventHandler(async (event) => {
     statusMessage: "Not authenticated"
   })
 
-  if (user.roles.includes('admin')) throw createError({
+  if (!user.roles.includes(UserRole.admin)) throw createError({
     statusCode: 403,
     statusMessage: "Forbidden"
   })

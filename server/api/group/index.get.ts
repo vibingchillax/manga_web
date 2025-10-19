@@ -32,8 +32,19 @@ export default defineEventHandler(async (event) => {
       skip: query.data?.offset ?? 0,
       where: filters,
       include: {
-        members: query.data?.['includes[]']?.includes('member')
-      }
+          members: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  roles: true
+                }
+              },
+              role: true
+            }
+          }
+        }
     }),
 
     await prisma.scanlationGroup.count({
@@ -42,7 +53,15 @@ export default defineEventHandler(async (event) => {
 
   return {
     result: 'ok',
-    data: groups,
+    data: groups.map(g => ({
+      ...g,
+      members: g.members?.map(m => ({
+        id: m.user.id,
+        username: m.user.username,
+        roles: m.user.roles,
+        groupRole: m.role,
+      }))
+    })),
     limit: query.data?.limit ?? 10,
     offset: query.data?.offset ?? 0,
     count: total

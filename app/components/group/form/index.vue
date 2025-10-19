@@ -22,11 +22,34 @@ const schema = z.object({
   website: allowEmpty(z.string().url({ message: 'Website must be a valid URL' })),
   ircServer: allowEmpty(z.string().max(100)),
   ircChannel: allowEmpty(z.string().max(100)),
-  discord: allowEmpty(z.string().url({ message: 'Discord must be a valid URL' }).max(100)),
+  discord: allowEmpty(
+    z.string()
+      .regex(/^((https?:\/\/)?(www\.)?(discord\.(gg|com)\/(invite\/)?[A-Za-z0-9-]+))$/, {
+        message: 'Must be a valid Discord invite link',
+      })
+      .max(200)
+  ),
   contactEmail: allowEmpty(z.string().email({ message: 'Must be a valid email address' })),
   description: allowEmpty(z.string().max(500, { message: 'Description must be less than 500 characters' })),
-  twitter: allowEmpty(z.string().max(15)),
-  mangaUpdates: allowEmpty(z.string().max(100)).refine((url) => !url || url?.includes("mangaupdates.com")),
+  twitter: allowEmpty(
+    z.string()
+      .regex(
+        /^(?:@)?(?:https?:\/\/(?:www\.)?twitter\.com\/)?([A-Za-z0-9_]{1,15})$/,
+        { message: 'Must be a valid Twitter username, @username, or full Twitter URL' }
+      )
+      .transform(v => {
+        const match = v.match(/([A-Za-z0-9_]{1,15})$/)
+        return match ? match[1] : undefined
+      })
+  ),
+  mangaUpdates: allowEmpty(
+    z.string()
+      .url({ message: 'Must be a valid URL' })
+      .regex(/^https?:\/\/(www\.)?mangaupdates\.com\//, {
+        message: 'Must be a valid MangaUpdates URL',
+      })
+      .max(200)
+  ),
   focusedLanguages: z.array(z.string()).optional(),
   locked: z.boolean().optional(),
   publishDelay: z.string().default('P0D'),
@@ -63,26 +86,15 @@ const router = useRouter()
 const languages = LANGUAGE_OPTIONS.ENGLISH_FIRST.WITHOUT_SCRIPTS
 
 const members = ref<Member[]>([])
-const original = ref<ScanlationGroup | null>(null)
+const original = ref<GroupSchema>()
 const leaderChanged = ref(false)
 const pendingData = ref<Partial<GroupSchema> | null>(null)
 const showAddMember = ref(false)
 
-if (props.group) {
-  const group = props.group
-  state.name = group.name
-  state.description = group.description ?? ''
-  state.focusedLanguages = group.focusedLanguages
-  state.locked = group.locked
-  state.publishDelay = group.publishDelay ?? 'P0D'
-
-  original.value = group
-}
-
-const normalized = (group: ScanlationGroup | Partial<GroupSchema>) => ({
+const toState = (group: ScanlationGroup) => ({
   name: group.name ?? '',
-  leader: group.leader ?? undefined,
-  members: group.members ?? [],
+  leader: group.members?.find(m => m.groupRole === 'leader')?.id,
+  members: group.members?.map(m => m.id) ?? [],
   website: group.website ?? undefined,
   ircServer: group.ircServer ?? undefined,
   ircChannel: group.ircChannel ?? undefined,
@@ -98,9 +110,7 @@ const normalized = (group: ScanlationGroup | Partial<GroupSchema>) => ({
 
 const hasChanged = computed(() => {
   if (props.create || !props.group) return true
-  const original = normalized(props.group)
-  const current = normalized(state)
-  return !equal(original, current)
+  return !equal(original, state)
 })
 
 function toggleLeader(member: Member) {
@@ -147,6 +157,32 @@ async function submit(data: Partial<GroupSchema>) {
   pendingData.value = null
   leaderChanged.value = false
 }
+
+watch(() => props.group, (group) => {
+  if (!group) return
+
+  state.name = group.name
+  state.leader = group.members?.find(m => m.groupRole === 'leader')?.id
+  state.members = group.members?.map(m => m.id)
+  state.website = group.website ?? undefined
+  state.ircServer = group.ircServer ?? undefined
+  state.ircChannel = group.ircChannel ?? undefined
+  state.discord = group.discord ?? undefined
+  state.contactEmail = group.contactEmail ?? undefined
+  state.description = group.description ?? undefined
+  state.twitter = group.twitter ?? undefined
+  state.mangaUpdates = group.mangaUpdates ?? undefined
+  state.focusedLanguages = group.focusedLanguages
+  state.locked = group.locked
+  state.publishDelay = group.publishDelay ?? 'P0D'
+
+  members.value = group.members?.map(m => ({
+    ...m,
+    leader: m.groupRole === 'leader'
+  })) ?? []
+
+  original.value = toState(group)
+}, { immediate: true })
 </script>
 <template>
   <div class="sm:mb-6">
@@ -188,7 +224,7 @@ async function submit(data: Partial<GroupSchema>) {
 
             <div class="flex gap-4 items-center my-6">
               <div class="font-medium mb-2">Group Delay</div>
-              <GroupPublishDelay v-model:duration="state.publishDelay" class="ml-auto"
+              <GroupFormPublishDelay v-model:duration="state.publishDelay" class="ml-auto"
                 :disabled="!isStaff && !create" />
             </div>
           </div>
@@ -208,15 +244,22 @@ async function submit(data: Partial<GroupSchema>) {
             </UserCard>
             <UButton icon="i-lucide-user-plus" @click="showAddMember = true">Add Member</UButton>
           </div>
-          <div class="mb-6">
-            <div v-if="!create">
+          <div>
+            <div v-if="!create" class="mb-6">
               <div class="font-medium mb-2">Focused Languages</div>
               <USelect v-model="state.focusedLanguages" :items="languages" multiple
-                placeholder="Languages that your group usually translates to" />
+                placeholder="Languages that your group usually translates to" :ui="{ content: 'min-w-fit' }">
+                <template #item-label="{ item }">
+                  <div class="flex flex-row items-center gap-2">
+                    <LangFlag :lang="item.value" />
+                    {{ item.label }}
+                  </div>
+                </template>
+              </USelect>
             </div>
-            <div>
+            <div class="mb-6">
               <div class="font-medium mb-2">Group Contacts</div>
-              <GroupContactInput v-model="state" />
+              <GroupFormContactInput v-model="state" />
               <div class="font-medium mt-4 mb-2">Group Description</div>
               <UFormField>
                 <UTextarea size="xl" class="w-full" v-model="state.description" label="Group Description" max="1" />
@@ -242,7 +285,7 @@ async function submit(data: Partial<GroupSchema>) {
 
       <UModal v-model:open="showAddMember">
         <template #body>
-          <GroupAddMembers @add="addMember" @remove="removeMember" :added="members.map(m => m.id)" />
+          <GroupFormAddMembers @add="addMember" @remove="removeMember" :added="members.map(m => m.id)" />
         </template>
       </UModal>
     </div>

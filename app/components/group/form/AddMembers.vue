@@ -55,6 +55,8 @@ function toggleUser(user: User) {
   if (props.added.includes(user.id)) emit('remove', user.id)
   else if (props.added.length < props.max) emit('add', user)
 }
+
+onMounted(() => fetchUsers())
 </script>
 <template>
   <div>

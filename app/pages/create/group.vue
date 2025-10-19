@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GroupSchema } from '~/components/group/Form.vue'
+import type { GroupSchema } from '~/components/group/form/index.vue'
 
 const router = useRouter()
 const loading = ref(false)

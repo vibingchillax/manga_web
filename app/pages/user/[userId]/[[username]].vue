@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
-const { data, pending, error } = await useFetch(`/api/user/${route.params.userId}`)
+const { data, pending, error } = await useFetch<{ result: string, data: User }>(`/api/user/${route.params.userId}`)
 </script>
 <template>
   <UserPage v-if="data?.data" :user="data.data" />

@@ -13,7 +13,11 @@ export default defineEventHandler(async (event) => {
       id: true,
       username: true,
       roles: true,
-      ScanlationGroupMember: true
+      ScanlationGroupMember: {
+        select: {
+          groupId: true
+        }
+      }
     },
   })
 
@@ -28,7 +32,7 @@ export default defineEventHandler(async (event) => {
     result: "ok",
     data: {
       ...rest,
-      groups: ScanlationGroupMember.map(g => g.groupId)
+      groups: user.ScanlationGroupMember.map(g => g.groupId)
     }
   }
 

@@ -5,6 +5,24 @@ const props = defineProps<{
   user: User
 }>()
 
+const groups = ref<ScanlationGroup[]>([])
+
+async function loadGroups() {
+  if (!props.user.groups) return
+  try {
+    const data = await $fetch<{data: ScanlationGroup[]}>(`/api/group`, {
+      query: {
+        limit: 24,
+        'ids[]': props.user.groups,
+      }
+    })
+
+    groups.value = data.data
+  } catch {
+
+  }
+}
+
 const items = ref<TabsItem[]>([
   {
     label: 'Info',
@@ -19,6 +37,8 @@ const items = ref<TabsItem[]>([
     slot: 'lists' as const
   }
 ])
+
+onMounted(() => loadGroups())
 </script>
 <template>
   <PageSeparator>
@@ -42,9 +62,12 @@ const items = ref<TabsItem[]>([
                 <UserRoleTag v-for="role in user.roles" :role="role" bgIndependent />
               </dd>
             </div>
-            <div class="mb-6">
+            <div class="mb-6" v-if="user.groups && user.groups.length">
               <dt class="mb-2 font-bold">Groups</dt>
-              <!-- <dd></dd> -->
+              <div class="grid gap-y-2">
+                <GroupCard v-for="group in groups" :group="group" :userId="user.id"
+                  showLeader />
+              </div>
             </div>
             <div class="mb-6">
               <dt class="mb-2 font-bold">Uploads</dt>

@@ -6,12 +6,25 @@ const ScanlationGroupCreateSchema = z.object({
   website: z.string().url().optional(),
   ircServer: z.string().max(100).optional(),
   ircChannel: z.string().max(100).optional(),
-  discord: z.string().url().max(100).optional(),
+  discord: z.string()
+    .regex(/^((https?:\/\/)?(www\.)?(discord\.(gg|com)\/(invite\/)?[A-Za-z0-9-]+))$/, {
+    })
+    .max(200).optional(),
   contactEmail: z.string().email().optional(),
   description: z.string().max(500).optional(),
-  twitter: z.string().max(15).optional(),
-  mangaUpdates: z.string().max(100).optional()
-    .refine((url) => !url || url?.includes("mangaupdates.com")),
+  twitter: z.string()
+    .regex(
+      /^(?:@)?(?:https?:\/\/(?:www\.)?twitter\.com\/)?([A-Za-z0-9_]{1,15})$/,
+    )
+    .transform(v => {
+      const match = v.match(/([A-Za-z0-9_]{1,15})$/)
+      return match ? match[1] : undefined
+    }).optional(),
+  mangaUpdates: z.string()
+      .url()
+      .regex(/^https?:\/\/(www\.)?mangaupdates\.com\//, {
+      })
+      .max(200).optional(),
   publishDelay: z.coerce.string().optional()
 })
 
