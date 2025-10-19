@@ -15,7 +15,7 @@ export async function getUserFromToken(token: string) {
         id: true,
         email: true,
         username: true,
-        role: true,
+        roles: true,
         createdAt: true,
         updatedAt: true
       }

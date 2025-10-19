@@ -65,7 +65,7 @@ model User {
   email                 String                  @unique
   password              String
   username              String                  @unique
-  role                  UserRole                @default(user)
+  roles                 UserRole[]              @default([user])
   createdAt             DateTime                @default(now()) @db.Timestamp(6)
   updatedAt             DateTime                @default(now()) @updatedAt @db.Timestamp(6)
   MangaFollows          MangaFollows[]
@@ -196,7 +196,9 @@ model UploadedChapterGroup {
 }
 
 enum UserRole {
+  banned
   user
+  groupLeader
   admin
 }
 

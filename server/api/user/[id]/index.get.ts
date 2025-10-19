@@ -12,8 +12,9 @@ export default defineEventHandler(async (event) => {
     select: {
       id: true,
       username: true,
-      role: true
-    }
+      roles: true,
+      ScanlationGroupMember: true
+    },
   })
 
   if (!user) throw createError({
@@ -21,9 +22,14 @@ export default defineEventHandler(async (event) => {
     statusMessage: "User not found"
   })
 
+  const { ScanlationGroupMember, ...rest } = user
+
   return {
     result: "ok",
-    data: user
+    data: {
+      ...rest,
+      groups: ScanlationGroupMember.map(g => g.groupId)
+    }
   }
-  
+
 })

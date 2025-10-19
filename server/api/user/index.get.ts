@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       select: {
         id: true,
         username: true,
-        role: true
+        roles: true
       }
     }),
     prisma.user.count({ where: filters })

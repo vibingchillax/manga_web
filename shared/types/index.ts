@@ -44,5 +44,6 @@ export type ScanlationGroup = Group & {
 export type User = {
   id: string
   username: string
-  role: UserRole
+  roles: UserRole[]
+  groups: string[]
 }

@@ -4,7 +4,7 @@ export interface Session {
   id: string
   email: string
   username: string
-  role: UserRole
+  roles: UserRole[]
   createdAt: string
   updatedAt: string
 }
@@ -32,8 +32,8 @@ export const useAuth = () => {
     }
   }
 
-  const hasRole = (roles: UserRole[]) =>
-    computed(() => session.value && roles.includes(session.value.role))
+  const hasRole = (roles: UserRole[]) => 
+    computed(() => !!session.value?.roles.some(r => roles.includes(r)))
 
   const isStaff = hasRole(STAFF_ROLES)
 

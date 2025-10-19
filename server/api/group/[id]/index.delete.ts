@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     statusMessage: "Not authenticated"
   })
 
-  if (user.role !== 'admin') throw createError({
+  if (user.roles.includes('admin')) throw createError({
     statusCode: 403,
     statusMessage: "Forbidden"
   })
