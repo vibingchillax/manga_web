@@ -2,8 +2,6 @@ services:
   app:
     build:
       context: .
-    ports:
-      - "80:3000"
     depends_on:
       - db
       - redis
@@ -20,8 +18,6 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "${DB_PORT}:5432"
     volumes:
       - db:/var/lib/postgresql/data
     env_file:
@@ -33,7 +29,6 @@ services:
       - "${KUBO_TRANSPORT_PORT}:4001"
       - "${KUBO_TRANSPORT_PORT}:4001/udp"
       - "127.0.0.1:${KUBO_GATEWAY_PORT}:8080"
-      - "127.0.0.1:${KUBO_API_PORT}:5001"
     volumes:
       - ipfs_staging:/export
       - ipfs_data:/data/ipfs
@@ -56,8 +51,6 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: "False"
     volumes:
       - ./pgadmin/servers.json:/pgadmin4/servers.json
-    ports:
-      - "${PGADMIN_PORT}:80"
     depends_on:
       - db
     env_file:

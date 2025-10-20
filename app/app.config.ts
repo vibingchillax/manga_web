@@ -1,4 +1,6 @@
 export default defineAppConfig({
-  proxyUrl: 'http://localhost:1234',
-  kuboUrl: `http://localhost:${process.env.KUBO_API_PORT}`
+  appUrl: process.env.APP_URL ?? 'http://localhost',
+  proxyUrl: process.env.PROXY_URL ??  'http://localhost:1234',
+  kuboGatewayUrl: `${process.env.APP_URL}:8080/ipfs/`,
+  kuboApiUrl: `http://${process.env.NODE_ENV === 'production' ? 'kubo' : 'localhost'}:5001/api/v0`
 })

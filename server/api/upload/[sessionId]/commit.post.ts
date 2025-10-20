@@ -13,8 +13,6 @@ const commitSchema = z.object({
 }) 
 
 export default defineEventHandler(async (event) => {
-  const kuboUrl = useAppConfig().kuboUrl
-
   const user = await getAuthenticatedUser(event)
 
   if (!user) throw createError({
@@ -72,7 +70,7 @@ export default defineEventHandler(async (event) => {
       translatedLanguage: data.chapterDraft.translatedLanguage,
       uploader: user.id,
       pages: {
-        originalUrl: kuboUrl as string,
+        originalUrl: useAppConfig().kuboGatewayUrl,
         data: orderedFiles.map(f => ({
           originalFileName: f.originalFileName,
           cid: f.cid,

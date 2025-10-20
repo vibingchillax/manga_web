@@ -1,3 +1,5 @@
 import { create } from 'kubo-rpc-client'
 
-export const kubo = create()
+export const kubo = create({
+  url: useAppConfig().kuboApiUrl
+})

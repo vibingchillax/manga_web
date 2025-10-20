@@ -1,7 +1,7 @@
 import Redis from 'ioredis'
 
 export const redis = new Redis({
-  host: 'localhost',
+  host: process.env.NODE_ENV === 'production' ? 'redis' : 'localhost',
   port: 6379,
 })
 
