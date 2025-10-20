@@ -46,6 +46,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/jszip": "^3.4.0",
     "@types/qs": "^6.14.0",
+    "dotenv": "^17.2.3",
     "nuxt": "^4.1.3",
     "nuxt-open-fetch": "^0.13.1",
     "nuxt-viewport": "^2.3.1",

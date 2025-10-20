@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       userId: user.id
     },
     include: {
-      UploadSessionFile: true
+      files: true
     }
   })
 
@@ -51,13 +51,13 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'No upload session with that id'
   })
 
-  if (!(session.UploadSessionFile.length > 0)) throw createError({
+  if (!(session.files.length > 0)) throw createError({
     statusCode: 400,
     statusMessage: 'No files uploaded yet'
   })
 
   const orderedFiles = data.pageOrder.map(idOrName => {
-    const file = session.UploadSessionFile.find(f => f.id === idOrName || f.originalFileName === idOrName)
+    const file = session.files.find(f => f.id === idOrName || f.originalFileName === idOrName)
     if (!file) throw createError({ statusCode: 400, statusMessage: `File ${idOrName} not found in session` })
     return file
   })

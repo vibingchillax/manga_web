@@ -1,0 +1,53 @@
+model User {
+  id                    String                  @id @db.Uuid
+  email                 String                  @unique
+  password              String
+  username              String                  @unique
+  roles                 UserRole[]              @default([user])
+  createdAt             DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt             DateTime                @default(now()) @updatedAt @db.Timestamp(6)
+  mangaFollows          MangaFollows[]
+  uploadedChapters      UploadedChapter[]
+  uploadSession         UploadSession?
+  refreshTokens         RefreshToken[]
+  groupMemberships      ScanlationGroupMember[]
+}
+
+model RefreshToken {
+  id        String   @id @db.Uuid
+  token     String   @unique
+  userId    String   @db.Uuid
+  expiresAt DateTime
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model MangaFollows {
+  userId  String            @db.Uuid
+  mangaId String            @db.Uuid
+  status  MangaFollowStatus
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, mangaId])
+  @@index([userId])
+  @@index([mangaId])
+  @@index([status])
+}
+
+enum UserRole {
+  banned
+  user
+  groupLeader
+  admin
+}
+
+enum MangaFollowStatus {
+  reading
+  onHold
+  dropped
+  planToRead
+  completed
+  rereading
+}

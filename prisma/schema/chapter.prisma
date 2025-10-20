@@ -1,0 +1,31 @@
+model UploadedChapter {
+  id                 String                 @id @db.Uuid
+  mangaId            String                 @db.Uuid
+  title              String?
+  volume             String?
+  chapter            String?
+  translatedLanguage String
+  uploader           String?                @db.Uuid
+  pages              Json
+  version            Int                    @default(1)
+  createdAt          DateTime               @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime               @default(now()) @updatedAt @db.Timestamp(6)
+  publishAt          DateTime               @default(now())
+  readableAt         DateTime               @default(now())
+  user               User?                  @relation(fields: [uploader], references: [id], onDelete: SetNull)
+  groups             UploadedChapterGroup[]
+  @@index([mangaId])
+  @@index([uploader])
+}
+
+model UploadedChapterGroup {
+  chapterId String @db.Uuid
+  groupId   String @db.Uuid
+
+  chapter UploadedChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  group   ScanlationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([chapterId, groupId])
+  @@index([chapterId])
+  @@index([groupId])
+}

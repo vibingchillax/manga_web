@@ -1,0 +1,44 @@
+model ScanlationGroup {
+  id                    String                  @id @db.Uuid
+  name                  String
+  altNames              Json?
+  website               String?
+  ircServer             String?
+  ircChannel            String?
+  discord               String?
+  contactEmail          String?
+  description           String?
+  twitter               String?
+  mangaUpdates          String?
+  inactive              Boolean                 @default(false)
+  publishDelay          String                  @default("P0D")
+  focusedLanguages      String[]
+  locked                Boolean                 @default(false)
+  official              Boolean                 @default(false) 
+  verified              Boolean                 @default(false)
+  exLicensed            Boolean                 @default(false)
+  version               Int                     @default(1)
+  createdAt             DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt             DateTime                @default(now()) @updatedAt @db.Timestamp(6)
+  members               ScanlationGroupMember[]
+  uploadSessions        UploadSessionGroup[]
+  uploadedChapters      UploadedChapterGroup[]
+  @@index([name])
+}
+
+model ScanlationGroupMember {
+  userId  String          @db.Uuid
+  groupId String          @db.Uuid
+  role    GroupRole
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group   ScanlationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId])
+  @@index([userId])
+  @@index([groupId])
+}
+
+enum GroupRole {
+  leader
+  member
+}

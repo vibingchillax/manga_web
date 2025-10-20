@@ -1,0 +1,40 @@
+model UploadSession {
+  id                String               @id @db.Uuid
+  userId            String               @unique @db.Uuid
+  mangaId           String               @db.Uuid
+  data              Json?
+  isCommitted       Boolean              @default(false)
+  isProcessed       Boolean              @default(false)
+  isDeleted         Boolean              @default(false)
+  version           Int                  @default(1)
+  createdAt         DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime             @default(now()) @updatedAt @db.Timestamp(6)
+  user              User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groups            UploadSessionGroup[]
+  files             UploadSessionFile[]
+  @@index([mangaId])
+}
+
+model UploadSessionFile {
+  id               String        @id @db.Uuid
+  sessionId        String        @db.Uuid
+  originalFileName String
+  cid              String
+  fileSize         Int
+  mimeType         String
+  source           String
+  version          Int           @default(1)
+  session          UploadSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  @@index([sessionId])
+}
+
+model UploadSessionGroup {
+  sessionId String          @db.Uuid
+  groupId   String          @db.Uuid
+  session   UploadSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  group     ScanlationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, groupId])
+  @@index([sessionId])
+  @@index([groupId])
+}

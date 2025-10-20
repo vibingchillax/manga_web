@@ -1,0 +1,78 @@
+model ScrapedManga {
+  id                     String                  @id @db.Uuid
+  mangaDexId             String                  @db.Uuid
+  sourceId               String
+  title                  String
+  url                    String                  @unique
+  altTitles              Json?
+  description            String?
+  coverUrl               String?
+  author                 String[]
+  artist                 String[]
+  publicationDemographic PublicationDemographic?
+  status                 MangaStatus?
+  year                   Int?
+  contentRating          ContentRating?
+  tags                   String[]
+  originalLanguage       String?
+  vote                   Int                     @default(0)
+  version                Int                     @default(1)
+  createdAt              DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt              DateTime                @default(now()) @updatedAt @db.Timestamp(6)
+  chapters               ScrapedChapter[]
+  @@index([mangaDexId])
+  @@index([sourceId])
+  @@index([title])
+}
+
+model ScrapedChapter {
+  id                 String         @id @db.Uuid
+  mangaId            String         @db.Uuid
+  sourceId           String
+  url                String         @unique
+  title              String?
+  volume             String?
+  chapter            String?
+  translatedLanguage String?
+  uploader           String?
+  scanlationGroup    String?
+  branch             String?
+  publishedAt        String?
+  createdAt          DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime       @default(now()) @updatedAt @db.Timestamp(6)
+  manga              ScrapedManga   @relation(fields: [mangaId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  pages              ScrapedPage[]
+  @@index([mangaId])
+  @@index([sourceId])
+}
+
+model ScrapedPage {
+  id              String          @id @db.Uuid
+  chapterId       String          @db.Uuid
+  data            String[]
+  createdAt       DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime        @default(now()) @updatedAt @db.Timestamp(6)
+  chapter         ScrapedChapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@index([chapterId])
+}
+
+enum PublicationDemographic {
+  shounen
+  shoujo
+  josei
+  seinen
+}
+
+enum MangaStatus {
+  completed
+  ongoing
+  cancelled
+  hiatus
+}
+
+enum ContentRating {
+  safe
+  suggestive
+  erotica
+  pornographic
+}
