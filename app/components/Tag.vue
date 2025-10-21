@@ -21,7 +21,7 @@ const classes = computed(() => [
 </script>
 <template>
   <!-- no idea why they separate href and to? -->
-  <NuxtLink v-if="href" :class="classes" :href="href" target="_blank" rel="noopener noreferer">
+  <NuxtLink v-if="href" :class="classes" :href="href">
     <!-- <Icon
       v-if="icon"
       :icon="icon"
