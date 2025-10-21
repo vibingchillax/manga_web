@@ -48,7 +48,50 @@ export const useManga = (manga: Manga | undefined) => {
   const publicationYear = computed(() => manga?.attributes?.year)
   const publicationDemographic = computed(() => manga?.attributes?.publicationDemographic)
   const contentRating = computed(() => manga?.attributes?.contentRating)
-  const links = computed(() => manga?.attributes?.links ?? {})
+  const links = computed(() => {
+    const linkMap = manga?.attributes?.links ?? {}
+
+    const read: { href: string, name: string, icon: string }[] = []
+    const buy: { href: string, name: string, icon: string }[] = []
+    const track: { href: string, name: string, icon: string }[] = []
+
+    OFFICIAL_SOURCES.forEach(o => {
+      if (linkMap[o.apiCode]) {
+        read.push({
+          name: o.name,
+          href: linkMap[o.apiCode]!,
+          icon: o.icon
+        })
+      }
+    })
+
+    BOOK_STORES.forEach(o => {
+      if (linkMap[o.apiCode]) {
+        buy.push({
+          name: o.name,
+          href: linkMap[o.apiCode]!,
+          icon: o.icon
+        })
+      }
+    })
+
+    TRACKING_SITES.forEach(o => {
+      if (linkMap[o.apiCode]) {
+        track.push({
+          name: o.name,
+          href: linkMap[o.apiCode]!,
+          icon: o.icon
+        })
+      }
+    })
+
+    return {
+      read,
+      buy,
+      track
+    }
+  })
+
   const tags = computed(() => manga?.attributes?.tags ?? [])
   const originalLanguage = computed(() => manga?.attributes?.originalLanguage)
 

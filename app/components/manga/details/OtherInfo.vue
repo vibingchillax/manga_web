@@ -35,8 +35,7 @@ for (const tag of tags.value) {
     <div class="mb-2">
       <div class="font-bold mb-2">Author</div>
       <div class="flex gap-2 flex-wrap">
-        <Tag v-for="author in author.authors"
-          :href="`/author/${author.id}/${toKebabCase(author.attributes?.name!)}`">
+        <Tag v-for="author in author.authors" :href="`/author/${author.id}/${toKebabCase(author.attributes?.name!)}`">
           {{ author.attributes?.name }}
         </Tag>
       </div>
@@ -44,8 +43,7 @@ for (const tag of tags.value) {
     <div class="mb-2">
       <div class="font-bold mb-2">Artist</div>
       <div class="flex gap-2 flex-wrap">
-        <Tag v-for="artist in author.artists"
-          :href="`/author/${artist.id}/${toKebabCase(artist.attributes?.name!)}`">
+        <Tag v-for="artist in author.artists" :href="`/author/${artist.id}/${toKebabCase(artist.attributes?.name!)}`">
           {{ artist.attributes?.name }}
         </Tag>
       </div>
@@ -54,6 +52,14 @@ for (const tag of tags.value) {
       <div class="font-bold mb-2">Genres</div>
       <div class="flex gap-2 flex-wrap">
         <Tag v-for="tag in genres" :href="`/tag/${tag.id}/${toKebabCase(tag.attributes?.name?.en!)}`">
+          {{ tag.attributes?.name?.en }}
+        </Tag>
+      </div>
+    </div>
+    <div v-if="themes.length > 0" class="mb-2">
+      <div class="font-bold mb-2">Themes</div>
+      <div class="flex gap-2 flex-wrap">
+        <Tag v-for="tag in themes" :href="`/tag/${tag.id}/${toKebabCase(tag.attributes?.name?.en!)}`">
           {{ tag.attributes?.name?.en }}
         </Tag>
       </div>
@@ -74,26 +80,17 @@ for (const tag of tags.value) {
         </Tag>
       </div>
     </div>
-    <div class="mb-2">
+    <div class="mb-2" v-if="links.read || links.buy">
       <div class="font-bold mb-2">Read or Buy</div>
       <div class="flex gap-2 flex-wrap">
-        <Tag v-if="links?.raw" :href="links?.raw" target="_blank">Official Raw</Tag>
-        <Tag v-if="links?.engtl" :href="links?.engtl" target="_blank">Official English</Tag>
-        <Tag v-if="links?.amz" :href="links?.amz" target="_blank">Amazon</Tag>
-        <Tag v-if="links?.bw" :href="`https://bookwalker.jp/${links?.bw}`" target="_blank">Book☆Walker</Tag>
-        <Tag v-if="links?.cdj" :href="links?.cdj" target="_blank">CDJapan</Tag>
-        <Tag v-if="links?.ebj" :href="links?.ebj" target="_blank">eBookJapan</Tag>
+        <Tag v-for="link in links.read" :href="link.href">{{ link.name }}</Tag>
+        <Tag v-for="link in links.buy" :href="link.href">{{ link.name }}</Tag>
       </div>
     </div>
-    <div class="mb-2" v-if="links?.al || links?.ap || links?.kt || links?.mal || links?.mu || links?.nu">
+    <div class="mb-2" v-if="links.track">
       <div class="font-bold mb-2">Track</div>
       <div class="flex gap-2 flex-wrap">
-        <Tag v-if="links?.al" :href="`https://anilist.co/manga/${links?.al}`" target="_blank">AniList</Tag>
-        <Tag v-if="links?.ap" :href="`https://www.anime-planet.com/manga/${links?.ap}`" target="_blank">Anime-Planet</Tag>
-        <Tag v-if="links?.kt" :href="`https://kitsu.app/manga/${links?.kt}`" target="_blank">Kitsu</Tag>
-        <Tag v-if="links?.mal" :href="`https://myanimelist.net/manga/${links?.mal}`" target="_blank">MyAnimeList</Tag>
-        <Tag v-if="links?.mu" :href="`https://www.mangaupdates.com/series/${links?.mu}`" target="_blank">MangaUpdates</Tag>
-        <Tag v-if="links?.nu" :href="`https://www.novelupdates.com/series/${links?.nu}`" target="_blank">NovelUpdates</Tag>
+        <Tag v-for="link in links.track" :href="link.href">{{ link.name }}</Tag>
       </div>
     </div>
 
@@ -101,7 +98,7 @@ for (const tag of tags.value) {
       <div class="font-bold mb-1">Alternative Titles</div>
       <div class="mb-1 flex flex-col gap-1 alt-title">
         <div v-for="[lang, title] in altTitlesList" :key="lang" class="flex items-center gap-2">
-          <LangFlag :lang="lang" :display-scripts="true"/>
+          <LangFlag :lang="lang" :display-scripts="true" />
           <span>{{ title }}</span>
         </div>
       </div>
