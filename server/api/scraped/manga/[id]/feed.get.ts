@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { ScrapeTarget } from '~~/shared/prisma/enums'
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(event, z.object({
@@ -27,8 +28,17 @@ export default defineEventHandler(async (event) => {
       return await refreshChapters(manga)
     }
 
-    const lastUpdated = result[0].updatedAt
-    const stale = Date.now() - lastUpdated.getTime() > 1000 * 60 * 60
+    const status = await prisma.scrapeStatus.findUnique({
+      where: {
+        targetId_targetType: {
+          targetId: params.id,
+          targetType: ScrapeTarget.chapters
+        }
+      }
+    })
+
+    const lastRefreshed = status?.refreshedAt ?? new Date(0)
+    const stale = Date.now() - lastRefreshed.getTime() > 1000 * 60 * 60
 
     if (stale) {
       refreshChapters(manga).catch((err: any)=> {

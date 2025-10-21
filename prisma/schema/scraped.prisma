@@ -20,16 +20,17 @@ model ScrapedManga {
   createdAt              DateTime                @default(now()) @db.Timestamp(6)
   updatedAt              DateTime                @default(now()) @updatedAt @db.Timestamp(6)
   chapters               ScrapedChapter[]
+
   @@index([mangaDexId])
   @@index([sourceId])
   @@index([title])
 }
 
 model ScrapedChapter {
-  id                 String         @id @db.Uuid
-  mangaId            String         @db.Uuid
+  id                 String        @id @db.Uuid
+  mangaId            String        @db.Uuid
   sourceId           String
-  url                String         @unique
+  url                String        @unique
   title              String?
   volume             String?
   chapter            String?
@@ -38,22 +39,39 @@ model ScrapedChapter {
   scanlationGroup    String?
   branch             String?
   publishedAt        String?
-  createdAt          DateTime       @default(now()) @db.Timestamp(6)
-  updatedAt          DateTime       @default(now()) @updatedAt @db.Timestamp(6)
-  manga              ScrapedManga   @relation(fields: [mangaId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  createdAt          DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime      @default(now()) @updatedAt @db.Timestamp(6)
+  manga              ScrapedManga  @relation(fields: [mangaId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   pages              ScrapedPage[]
+
   @@index([mangaId])
   @@index([sourceId])
 }
 
 model ScrapedPage {
-  id              String          @id @db.Uuid
-  chapterId       String          @db.Uuid
-  data            String[]
-  createdAt       DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt       DateTime        @default(now()) @updatedAt @db.Timestamp(6)
-  chapter         ScrapedChapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id        String         @id @db.Uuid
+  chapterId String         @db.Uuid
+  data      String[]
+  createdAt DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt DateTime       @default(now()) @updatedAt @db.Timestamp(6)
+  chapter   ScrapedChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
   @@index([chapterId])
+}
+
+model ScrapeStatus {
+  id          String       @id @db.Uuid
+  targetId    String       @db.Uuid
+  targetType  ScrapeTarget
+  refreshedAt DateTime     @default(now()) @db.Timestamp(6)
+
+  @@unique([targetId, targetType])
+}
+
+enum ScrapeTarget {
+  mangas
+  chapters
+  pages
 }
 
 enum PublicationDemographic {

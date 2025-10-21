@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { ScrapedManga, ScrapeTarget } from '~~/shared/prisma/client';
 
 export async function refreshChapters(manga: ScrapedManga) {
 
@@ -31,6 +32,24 @@ export async function refreshChapters(manga: ScrapedManga) {
       publishedAt: chapter.date
     })),
     skipDuplicates: true
+  })
+
+  await prisma.scrapeStatus.upsert({
+    where: {
+      targetId_targetType: {
+        targetId: manga.id,
+        targetType: ScrapeTarget.chapters
+      }
+    },
+    update: {
+      refreshedAt: new Date()
+    },
+    create: {
+      id: randomUUID(),
+      targetId: manga.id,
+      targetType: ScrapeTarget.chapters,
+      refreshedAt: new Date()
+    }
   })
 
   return created

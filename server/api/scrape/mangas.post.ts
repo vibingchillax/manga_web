@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { ScrapeTarget } from '~~/shared/prisma/enums'
 
 const scrapeMangaSchema = z.object({
   sourceId: z.string()
@@ -33,8 +34,17 @@ export default defineEventHandler(async (event) => {
       return await refreshMangas(data)
     }
 
-    const lastUpdated = result[0].updatedAt
-    const stale = Date.now() - lastUpdated.getTime() > 1000 * 60 * 60
+    const status = await prisma.scrapeStatus.findUnique({
+      where: {
+        targetId_targetType: {
+          targetId: data.mangadexId,
+          targetType: ScrapeTarget.mangas
+        }
+      }
+    })
+
+    const lastRefreshed = status?.refreshedAt ?? new Date(0)
+    const stale = Date.now() - lastRefreshed.getTime() > 1000 * 60 * 60
 
     if (stale) {
       refreshMangas(data).catch((err: any) => {
@@ -46,6 +56,9 @@ export default defineEventHandler(async (event) => {
 
   } catch (err: any) {
     if (err?.statusCode) throw err
-    throw createError(err instanceof Error ? err.message : String(err))
+    throw createError({
+      statusCode: 500,
+      statusMessage: err instanceof Error ? err.message : String(err)
+    })
   }
 })
