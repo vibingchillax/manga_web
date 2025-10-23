@@ -322,8 +322,10 @@ export const useReaderStore = defineStore("reader", {
     },
     async _markChapterRead(chapter: ScrapedChapter) {
       const history = useReadingHistoryStore()
+      const readMarker = useReadMarkers()
       debug(`Marking C:${chapter.id} read`)
       history.pushChapterRead({ chapterId: chapter.id, type: "scraped" })
+      readMarker.setMarkers(this.manga?.id!, [{chapterId: chapter.id, type: "scraped"}])
     },
     setCurrentPageGroup(groupIndex: number, router?: Router) {
       const readerMenu = useReaderMenu()
