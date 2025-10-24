@@ -26,20 +26,6 @@ const { data: mangasList, pending, error } = await useMangadex('/manga', {
   key: 'seasonalPage'
 })
 
-const items = ref([
-  {
-    icon: 'i-lucide-list',
-    value: 'dense'
-  },
-  {
-    icon: 'i-lucide-rows-2',
-    value: 'normal'
-  },
-  {
-    icon: 'i-lucide-grid-2x2',
-    value: 'coverOnly'
-  }
-]);
 const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
 </script>
 <template>
@@ -48,7 +34,7 @@ const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
       <div class="flex my-6 flex-row justify-between gap-6">
         <div>
         </div>
-        <UTabs v-model="active" :items="items" />
+        <ListStyleControls v-model="active" />
       </div>
       <div class="grid gap-2" :class="{
         'manga-card-dense': active === 'dense',

@@ -1,20 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{ manga: Manga }>()
 const { related, pending, error } = await useRelatedMangas(props.manga)
-const items = ref([
-  {
-    icon: 'i-lucide-list',
-    value: 'dense'
-  },
-  {
-    icon: 'i-lucide-rows-2',
-    value: 'normal'
-  },
-  {
-    icon: 'i-lucide-grid-2x2',
-    value: 'coverOnly'
-  }
-]);
 const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
 </script>
 <template>
@@ -23,7 +9,7 @@ const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
     <div class="flex flex-row justify-between gap-6">
       <div>
       </div>
-      <UTabs v-model="active" :items="items" />
+      <ListStyleControls v-model="active" />
     </div>
     <div v-if="pending">Loading</div>
     <div v-if="error">{{ error }}</div>

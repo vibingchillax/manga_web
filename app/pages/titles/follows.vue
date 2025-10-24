@@ -4,20 +4,6 @@ import type { MangaFollowStatus } from '~~/shared/prisma/enums';
 const { loggedIn } = useAuth()
 const preferences = usePreferencesStore();
 const { contentRating } = storeToRefs(preferences)
-const items = ref([
-  {
-    icon: 'i-lucide-list',
-    value: 'dense'
-  },
-  {
-    icon: 'i-lucide-rows-2',
-    value: 'normal'
-  },
-  {
-    icon: 'i-lucide-grid-2x2',
-    value: 'coverOnly'
-  }
-]);
 
 const tabs = ref([
   {
@@ -95,7 +81,7 @@ const filteredMangas = computed(() => {
       <div class="text-lg">
         {{ filteredMangas.length }} title(s)
       </div>
-      <UTabs v-model="active" :items="items" />
+      <ListStyleControls v-model="active" />
     </div>
     <div>
       <div class="grid gap-2" :class="{

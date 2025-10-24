@@ -2,16 +2,6 @@
 const toast = useToast()
 const history = useReadingHistoryStore()
 
-const items = ref([
-  {
-    icon: 'i-lucide-list',
-    value: 'dense'
-  },
-  {
-    icon: 'i-lucide-rows-2',
-    value: 'normal'
-  },
-]);
 const active = ref<'dense' | 'normal'>('dense');
 
 const chapters = ref<ScrapedChapterWithManga[]>([])
@@ -62,7 +52,7 @@ function clearHistory() {
     <div>
       <div class="relative flex justify-between gap-2 items-center mb-6">
         <UButton @click="clearHistory" icon="i-lucide-trash" label="Clear history" color="error" variant="outline" />
-        <UTabs v-model="active" :items="items" />
+        <ListStyleControls noArt v-model="active" />
       </div>
       <div :start="new Date().toISOString()">
         <MangaFeedContainer v-if="groupedChapters.length > 0" v-for="group in groupedChapters"
