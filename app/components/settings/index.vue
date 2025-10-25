@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import LanguageFilter from './LanguageFilter.vue';
 import ContentFilter from './ContentFilter.vue';
+import MOTD from './MOTD.vue';
 </script>
 <template>
   <div class="flex">
@@ -10,6 +11,7 @@ import ContentFilter from './ContentFilter.vue';
       <div class="flex flex-col gap-2">
         <LanguageFilter />
         <ContentFilter />
+        <MOTD />
       </div>
     </div>
   </div>
