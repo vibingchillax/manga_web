@@ -59,7 +59,7 @@ export const useManga = (manga: Manga | undefined) => {
       if (linkMap[o.apiCode]) {
         read.push({
           name: o.name,
-          href: linkMap[o.apiCode]!,
+          href: o.constructUrl(linkMap[o.apiCode]!),
           icon: o.icon
         })
       }
@@ -69,7 +69,7 @@ export const useManga = (manga: Manga | undefined) => {
       if (linkMap[o.apiCode]) {
         buy.push({
           name: o.name,
-          href: linkMap[o.apiCode]!,
+          href: o.constructUrl(linkMap[o.apiCode]!),
           icon: o.icon
         })
       }
@@ -79,7 +79,7 @@ export const useManga = (manga: Manga | undefined) => {
       if (linkMap[o.apiCode]) {
         track.push({
           name: o.name,
-          href: linkMap[o.apiCode]!,
+          href: o.constructUrl(linkMap[o.apiCode]!),
           icon: o.icon
         })
       }
