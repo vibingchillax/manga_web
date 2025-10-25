@@ -6,6 +6,7 @@ interface UserPreferences {
   showSuggestive: boolean
   showErotic: boolean
   showHentai: boolean
+  proxyUrl: string
 }
 
 export const usePreferencesStore = defineStore('userPreferences', {
@@ -16,7 +17,8 @@ export const usePreferencesStore = defineStore('userPreferences', {
     showSafe: true,
     showSuggestive: true,
     showErotic: true,
-    showHentai: false
+    showHentai: false,
+    proxyUrl: useAppConfig().proxyUrl
   }),
   persist: {
     storage: localStorage
