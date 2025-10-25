@@ -80,14 +80,14 @@ for (const tag of tags.value) {
         </Tag>
       </div>
     </div>
-    <div class="mb-2" v-if="links.read || links.buy">
+    <div class="mb-2" v-if="links.read.length || links.buy.length">
       <div class="font-bold mb-2">Read or Buy</div>
       <div class="flex gap-2 flex-wrap">
         <Tag v-for="link in links.read" :href="link.href">{{ link.name }}</Tag>
         <Tag v-for="link in links.buy" :href="link.href">{{ link.name }}</Tag>
       </div>
     </div>
-    <div class="mb-2" v-if="links.track">
+    <div class="mb-2" v-if="links.track.length">
       <div class="font-bold mb-2">Track</div>
       <div class="flex gap-2 flex-wrap">
         <Tag v-for="link in links.track" :href="link.href">{{ link.name }}</Tag>
