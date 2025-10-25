@@ -1,6 +1,14 @@
 import { kubo } from "~~/server/utils/kubo"
 import { randomUUID } from 'crypto'
 import * as z from 'zod'
+import { fileTypeFromBuffer } from 'file-type'
+
+const IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif"
+]
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
@@ -44,6 +52,13 @@ export default defineEventHandler(async (event) => {
 
   for (const file of data) {
     try {
+      const detect = await fileTypeFromBuffer(file.data)
+      const mime = detect?.mime
+
+      if (!mime || !IMAGE_TYPES.includes(mime)) {
+        throw new Error(`Invalid or unrecognized file type: ${mime ?? 'unknown'}. Allowed: JPEG, PNG, GIF.`)
+      }
+
       const result = await kubo.add(file.data) //TODO: compare add vs addAll perf
       const cid = result.cid.toString()
       const targetDir = `/manga_web/${session.mangaId}/${session.id}`
