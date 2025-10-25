@@ -31,7 +31,7 @@ const fetchUsers = async () => {
         username: search.value,
       }
     })
-    resultList.value = res.data
+    resultList.value = res.data as User[]
     totalPages.value = res.count === 0 ? 1 : Math.ceil(res.count / 20)
   } catch (err) {
     error.value = err instanceof Error ? err.message : String(err)

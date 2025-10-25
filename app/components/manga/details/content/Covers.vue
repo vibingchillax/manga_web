@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { components } from '#open-fetch-schemas/mangadex';
-import type { Manga } from '~~/shared/types';
+import type { Cover, Manga } from '~~/shared/types';
 
 const props = defineProps<{
   manga: Manga
@@ -11,7 +10,7 @@ const manga = props.manga;
 const { $mangadex } = useNuxtApp()
 
 const selectedLocales = ref([manga.attributes?.originalLanguage ?? '??']);
-const allCovers = ref<components["schemas"]["Cover"][]>([])
+const allCovers = ref<Cover[]>([])
 const foundLocales = ref<string[]>([])
 
 const filteredByLocale = computed(() => {
@@ -74,7 +73,7 @@ const { pending, error } = useAsyncData(async () => {
 
     result.data?.push(...next.data ?? [])
   }
-  const data = result.data as components["schemas"]["Cover"][]
+  const data = result.data as Cover[]
   allCovers.value = data
   foundLocales.value = data
     .filter(c => c.attributes?.locale)

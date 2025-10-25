@@ -1,6 +1,6 @@
 import type { Router } from "vue-router"
-import type { ScrapedChapter, ScrapedManga } from "~~/shared/prisma/client"
 import { ReadStyleEnum, ViewStyleEnum } from "./useReaderMenu"
+import type { ScrapedScanlationGroup } from "~~/shared/types"
 
 function debug(...e: any[]) {
   console.debug("%c[Reader Store]", "color: #d3d", ...arguments)
@@ -18,12 +18,12 @@ export type AdjacentChapter = {
 export interface ReaderState {
   startingPage: number
   cancelStartingPageSwitch: boolean
-  currentChapter: ScrapedChapterWithManga | null
+  currentChapter: ScrapedChapter | null
   _nextChapter: AdjacentChapter | null
   _prevChapter: AdjacentChapter | null
   chapterLoadError: { status: number, message: string } | null
   adjacentPopulated: boolean
-  oldCurrentChapter: ScrapedChapterWithManga | null
+  oldCurrentChapter: ScrapedChapter | null
   isClickFromPage: boolean
   serverLoadError: any | null
   currentPageGroup: number
@@ -39,7 +39,7 @@ export interface ReaderState {
     volumeNo: string | null
     chapterTitle: string
     chapterIdentifier: string
-    chapterGroups: string | null
+    chapterGroups: ScrapedScanlationGroup[] | null
     chapterUploader: string | null
     chapterPageCount: number | null | undefined
   }
@@ -136,8 +136,12 @@ export const useReaderStore = defineStore("reader", {
 
         this._markChapterRead(chapter)
 
-        if (chapter.manga.contentRating && !preferences.contentRating.includes(chapter.manga.contentRating)) {
-          this.showContentWarning = contentWarn
+        const manga = chapter.relationships?.find(r => r.type === 'scraped_manga')
+        if (manga && 'attributes' in manga) {
+          if (manga.attributes.contentRating &&
+            !preferences.contentRating.includes(manga.attributes.contentRating)) {
+            this.showContentWarning = contentWarn
+          }
         }
       } catch (error: any) {
         if (error.response.status === 429) {
@@ -153,11 +157,17 @@ export const useReaderStore = defineStore("reader", {
         }
       }
 
-      if (this.currentChapter) {
-        if (!this.manga) this.manga = this.currentChapter.manga
-        if (this.manga) this.refreshAggregate()
-        this.chapterMeta = useScrapedChapterMeta()
+      if (!this.currentChapter) return
+
+      if (!this.manga) {
+        const manga = this.currentChapter.relationships?.find(r => r.type === 'scraped_manga')
+        if (manga && ('attributes' in manga)) {
+          this.manga = manga
+        }
       }
+
+      if (this.manga) this.refreshAggregate()
+      this.chapterMeta = useScrapedChapterMeta()
     },
     async switchChapter(chapterId: string | undefined, isJump: boolean = false, keepCurrentPage: boolean = false) {
       const readerCache = useReaderCache()
@@ -229,8 +239,14 @@ export const useReaderStore = defineStore("reader", {
 
       this.adjacentPopulated = false
 
-      this._nextChapter = getAdjacentChapter(this.aggregate, this.currentChapter?.volume, this.currentChapter?.chapter, 1) ?? null
-      this._prevChapter = getAdjacentChapter(this.aggregate, this.currentChapter?.volume, this.currentChapter?.chapter, -1) ?? null
+      this._nextChapter = getAdjacentChapter(
+        this.aggregate,
+        this.currentChapter?.attributes.volume,
+        this.currentChapter?.attributes.chapter, 1) ?? null
+      this._prevChapter = getAdjacentChapter(
+        this.aggregate,
+        this.currentChapter?.attributes.volume,
+        this.currentChapter?.attributes.chapter, -1) ?? null
       this.chapterMeta = useScrapedChapterMeta()
 
       this.adjacentPopulated = true
@@ -240,7 +256,7 @@ export const useReaderStore = defineStore("reader", {
       this._setAdjacentChapters()
     },
 
-    _setCurrentChapter(chapter: ScrapedChapterWithManga | null) {
+    _setCurrentChapter(chapter: ScrapedChapter | null) {
       if (!chapter) {
         if (this.currentChapter) {
           this.oldCurrentChapter = this.currentChapter
@@ -325,7 +341,7 @@ export const useReaderStore = defineStore("reader", {
       const readMarker = useReadMarkers()
       debug(`Marking C:${chapter.id} read`)
       history.pushChapterRead({ chapterId: chapter.id, type: "scraped" })
-      readMarker.setMarkers(this.manga?.id!, [{chapterId: chapter.id, type: "scraped"}])
+      readMarker.setMarkers(this.manga?.id!, [{ chapterId: chapter.id, type: "scraped" }])
     },
     setCurrentPageGroup(groupIndex: number, router?: Router) {
       const readerMenu = useReaderMenu()
@@ -417,9 +433,9 @@ export const useReaderStore = defineStore("reader", {
     },
     showImagePage(pageGroup: number) {
       const readerMenu = useReaderMenu()
-      return readerMenu.viewStyle === ViewStyleEnum.LongStrip || 
-      readerMenu.viewStyle === ViewStyleEnum.WideStrip ||
-      pageGroup === this.currentPageGroup
+      return readerMenu.viewStyle === ViewStyleEnum.LongStrip ||
+        readerMenu.viewStyle === ViewStyleEnum.WideStrip ||
+        pageGroup === this.currentPageGroup
     },
     setCommentsOpen(bool: boolean) {
       this.commentsOpen = bool

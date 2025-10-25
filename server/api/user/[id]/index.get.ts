@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { formatUser } from '~~/server/utils/formatResponse'
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(event, z.object({
@@ -26,14 +27,8 @@ export default defineEventHandler(async (event) => {
     statusMessage: "User not found"
   })
 
-  const { groupMemberships, ...rest } = user
-
   return {
     result: "ok",
-    data: {
-      ...rest,
-      groups: user.groupMemberships.map(g => g.groupId)
-    }
+    data: formatUser(user)
   }
-
 })

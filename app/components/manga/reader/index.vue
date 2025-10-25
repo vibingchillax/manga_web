@@ -144,7 +144,7 @@ watch([currentChapter, currentPageNumber], () => {
   <div ref="root" class="mw--reader-wrap">
     <div v-if="showContentWarning && contentWarningVisible" class="mw--reader-warning">
       <h2>Content Warning</h2>
-      <p>{{ manga?.title }} - Chapter contains filtered out content</p>
+      <p>{{ manga?.attributes.title.en }} - Chapter contains filtered out content</p>
       <button @click="router.back()">Back</button>
       <button @click="contentWarningVisible = false">OK</button>
     </div>

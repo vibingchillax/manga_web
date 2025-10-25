@@ -4,37 +4,44 @@ const history = useReadingHistoryStore()
 
 const active = ref<'dense' | 'normal'>('dense');
 
-const chapters = ref<ScrapedChapterWithManga[]>([])
+const scrapedChapters = ref<ScrapedChapter[]>([])
 
 watch(
   () => history._readingHistory,
   async (newHistory) => {
     const chapterIds = newHistory.map(h => h.chapterId)
 
-    if (chapterIds.length > 0) {
-      const result = await $fetch<ScrapedChapterWithManga[]>('/api/scraped/chapter', {
+    if (chapterIds.length) {
+      const result = await $fetch<ScrapedChapter[]>('/api/scraped/chapter', {
         query: {
           'ids[]': chapterIds,
           'includes[]': ['manga']
         }
       })
-      chapters.value = result
-    } else {
-      chapters.value = []
+      scrapedChapters.value = result
     }
   },
   { immediate: true, deep: true }
 )
 
 const groupedChapters = computed(() => {
-  const uniqueMangaIds = [...new Set(chapters.value.map(c => c.manga.mangaDexId))]
-  return uniqueMangaIds.map(id => {
-    const manga = chapters.value.find(c => c.manga.mangaDexId === id)?.manga
-    const mangaChapters = chapters.value
-      .filter(c => c.manga.mangaDexId === id)
-      .map(({ manga, ...rest }) => rest)
-    return { manga, chapters: mangaChapters }
-  })
+  const groups = new Map<string, { manga: ScrapedManga; chapters: ScrapedChapter[] }>()
+
+  for (const chapter of scrapedChapters.value) {
+    const mangaRel = chapter.relationships?.find(
+      (r): r is ScrapedManga => r.type === 'scraped_manga' && 'attributes' in r
+    )
+
+    if (!mangaRel?.attributes) continue
+
+    if (!groups.has(mangaRel.id)) {
+      groups.set(mangaRel.id, { manga: mangaRel, chapters: [] })
+    }
+
+    groups.get(mangaRel.id)!.chapters.push(chapter)
+  }
+
+  return Array.from(groups.values())
 })
 
 function clearHistory() {
@@ -56,7 +63,7 @@ function clearHistory() {
       </div>
       <div :start="new Date().toISOString()">
         <MangaFeedContainer v-if="groupedChapters.length > 0" v-for="group in groupedChapters"
-          :key="group.manga!.mangaDexId + group.chapters[0]?.id" class="mb-4"
+          :key="group.manga?.id + group.chapters[0]?.id" class="mb-4"
           :chapter-list="group.chapters"
           :manga="group.manga!" />
         <div v-else class="text-center text-muted-foreground mt-20">

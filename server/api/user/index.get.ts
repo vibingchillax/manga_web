@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { formatUser } from '~~/server/utils/formatResponse'
 
 const querySchema = z.object({
   limit: z.coerce.number().min(0).max(100).optional(),
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     result: "ok",
-    data: users,
+    data: users.map(formatUser),
     limit: query.data?.limit ?? 10,
     offset: query.data?.offset ?? 0,
     count: total

@@ -6,7 +6,7 @@ function debug(...e: any[]) {
 
 export const useReaderCache = defineStore('readerCache', () => {
   const serverCache = ref<ScrapedPage[]>([]), 
-  chapterCache = ref<ScrapedChapterWithManga[]>([]), 
+  chapterCache = ref<ScrapedChapter[]>([]), 
   aggCache = ref<MangaAggregateResponse[]>([])
 
   return {
@@ -22,10 +22,10 @@ export const useReaderCache = defineStore('readerCache', () => {
     aggCache,
     existsAggregate: () => false,
     appendAggregateCache: (a: any, b: any) => {},
-    getAggregate: async (chapter: ScrapedChapterWithManga, mangaId: string) => {
+    getAggregate: async (chapter: ScrapedChapter, mangaId: string) => {
       debug("Aggregate cache miss, fetching: ", chapter.id, mangaId)
       return await getScrapedMangaAggregate(mangaId, {
-        'translatedLanguage[]': [chapter.translatedLanguage ?? "en"]
+        'translatedLanguage[]': [chapter.attributes.translatedLanguage ?? "en"]
       })
     },
     $reset: () => {

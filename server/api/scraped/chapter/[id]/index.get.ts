@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { formatScrapedChapter } from '~~/server/utils/formatResponse'
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(event, z.object({
@@ -28,5 +29,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return chapter;
+  return formatScrapedChapter(chapter);
 })

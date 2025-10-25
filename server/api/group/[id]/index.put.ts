@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { formatGroup } from '~~/server/utils/formatResponse'
 import { GroupRole, UserRole } from '~~/shared/prisma/enums'
 
 const ScanlationGroupUpdateSchema = z.object({
@@ -108,8 +109,30 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  return prisma.scanlationGroup.findUnique({
+  const result = await prisma.scanlationGroup.findUnique({
     where: { id: params.id },
-    include: { members: true }
+    include: {
+      members: {
+        select: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              roles: true
+            }
+          },
+          role: true
+        }
+      }
+    }
   })
+
+  if (!result) {
+    throw createError({
+      statusCode: 409,
+      statusMessage: "Updated successfully, but record not found"
+    })
+  }
+
+  return formatGroup(result)
 })

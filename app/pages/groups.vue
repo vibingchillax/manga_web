@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { InternalApi } from 'nitropack/types'
 import { useDebounceFn } from '@vueuse/core'
 
-const groups = ref<InternalApi['/api/group']['get']['data']>([])
+const groups = ref<ScanlationGroup[]>([])
 const totalPages = ref(1)
 const pending = ref(false)
 const error = ref<Error | null>(null)
@@ -43,7 +42,7 @@ const fetchData = async (pageNum = 1) => {
       }
     })
 
-    groups.value = response.data || []
+    groups.value = response.data as ScanlationGroup[] || []
     totalPages.value = Math.ceil((response.count || 1) / (response.limit || 10))
   } catch (err) {
     error.value = err as Error

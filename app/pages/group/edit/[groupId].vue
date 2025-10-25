@@ -12,6 +12,8 @@ const loading = ref(false)
 const group = ref<ScanlationGroup>()
 const groupId = ref(route.params.groupId as string)
 
+const { leader } = useScanlationGroup(group)
+
 const { error } = await useAsyncData(`group-${groupId.value}`, async () => {
   loading.value = true
   const data = await $fetch<ScanlationGroup>(`/api/group/${groupId.value}`, {
@@ -24,7 +26,7 @@ const { error } = await useAsyncData(`group-${groupId.value}`, async () => {
 })
 
 const canEdit = computed(() => loggedIn.value &&
-  (session.value?.id === group.value?.members?.find(m => m.groupRole === 'leader')?.id
+  (session.value?.id === leader.value?.id
     || isStaff.value))
 
 async function submit(e: Partial<GroupSchema>) {

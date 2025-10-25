@@ -1,6 +1,4 @@
-import type { components } from "#open-fetch-schemas/mangadex"
-
-type Relationship = components["schemas"]["Relationship"]
+import type { Relationship } from "~~/shared/types"
 
 function isManga(r: Relationship) {
   return r.type === "manga"

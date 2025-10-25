@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { formatScrapedChapter } from '~~/server/utils/formatResponse';
 
 export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(event, z.object({
@@ -24,5 +25,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return chapters;
+  return chapters.map(formatScrapedChapter);
 });

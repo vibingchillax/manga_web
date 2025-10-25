@@ -30,10 +30,10 @@ const settings = storeToRefs(useReaderMenu())
       <div class="flex flex-col gap-y-2">
         <div class="font-medium">Uploaded By</div>
         <div class="flex items-center">
-          <Icon name="i-lucide-globe"></Icon> {{ reader.currentChapter?.sourceId }}
+          <Icon name="i-lucide-globe"></Icon> {{ reader.currentChapter?.attributes.sourceId }}
         </div>
         <div class="flex items-center" v-if="reader.chapterMeta.chapterGroups">
-          <Icon name="i-lucide-users"></Icon> {{ reader.chapterMeta.chapterGroups }}
+          <Icon name="i-lucide-users"></Icon> {{ reader.chapterMeta.chapterGroups.map(g => g.attributes.name).join(", ") }}
         </div>
         <div class="flex items-center" v-if="reader.chapterMeta.chapterUploader">
           <Icon name="i-lucide-user"></Icon> {{ reader.chapterMeta.chapterUploader }}

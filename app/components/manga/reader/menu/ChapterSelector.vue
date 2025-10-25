@@ -27,8 +27,8 @@ const chaptersOptions = computed(() => {
               ? `Chapter ${chapter.chapter}`
               : 'Oneshot'
           const isCurrent =
-            volumeKey === (currentChapter.value?.volume ?? 'none') &&
-            chapter.chapter === currentChapter.value?.chapter
+            volumeKey === (currentChapter.value?.attributes.volume ?? 'none') &&
+            chapter.chapter === currentChapter.value?.attributes.chapter
 
           return {
             label,

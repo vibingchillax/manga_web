@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { formatGroup } from '~~/server/utils/formatResponse'
 
 export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(event, z.object({
@@ -53,15 +54,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     result: 'ok',
-    data: groups.map(g => ({
-      ...g,
-      members: g.members?.map(m => ({
-        id: m.user.id,
-        username: m.user.username,
-        roles: m.user.roles,
-        groupRole: m.role,
-      }))
-    })),
+    data: groups.map(formatGroup),
     limit: query.data?.limit ?? 10,
     offset: query.data?.offset ?? 0,
     count: total

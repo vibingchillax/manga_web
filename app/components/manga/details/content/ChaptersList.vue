@@ -13,7 +13,7 @@ const toggle = () => {
       <div class="col-span-4" v-if="volume === 'No Volume'">{{ volume }}</div>
       <div class="col-span-4" v-else>Volume {{ volume }}</div>
       <div class="text-center col-span-4">
-        Ch. {{ chapters[chapters.length - 1]?.chapter }} - {{ chapters[0]?.chapter }}
+        Ch. {{ chapters[chapters.length - 1]?.attributes.chapter }} - {{ chapters[0]?.attributes.chapter }}
       </div>
       <div class="text-right col-span-4">
         <span>

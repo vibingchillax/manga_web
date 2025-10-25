@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { components } from '#open-fetch-schemas/mangadex';
+import type { Author } from '~~/shared/types';
 
 const { $mangadex } = useNuxtApp()
 
 const props = defineProps<{
-  author: components["schemas"]["Author"]
+  author: Author
 }>()
 
 const { contentRating } = storeToRefs(usePreferencesStore())

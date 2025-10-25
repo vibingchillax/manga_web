@@ -9,12 +9,13 @@ const group = ref<ScanlationGroup>()
 const groupId = ref(route.params.groupId as string)
 
 const { session, loggedIn, isStaff } = useAuth()
+const { leader } = useScanlationGroup(group)
 
 const loading = ref(false)
 const showDeleteModal = ref(false)
 
 const canEdit = computed(() => loggedIn.value &&
-  (session.value?.id === group.value?.members?.find(m => m.groupRole === 'leader')?.id
+  (session.value?.id === leader.value?.id
     || isStaff.value))
 
 const canDelete = computed(() => loggedIn.value && isStaff.value)

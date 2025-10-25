@@ -3,9 +3,9 @@ import * as z from 'zod'
 
 const beginSchema = z.object({
   groups: z.array(z.string().uuid({ message: "Group ID must be a valid UUID" }))
-  .refine((arr) => new Set(arr).size === arr.length, {
-    message: "Duplicate group IDs are not allowed"
-  })
+    .refine((arr) => new Set(arr).size === arr.length, {
+      message: "Duplicate group IDs are not allowed"
+    })
   ,
   manga: z.string().uuid({ message: "Manga ID must be a valid UUID" })
 })
@@ -43,5 +43,16 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return session
+  return {
+    id: session.id,
+    type: "upload_session",
+    attributes: {
+      isCommited: session.isCommitted,
+      isProcessed: session.isProcessed,
+      isDeleted: session.isDeleted,
+      version: session.version,
+      createdAt: session.createdAt,
+      updatedAt: session.updatedAt
+    }
+  }
 })

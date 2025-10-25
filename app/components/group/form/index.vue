@@ -92,20 +92,21 @@ const pendingData = ref<Partial<GroupSchema> | null>(null)
 const showAddMember = ref(false)
 
 const toState = (group: ScanlationGroup) => ({
-  name: group.name ?? '',
-  leader: group.members?.find(m => m.groupRole === 'leader')?.id,
-  members: group.members?.map(m => m.id) ?? [],
-  website: group.website ?? undefined,
-  ircServer: group.ircServer ?? undefined,
-  ircChannel: group.ircChannel ?? undefined,
-  discord: group.discord ?? undefined,
-  contactEmail: group.contactEmail ?? undefined,
-  description: group.description ?? undefined,
-  twitter: group.twitter ?? undefined,
-  mangaUpdates: group.mangaUpdates ?? undefined,
-  focusedLanguages: group.focusedLanguages ?? [],
-  locked: group.locked ?? false,
-  publishDelay: group.publishDelay ?? 'P0D',
+  name: group.attributes.name ?? '',
+  leader: group.relationships?.find(r => r.type === 'leader')?.id,
+  members: group.relationships?.filter(r => r.type === 'member' || r.type === 'leader').
+    map(m => m.id) ?? [],
+  website: group.attributes.website ?? undefined,
+  ircServer: group.attributes.ircServer ?? undefined,
+  ircChannel: group.attributes.ircChannel ?? undefined,
+  discord: group.attributes.discord ?? undefined,
+  contactEmail: group.attributes.contactEmail ?? undefined,
+  description: group.attributes.description ?? undefined,
+  twitter: group.attributes.twitter ?? undefined,
+  mangaUpdates: group.attributes.mangaUpdates ?? undefined,
+  focusedLanguages: group.attributes.focusedLanguage ?? [],
+  locked: group.attributes.locked ?? false,
+  publishDelay: group.attributes.publishDelay ?? 'P0D',
 })
 
 const hasChanged = computed(() => {
@@ -161,25 +162,28 @@ async function submit(data: Partial<GroupSchema>) {
 watch(() => props.group, (group) => {
   if (!group) return
 
-  state.name = group.name
-  state.leader = group.members?.find(m => m.groupRole === 'leader')?.id
-  state.members = group.members?.map(m => m.id)
-  state.website = group.website ?? undefined
-  state.ircServer = group.ircServer ?? undefined
-  state.ircChannel = group.ircChannel ?? undefined
-  state.discord = group.discord ?? undefined
-  state.contactEmail = group.contactEmail ?? undefined
-  state.description = group.description ?? undefined
-  state.twitter = group.twitter ?? undefined
-  state.mangaUpdates = group.mangaUpdates ?? undefined
-  state.focusedLanguages = group.focusedLanguages
-  state.locked = group.locked
-  state.publishDelay = group.publishDelay ?? 'P0D'
+  state.name = group.attributes.name
+  state.leader = group.relationships?.find(r => r.type === 'leader')?.id ?? undefined
+  state.members = group.relationships
+    ?.filter(r => r.type === 'leader' || r.type === 'member').map(m => m.id) ?? []
+  state.website = group.attributes.website ?? undefined
+  state.ircServer = group.attributes.ircServer ?? undefined
+  state.ircChannel = group.attributes.ircChannel ?? undefined
+  state.discord = group.attributes.discord ?? undefined
+  state.contactEmail = group.attributes.contactEmail ?? undefined
+  state.description = group.attributes.description ?? undefined
+  state.twitter = group.attributes.twitter ?? undefined
+  state.mangaUpdates = group.attributes.mangaUpdates ?? undefined
+  state.focusedLanguages = group.attributes.focusedLanguage
+  state.locked = group.attributes.locked
+  state.publishDelay = group.attributes.publishDelay ?? 'P0D'
 
-  members.value = group.members?.map(m => ({
-    ...m,
-    leader: m.groupRole === 'leader'
-  })) ?? []
+  members.value = group.relationships
+    ?.filter(r => r.type === 'leader' || r.type === 'member').map(m => ({
+      ...m,
+      type: "user",
+      leader: m.id === state.leader
+    })) ?? []
 
   original.value = toState(group)
 }, { immediate: true })
@@ -197,7 +201,7 @@ watch(() => props.group, (group) => {
           <template v-else-if="props.group">
             <div class="font-medium text-right">
               Last updated at
-              <NuxtTime :datetime="props.group?.updatedAt" />
+              <NuxtTime :datetime="props.group?.attributes.updatedAt" />
             </div>
           </template>
 

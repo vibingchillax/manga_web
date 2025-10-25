@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { formatGroup } from '~~/server/utils/formatResponse'
 
 export default defineEventHandler(async (event) => {
 
@@ -29,13 +30,5 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Group not found'
   })
 
-  return {
-    ...group,
-    members: group?.members?.map(m => ({
-      id: m.user.id,
-      username: m.user.username,
-      roles: m.user.roles,
-      groupRole: m.role
-    }))
-  }
+  return formatGroup(group)
 })

@@ -68,9 +68,9 @@ const { pages, pageItems } = storeToRefs(pageManager);
         <Icon name="i-lucide-users" />
         <div class="flex items-center space-x-1">
           <NuxtLink class="group-tag" v-if="reader.chapterMeta.chapterGroups">
-            {{ reader.chapterMeta.chapterGroups }} ({{ reader.currentChapter?.sourceId }})
+            {{ reader.chapterMeta.chapterGroups.map(g => g.attributes.name).join(", ") }} ({{ reader.currentChapter?.attributes.sourceId }})
           </NuxtLink>
-          <NuxtLink class="group-tag" v-else>{{ reader.currentChapter?.sourceId }}</NuxtLink>
+          <NuxtLink class="group-tag" v-else>{{ reader.currentChapter?.attributes.sourceId }}</NuxtLink>
         </div>
       </div>
     </div>

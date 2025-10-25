@@ -2,11 +2,10 @@
 import type { TabsItem } from '@nuxt/ui';
 import Covers from './Covers.vue';
 import Comments from './Comments.vue';
-import type { Manga } from '~~/shared/types';
+import type { Manga, Relationship } from '~~/shared/types';
 import ScrapedChapters from './ScrapedChapters.vue';
 import UploadedChapters from './UploadedChapters.vue';
 import Related from './Related.vue';
-import type { components } from "#open-fetch-schemas/mangadex"
 
 const props = defineProps<{
   manga: Manga
@@ -14,7 +13,7 @@ const props = defineProps<{
 
 const hasRelated = computed(() =>
   (props.manga.relationships ?? []).some(
-    (r: components["schemas"]["Relationship"]) => r.type === "manga"
+    (r: Relationship) => r.type === "manga"
   )
 )
 

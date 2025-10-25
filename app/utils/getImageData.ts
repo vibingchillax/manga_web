@@ -1,8 +1,6 @@
-import type { ScrapedPage } from "~~/shared/prisma/client"
-
 export async function getImageData(chapterId: string) {
   try {
-    const response = await $fetch<ScrapedPage[]>(`/api/scraped/chapter/${chapterId}/pages`)
+    const response = await $fetch(`/api/scraped/chapter/${chapterId}/pages`)
     return {
       ...response,
       requestedAt: Date.now()
