@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { ScrapedChapter, ScrapedManga } from '~~/shared/prisma/client';
 import ChapterEntry from './details/content/ChapterEntry.vue';
 
 const props = defineProps<{
@@ -54,6 +53,12 @@ const toggleExpand = () => {
   showAll.value = !showAll.value;
 };
 
+const {
+  title,
+  detailsUrl,
+  coverUrl,
+} = useScrapedManga(toRef(props, 'manga'))
+
 </script>
 <template>
   <div class="chapter-feed__container" :class="{
@@ -62,12 +67,12 @@ const toggleExpand = () => {
     expand: isExpandable
     // && feedStyle !== 'Compact'
   }">
-    <RouterLink :to="`/title/${manga.mangaDexId}`" class="chapter-feed__cover">
-      <NuxtImg :src="manga.coverUrl ?? undefined" class="chapter-feed__cover-image" />
+    <RouterLink :to="detailsUrl" class="chapter-feed__cover">
+      <NuxtImg :src="coverUrl" class="chapter-feed__cover-image" />
     </RouterLink>
 
-    <RouterLink :to="`/title/${manga.mangaDexId}`" class="chapter-feed__title" :title="manga.title">
-      <span>{{ manga.title }}</span>
+    <RouterLink :to="detailsUrl" class="chapter-feed__title" :title="title">
+      <span>{{ title }}</span>
     </RouterLink>
 
     <div class="chapter-feed__chapters">

@@ -1,31 +1,39 @@
 <script setup lang="ts">
-import type { ScrapedChapter } from '~~/shared/prisma/client';
-
 const props = defineProps<{ chapter: ScrapedChapter }>();
-const chapterUrl = `/chapter/scraped/${props.chapter.id}`;
 
-function isValidDate(date: string | null) {
+function isValidDate(date: Date | string | null | undefined ) {
   if (!date) return false;
   const d = new Date(date);
   return !isNaN(d.getTime());
 }
+
+const {
+  sourceId,
+  title,
+  chapter,
+  readUrl,
+  uploader,
+  translatedLanguage,
+  scanlationGroup,
+  publishAt
+} = useScrapedChapter(toRef(props, 'chapter'))
 </script>
 <template>
   <div class="bg-accent rounded-sm">
     <div>
       <div class="chapter relative">
         <div class="flex">
-          <NuxtLink class="chapter-grid flex-grow" :to="chapterUrl">
+          <NuxtLink class="chapter-grid flex-grow" :to="readUrl">
             <NuxtLink class="flex flex-grow items-center" style="grid-area: title;">
               <LangFlag
-                :lang="chapter.translatedLanguage ? chapter.translatedLanguage.toLowerCase() : 'en'"
+                :lang="translatedLanguage"
                 />
               <span class="chapter-link ml-2 font-bold my-auto flex items-center space-x-1 break-all">
-                <span v-if="chapter.title === 'Oneshot'" class="line-clamp-1">Oneshot</span>
-                <span v-else-if="chapter.title" class="line-clamp-1">
-                  Ch. {{ chapter.chapter }} - {{ chapter.title }}
+                <span v-if="title === 'Oneshot'" class="line-clamp-1">Oneshot</span>
+                <span v-else-if="title" class="line-clamp-1">
+                  Ch. {{ chapter }} - {{ title }}
                 </span>
-                <span v-else class="line-clamp-1">Ch. {{ chapter.chapter }}</span>
+                <span v-else class="line-clamp-1">Ch. {{ chapter }}</span>
               </span>
             </NuxtLink>
             <div class="flex items-center justify-self-start" style="grid-area: comments;">
@@ -36,7 +44,8 @@ function isValidDate(date: string | null) {
               <Icon name="i-lucide-users"></Icon>
               <div class="flex items-center space-x-1">
                 <div class="line-clamp-1 break-all px-1 rounded duration-100 pill lift">
-                  {{ chapter.scanlationGroup ? chapter.scanlationGroup : 'N/A' }}
+                  {{ scanlationGroup?.length ?
+                    scanlationGroup.map(g => g.attributes.name).join(', ') : 'N/A' }}
                 </div>
               </div>
             </div>
@@ -47,13 +56,13 @@ function isValidDate(date: string | null) {
             <div class="user-tag flex items-center justify-self-start" style="grid-area: uploader;">
               <Icon name="i-lucide-user"></Icon>
               <div class="line-clamp-1 break-all px-1 rounded duration-100 pill lift">
-                {{ chapter.uploader ? chapter.uploader : chapter.sourceId }}
+                {{ uploader ? uploader : sourceId }}
               </div>
             </div>
             <div class="flex items-center timestamp justify-self-start" style="grid-area: timestamp;">
               <Icon name="i-lucide-clock"></Icon>
-              <NuxtTime v-if="isValidDate(chapter.publishedAt)" :datetime="chapter.publishedAt!" relative />
-              <time v-else class="whitespace-nowrap">{{ chapter.publishedAt ? chapter.publishedAt : 'N/A' }}</time>
+              <NuxtTime v-if="isValidDate(publishAt)" :datetime="publishAt!" relative />
+              <time v-else class="whitespace-nowrap">{{ publishAt ? publishAt : 'N/A' }}</time>
             </div>
           </NuxtLink>
         </div>

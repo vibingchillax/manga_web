@@ -20,12 +20,14 @@ export interface UploadPage {
   },
   sessionFile?: {
     id: string;
-    version: number;
-    originalFileName: string;
-    cid: string;
-    fileSize: number;
-    mimeType: string;
-    source: string;
+    attributes: {
+      version: number;
+      originalFileName: string;
+      cid: string;
+      fileSize: number;
+      mimeType: string;
+      source: string;
+    }
   }
 }
 

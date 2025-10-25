@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import type { User } from '~~/shared/types';
-defineProps<{ user: User, noLink?: boolean }>()
+const props = defineProps<{ user: User, noLink?: boolean }>()
+
+const {
+  username,
+  roles,
+  pageLink
+} = useUser(toRef(props, 'user'))
 </script>
 <template>
   <NuxtLink class="user-card" :to="noLink ?
-    undefined : `/user/${user.id}/${toKebabCase(user.username)}`">
+    undefined : pageLink">
     <div class="user-head">
       <slot name="prepend"></slot>
       <!-- <NuxtImg class="user-avatar" alt="Avatar" :src="undefined"
         style="width: 32px; height: 32px;" /> -->
       <UIcon name="i-lucide-user" style="width: 32px; height: 32px;" />
-      <div class="line-clamp-1 break-all" :title="user.username">{{ user.username }}</div>
+      <div class="line-clamp-1 break-all" :title="username">{{ username }}</div>
       <div class="ml-auto pl-1">
-        <UserRoleTag :roleList="user.roles" />
+        <UserRoleTag :roleList="roles" />
       </div>
     </div>
     <slot name="append"></slot>

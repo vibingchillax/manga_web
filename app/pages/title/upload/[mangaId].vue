@@ -175,8 +175,8 @@ async function processUploads(files: UploadPage[]): Promise<void> {
             file.state === UploadState.PendingRemoval
               ? UploadState.PendingRemoval
               : shouldRetry
-              ? UploadState.Pending
-              : UploadState.Fail,
+                ? UploadState.Pending
+                : UploadState.Fail,
           failReason: shouldRetry ? undefined : result.error,
         };
       }
@@ -284,12 +284,14 @@ async function uploadFiles(files: File[], onProgress: (progressEvent: any) => vo
     }[]
     data: {
       id: string;
-      version: number;
-      originalFileName: string;
-      cid: string;
-      fileSize: number;
-      mimeType: string;
-      source: string;
+      attributes: {
+        version: number;
+        originalFileName: string;
+        cid: string;
+        fileSize: number;
+        mimeType: string;
+        source: string;
+      }
     }[]
     // @ts-ignore
   } = await $fetch(`/api/upload/${sessionId}`, {
@@ -316,10 +318,8 @@ async function uploadFiles(files: File[], onProgress: (progressEvent: any) => vo
     if (response.data.length === files.length) {
       sessionFile = response.data[index];
     } else {
-      sessionFile = response.data.find(
-        ({ originalFileName, fileSize }) =>
-          file.name === originalFileName && file.size === fileSize
-      );
+      sessionFile = response.data.find(f =>
+        f.attributes.originalFileName === file.name && f.attributes.fileSize === file.size)
     }
 
     if (!sessionFile) {

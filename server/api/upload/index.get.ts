@@ -17,5 +17,16 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'No current upload session'
   })
 
-  return session
+  return {
+    id: session.id,
+    type: "upload_session",
+    attributes: {
+      isCommited: session.isCommitted,
+      isProcessed: session.isProcessed,
+      isDeleted: session.isDeleted,
+      version: session.version,
+      createdAt: session.createdAt,
+      updatedAt: session.updatedAt
+    }
+  }
 })

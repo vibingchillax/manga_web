@@ -111,3 +111,39 @@ export const useManga = (manga: Manga | undefined) => {
     originalLanguage
   }
 }
+
+export const useScrapedManga = (manga: Ref<ScrapedManga | undefined>) => {
+  const title = computed(() => manga.value?.attributes.title.en) //TODO
+
+  const coverUrl = computed(() => manga.value?.relationships
+    ?.find(r => r.type === 'scraped_cover_art')?.attributes.url)
+
+  const detailsUrl = computed(() =>
+    `/title/${manga.value?.attributes.mangadexId}/${toKebabCase(title.value)}`)
+
+  return {
+    title,
+    detailsUrl,
+    coverUrl
+  }
+}
+
+export const toManga = (manga: ScrapedManga) => {
+  const {
+    id,
+    type,
+    attributes: {
+      mangadexId,
+      ...attrRest
+    },
+    ...rest
+  } = manga
+  return {
+    id: mangadexId,
+    type: "manga",
+    attributes: {
+      ...attrRest
+    },
+    ...rest,
+  } as Manga
+}

@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto'
 import * as z from 'zod'
+import { formatGroup } from '~~/server/utils/formatResponse'
 
 const ScanlationGroupCreateSchema = z.object({
   name: z.string().min(1).max(100),
@@ -62,5 +63,5 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return group
+  return formatGroup(group)
 })

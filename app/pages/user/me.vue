@@ -13,7 +13,7 @@ onMounted(async () => {
   }
 
   const data = await $fetch(`/api/user/${session.value.id}`)
-  if (data.result === 'ok') user.value = data.data
+  if (data.result === 'ok') user.value = data.data as User
 })
 </script>
 <template>

@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { formatScrapedManga } from '~~/server/utils/formatResponse'
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(event, z.object({
@@ -18,5 +19,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return manga
+  return {
+    result: "ok",
+    data: formatScrapedManga(manga)
+  }
 })

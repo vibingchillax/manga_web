@@ -91,6 +91,17 @@ export default defineEventHandler(async (event) => {
   return {
     result: "ok",
     errors: results.filter(f => f.status === 'error'),
-    data: added
+    data: added.map(f => ({
+      id: f.id,
+      type: "upload_session_file",
+      attributes: {
+        originalFileName: f.originalFileName,
+        cid: f.cid,
+        fileSize: f.fileSize,
+        mimeType: f.mimeType,
+        source: f.source,
+        version: f.version
+      }
+    }))
   }
 })

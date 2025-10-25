@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { formatScrapedManga } from '~~/server/utils/formatResponse'
 import { ScrapeTarget } from '~~/shared/prisma/enums'
 
 const scrapeMangaSchema = z.object({
@@ -31,7 +32,10 @@ export default defineEventHandler(async (event) => {
     })
 
     if (!(result.length > 0)) {
-      return await refreshMangas(data)
+      return {
+        result: "ok",
+        data: (await refreshMangas(data)).map(formatScrapedManga)
+      }
     }
 
     const status = await prisma.scrapeStatus.findUnique({
@@ -52,7 +56,10 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    return result
+    return {
+      result: "ok",
+      data: result.map(formatScrapedManga)
+    }
 
   } catch (err: any) {
     if (err?.statusCode) throw err

@@ -79,7 +79,7 @@ const hasLinks = computed(() => !!website.value || !!ircServer.value || !!ircCha
     </div>
     <div v-if="leader" class="mb-6">
       <div class="font-bold mb-2">Group Leader</div>
-      <UserCard :user="leader" showRole />
+      <UserCard :user="toUser(leader)" showRole />
     </div>
     <div class="flex items-center mb-6">
       <div>

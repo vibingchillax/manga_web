@@ -97,5 +97,27 @@ export default defineEventHandler(async (event) => {
     console.warn('Failed to move files, might need manual cleanup', e)
   }
 
-  return chapter
+  return {
+    id: chapter.id,
+    type: "chapter",
+    attributes: {
+      title: chapter.title,
+      volume: chapter.volume,
+      chapter: chapter.chapter,
+      pages: chapter.pages,
+      translatedLanguage: chapter.translatedLanguage,
+      uploader: chapter.uploader,
+      version: chapter.version,
+      createdAt: chapter.createdAt,
+      updatedAt: chapter.updatedAt,
+      publishAt: chapter.publishAt,
+      readableAt: chapter.readableAt,
+    },
+    relationships: [
+      {
+        id: chapter.mangaId,
+        type: "manga"
+      }
+    ]
+  }
 })
