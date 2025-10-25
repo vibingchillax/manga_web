@@ -13,6 +13,9 @@ const reader = useReaderStore();
 const settings = useReaderMenu();
 const pageManager = useReaderPageManager();
 
+const { $breakpoints } = useNuxtApp()
+const { isFullscreen, enter, exit } = useFullscreen()
+
 const route = useRoute()
 const router = useRouter()
 
@@ -36,7 +39,8 @@ const {
   viewStyle,
   readStyle,
   turnPages,
-  turnPagesByScrolling
+  turnPagesByScrolling,
+  offsetDoubles
 } = storeToRefs(settings);
 
 const is404 = computed(() => !!chapterLoadError && chapterLoadError.value?.status === 404 && useReaderPageManager().pageState === 'error404');
@@ -51,8 +55,8 @@ function handleClick(e: MouseEvent, isDouble = false) {
   const noPageTurn = turnPages.value === TurnPagesEnum.None;
 
   if (
-    menuOpen.value && //  vvvvvv breakpoints.md & immersive
-    (!menuPinned.value || immersive.value)
+    menuOpen.value &&
+    (!menuPinned.value || !$breakpoints.md.value || immersive.value)
   ) {
     settings.setMenuOpen(false);
     return;
@@ -78,21 +82,17 @@ function handleClick(e: MouseEvent, isDouble = false) {
   if ((!inLeftZone && !inRightZone) || noPageTurn) {
     if (
       immersive.value
-      // ||        // already immersive
-      // !$breakpoints.sm ||          // not on small screen
-      // $isMobileApp                 // or in mobile app
+      || !$breakpoints.sm.value
+      // $isMobileApp
     ) {
-      // Break immersion
       reader.toggleImmersionBreak();
     } else {
-      // Toggle menu instead
       settings.toggleMenuOpen();
       e.stopPropagation();
     }
   } else {
     // Clicked **left or right zone**
     // if ($isMobileApp) {
-    //   // Mobile special handling: break immersion if needed
     //   settings.setImmersionBreak(false);
     // }
 
@@ -139,6 +139,13 @@ watch([currentChapter, currentPageNumber], () => {
   document.title = pageTitle.value;
 });
 
+watch(immersive, (val) => {
+  val ? enter() : exit()
+})
+
+watch(isFullscreen, (val) => {
+  if (!val) reader.setImmersive(false)
+})
 </script>
 <template>
   <div ref="root" class="mw--reader-wrap">

@@ -14,7 +14,8 @@ const props = withDefaults(defineProps<{
 })
 
 const route = useRoute()
-// const { $breakpoints, $isMobileApp } = useSomething()
+// const { breakpoints, $isMobileApp } = useSomething()
+const { $breakpoints } = useNuxtApp()
 // const { setNavBarTitle, menuActive } = useSomething()
 const { menuActive } = storeToRefs(useLayout())
 // const { ambient } = useSomething()
@@ -23,10 +24,10 @@ const { menuActive } = storeToRefs(useLayout())
 
 const bannerStyle = computed(() => ({
   backgroundImage: props.background ? `url(${props.background})` : undefined,
-  // width: !$isMobileApp && $breakpoints.lg && menuActive.value
+  // width: !$isMobileApp && breakpoints.lg && menuActive.value
   //   ? 'calc(100% - 256px)'
   //   : '100%'
-  width: menuActive.value
+  width: $breakpoints.lg.value && menuActive.value
     ? 'calc(100% - 256px)'
     : '100%'
 }))
@@ -44,11 +45,11 @@ const hasGradient = computed(() =>
     'px-4'
   ]">
     <!-- <div
-      v-if="$breakpoints.sm && ambient"
+      v-if="breakpoints.sm && ambient"
       class="absolute top-0 left-0 z-[-2] w-full h-[640px] blur-xl"
       :style="`background: radial-gradient(circle at top, rgb(var(--md-background) / 0.8), rgb(var(--md-background)) 75%), no-repeat top 35% center / 100% url(${background});`"
     ></div> -->
-    <div class="absolute top-0 left-0 z-[-2] w-full h-[640px] blur-xl"
+    <div v-if="$breakpoints.sm.value" class="absolute top-0 left-0 z-[-2] w-full h-[640px] blur-xl"
       :style="`background: radial-gradient(circle at top, rgb(var(--mw-background) / 0.8), rgb(var(--mw-background)) 75%), no-repeat top 35% center / 100% url(${background});`">
     </div>
     <div class="banner-container" :class="{ block: isManga }">
@@ -66,12 +67,13 @@ const hasGradient = computed(() =>
     <div v-if="isManga" class="title">
       <template v-if="title || altTitle">
         <BigText extra-text-class="line-clamp-2 leading-5 pt-1" class="mb-1"
-          style="text-shadow: rgba(0, 0, 0, 0.3) 1px 2px 4px">
+          style="text-shadow: rgba(0, 0, 0, 0.3) 1px 2px 4px"
+          :small="!$breakpoints.sm.value"
+          :target-height="$breakpoints.sm.value ? undefined : 180"
+          :extra-text="$breakpoints.sm.value ? undefined : altTitle"
+          >
           {{ title }}
         </BigText>
-        <!-- :small="!$breakpoints.sm"
-          :target-height="$breakpoints.sm ? undefined : 180"
-          :extra-text="$breakpoints.sm ? undefined : altTitle" -->
 
         <div v-if="altTitle" class="font-normal line-clamp-2 text-base sm:text-xl inline-block leading-5"
           :title="altTitle">
@@ -88,7 +90,7 @@ const hasGradient = computed(() =>
           </div>
 
           <!-- <Gt
-            v-else-if="supportLink && $breakpoints.sm"
+            v-else-if="supportLink && breakpoints.sm"
             class="flex whitespace-nowrap text-base mt-2 w-[13.75rem]"
             color="nami-comi-blue"
             hover-animation="shine"

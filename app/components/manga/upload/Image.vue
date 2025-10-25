@@ -22,6 +22,8 @@ const emit = defineEmits<{
   (e: "remove", id?: string | number): void
 }>()
 
+const { $breakpoints } = useNuxtApp()
+
 const showPreview = ref(false)
 
 function handleClick(e: MouseEvent) {
@@ -61,8 +63,8 @@ function handleClick(e: MouseEvent) {
           <div class="md:hidden h-10 w-10"></div>
           <div class="w-6 h-6 rounded-full bg-accent-20 text-white flex items-center
             justify-center transition-colors duration-150 ease-out hover:cursor-pointer
-            hover:bg-accent-20-hover">
-            <!-- :class="{ 'absolute top-0 left-0': !breakpoints.md }" -->
+            hover:bg-accent-20-hover"
+            :class="{ 'absolute top-0 left-0': !$breakpoints.md.value }">
             <UButton size="xs" variant="soft" color="neutral" class="rounded-full"
               icon="i-lucide-pencil" />
           </div>
@@ -79,7 +81,7 @@ function handleClick(e: MouseEvent) {
       </div>
 
       <div v-if="!disabled && !input" class="close" @click.stop="$emit('remove', id)">
-        <!-- <div v-if="!breakpoints.md" class="over-box" /> -->
+        <div v-if="!$breakpoints.md.value" class="over-box"></div>
         <div class="icon-container">
           <UButton size="xs" variant="soft" color="neutral" class="rounded-full"
             icon="i-lucide-x" />

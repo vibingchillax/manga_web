@@ -12,6 +12,8 @@ const reader = useReaderStore()
 const pageManager = useReaderPageManager()
 const settings = useReaderMenu()
 
+const { $breakpoints } = useNuxtApp()
+
 const {
   setCurrentPageGroup,
   setCurrentProgress,
@@ -51,6 +53,7 @@ const currentProgressPercent = computed(() =>
 );
 
 const sideClass = computed(() => {
+  if (!$breakpoints.sm.value) return ''
   switch (progressSide.value) {
     case ProgressSideEnum.Right: return 'side right'
     case ProgressSideEnum.Left: return 'side left'
@@ -153,6 +156,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
       [sideClass]: true,
       'no-anim': isAnimationDisabled,
       break: immersionBreak || isDragging,
+      mobile: !$breakpoints.sm.value,
       'show-num': showPageNumber
     },
   ]" :style="{
@@ -169,8 +173,8 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
       <div class="page-slider" :class="{
         rtl: isRTL,
         disabled: props.disabled || isLoading,
-        'mx-2': progressSide === ProgressSideEnum.Bottom,
-        'my-2': progressSide !== ProgressSideEnum.Bottom,
+        'mx-2': progressSide === ProgressSideEnum.Bottom || !$breakpoints.sm.value,
+        'my-2': progressSide !== ProgressSideEnum.Bottom && $breakpoints.sm.value,
       }" ref="pageSlider" @mousedown.prevent.stop="startDrag" @touchstart.prevent.stop="startDrag">
         <div id="slider-ball" ref="sliderBall" :class="{
           rtl: isRTL,
@@ -193,7 +197,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
             current: currentPageGroup === idx,
             [sideClass]: true
           }">
-            <div class="prog-divider-label" :class="{
+            <div v-if="$breakpoints.sm.value" class="prog-divider-label" :class="{
               current: currentPageGroup === idx
             }">{{group.map(p => p.pageNum).join('-')}}</div>
           </div>

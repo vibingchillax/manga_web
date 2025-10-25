@@ -1,8 +1,10 @@
 <script setup lang="ts">
-const router = useRouter();
-const reader = useReaderStore();
+const router = useRouter()
+const reader = useReaderStore()
 const pageManager = useReaderPageManager()
-const settings = useReaderMenu();
+const settings = useReaderMenu()
+
+const { $breakpoints } = useNuxtApp()
 
 const {
   currentPageGroup,
@@ -11,22 +13,28 @@ const {
   immersionBreak,
   scrolling,
   chapterMeta,
-  atTop
+  atTop,
+  shouldShowMobileReader
 } = storeToRefs(reader)
 
-const { viewStyle } = storeToRefs(settings);
+const { toggleMenuOpen } = settings
+
+const { viewStyle, navbarHoverMode } = storeToRefs(settings)
 const toggleImmersive = () => {
-  reader.toggleImmersive();
-};
+  reader.toggleImmersive()
+}
 
 // Random widths for skeleton loaders
-const skeletonWidth1 = 50 + Math.round(Math.random() * 30) + '%';
-const skeletonWidth2 = 30 + Math.round(Math.random() * 20) + '%';
+const skeletonWidth1 = 50 + Math.round(Math.random() * 30) + '%'
+const skeletonWidth2 = 30 + Math.round(Math.random() * 20) + '%'
 
-const showHeader = computed(() => !immersive.value);
-const hideHeader = computed(() => chapterState.value !== "loaded" ? false : !immersionBreak && (!atTop || viewStyle.value !== ViewStyleEnum.LongStrip));
+const showHeader = computed(
+  () => (!immersive.value || shouldShowMobileReader.value) &&
+    (!navbarHoverMode.value || !$breakpoints.md.value)
+)
+const hideHeader = computed(() => chapterState.value !== "loaded" ? false : !immersionBreak && (!atTop || viewStyle.value !== ViewStyleEnum.LongStrip))
 
-const { pages, pageItems } = storeToRefs(pageManager);
+const { pages, pageItems } = storeToRefs(pageManager)
 </script>
 
 <template>
@@ -34,10 +42,14 @@ const { pages, pageItems } = storeToRefs(pageManager);
     'reader--header',
     {
       hide: hideHeader && chapterState === 'loaded',
+      mobile: shouldShowMobileReader,
       ls: viewStyle === ViewStyleEnum.LongStrip
     },
     'mw--reader-header'
   ]">
+    <UButton v-if="shouldShowMobileReader" class="-ml-2 mr-2"
+      :icon="immersive ? 'i-lucide-minimize' : 'i-lucide-expand'" size="sm"
+      @click="toggleImmersive" variant="ghost" color="neutral" />
     <div class="flex-grow">
       <div v-if="chapterMeta.chapterTitle" class="reader--header-title">
         {{ reader.chapterMeta.chapterTitle }}
@@ -48,6 +60,8 @@ const { pages, pageItems } = storeToRefs(pageManager);
         :to="chapterMeta.mangaLink">{{ chapterMeta.mangaTitle }}</NuxtLink>
       <USkeleton v-else class="h-5 mb-1 rounded" :style="{ width: skeletonWidth2 }" />
     </div>
+    <UButton v-if="shouldShowMobileReader" class="ml-auto -mr-2"
+      icon="i=lucide-menu" size="sm" @click="toggleMenuOpen" variant="ghost" color="neutral" />
     <div class="reader--header-meta">
       <div v-if="chapterMeta.chapterIdentifier" class="reader--meta chapter">
         {{ chapterMeta.chapterIdentifier }}

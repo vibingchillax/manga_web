@@ -3,39 +3,18 @@ const route = useRoute()
 
 const layout = useLayout()
 
+const { $breakpoints } = useNuxtApp()
 const { menuActive } = storeToRefs(layout)
 const { loggedIn } = useAuth()
 
 const animating = ref(false)
 const menuEl = ref<HTMLElement | null>(null)
 
-// onMounted(() => {
-//   if (!$breakpoints.lg) setMenu(false)
-// })
 
 const offsetLeft = () => {
   const w = menuEl.value?.getBoundingClientRect().width
   return w ? `-${w}px` : 'calc(-1 * var(--drawer-menu-width))'
 }
-
-// watch(() => $breakpoints.lg, async (isLg) => {
-//   if (isLg) {
-//     if (menuEl.value !== null) {
-//       animating.value = true
-//       setMenu(!!menuEl.value)
-//       await nextTick()
-//       animating.value = false
-//     } else {
-//       animating.value = false
-//     }
-//   } else {
-//     animating.value = true
-//     menuEl.value = menuActive.value
-//     setMenu(false)
-//     await nextTick()
-//     animating.value = false
-//   }
-// })
 
 type ItemLink = { title: string; link: string; icon?: string }
 type ItemHeader = { title: string; icon: string; rightIcon?: string; rightIconLink?: string }
@@ -100,11 +79,34 @@ const sections = computed<Section[]>(() => {
   return [home, follows, titles, community]
 })
 
+onMounted(() => {
+  if (!$breakpoints.lg.value) layout.setMenu(false)
+})
+
 watch(() => route.name, (newName) => {
   if (newName?.toString().startsWith('chapter')) {
     layout.setMenu(false)
   }
 }, { immediate: true })
+
+watch($breakpoints.lg, async (isLg) => {
+  if (isLg) {
+    if (menuEl.value !== null) {
+      animating.value = true
+      layout.setMenu(!!menuEl.value)
+      await nextTick()
+      animating.value = false
+    } else {
+      animating.value = false
+    }
+  } else {
+    animating.value = true
+    // menuEl.value = menuActive.value
+    layout.setMenu(false)
+    await nextTick()
+    animating.value = false
+  }
+})
 </script>
 <template>
   <div class="flex flex-col bg-accent h-screen md:h-full z-[7] lg:z-auto">

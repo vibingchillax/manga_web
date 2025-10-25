@@ -22,6 +22,8 @@ const {
   contentRating,
   originalLanguage
 } = useManga(manga);
+
+const { $breakpoints } = useNuxtApp()
 </script>
 <template>
   <div :class="[
@@ -39,11 +41,11 @@ const {
       <MangaCover class="cover" :manga="manga" :noLink="noLink" :openInNewTab="openInNewTab" fillHeight fixedAspect
         :use256="use256" noTitle />
     </div>
-    <div style="grid-area: status;" class="flex flex-wrap status mb-auto"> <!-- breakpoints: sm-->
+    <div v-if="$breakpoints.sm.value" style="grid-area: status;" class="flex flex-wrap status mb-auto">
       <MangaStatus :status="publicationStatus ?? 'ongoing'" />
     </div>
-    <TagsRow class="self-start tags" :rows="1"> <!-- sm ? 1 : 2-->
-      <!-- <MangaStatus content :status="publicationStatus ?? 'ongoing'" />  breakpoints: sm-->
+    <TagsRow class="self-start tags" :rows="$breakpoints.sm.value ? 1 : 2">
+      <MangaStatus v-if="!$breakpoints.sm.value" content :status="publicationStatus ?? 'ongoing'" />
       <MangaTag v-if="contentRating" :value="contentRating" /> 
       <MangaTag v-for="tag in sortedTags(tags)" :key="tag.id" 
         :value="tag.attributes?.name?.en!"
@@ -52,7 +54,11 @@ const {
     </TagsRow>
     <div class="stats" style="grid-area: stats;"></div>
     <div class="description !py-0" style="grid-area: description;">
-      <MDC class="md-container dense" v-if="description && description.en" :value="description.en" />
+        <div class="md-container dense">
+          <p>
+            {{ manga.attributes?.description?.en }}
+          </p>
+        </div>
     </div>
   </div>
 </template>

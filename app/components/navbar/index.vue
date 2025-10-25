@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useScroll } from '@vueuse/core'
 import { HeaderStyleEnum } from '~/stores/useReaderMenu';
 import Logo from './Logo.vue';
 import User from './User.vue';
@@ -12,6 +11,7 @@ const isReader = computed(() => route.name?.toString().startsWith('chapter'))
 const { immersive } = storeToRefs(useReaderStore())
 const { headerStyle, menuPinned, menuOpen } = storeToRefs(useReaderMenu())
 const { menuActive, showMOTD } = storeToRefs(useLayout())
+const { $breakpoints } = useNuxtApp()
 </script>
 <template>
   <div :class="['navbar-wrap flex flex-col',
@@ -23,7 +23,7 @@ const { menuActive, showMOTD } = storeToRefs(useLayout())
       rmo: menuOpen,
       ma: menuActive,
     }, 'fixed top-0 right-0', {
-      'max-w-[calc(100%_-_var(--drawer-menu-width))] ml-auto': menuActive
+      'max-w-[calc(100%_-_var(--drawer-menu-width))] ml-auto': $breakpoints.lg.value && menuActive
     }]">
     <div class="nav-bar-main flex justify-center">
       <div class="nav-bar flex flex-grow justify-end w-full items-center gap-2">

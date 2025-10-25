@@ -33,8 +33,8 @@ const goNextChapter = async () => {
   <div v-if="showNextButton" style="grid-area: next;">
     <UButton
       v-if="isLongStrip"
-      class="!rounded-none"
-      :style="{ 'z-index': '1' }"
+      class="!rounded-none justify-center"
+      :style="{ 'z-index': '1', 'min-height': '3rem', 'min-width': '100%' }"
       :href="nextChapterLink"
       @click.prevent="goNextChapter"
       :disabled="!reader.adjacentPopulated"

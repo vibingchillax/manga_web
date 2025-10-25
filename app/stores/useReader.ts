@@ -452,8 +452,13 @@ export const useReaderStore = defineStore("reader", {
 
   },
   getters: {
+    shouldShowMobileReader(): boolean {
+      const { $breakpoints } = useNuxtApp()
+      return this.immersive && $breakpoints.sm.value
+    },
     immersionBreak(): boolean {
-      return this.immersive && this._immersionBreak
+      const { $breakpoints } = useNuxtApp()
+      return ($breakpoints.sm.value || this.immersive) && this._immersionBreak
     },
     chapterState() {
       if (!this.currentChapter && !this.chapterLoadError) return "waiting"

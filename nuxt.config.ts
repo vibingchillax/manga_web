@@ -15,8 +15,8 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     'nuxt-open-fetch',
     'pinia-plugin-persistedstate/nuxt',
-    'nuxt-viewport',
-    '@nuxtjs/device'
+    '@nuxtjs/device',
+    '@vueuse/nuxt'
   ],
   css: ['~/assets/css/main.css'],
   openFetch: {

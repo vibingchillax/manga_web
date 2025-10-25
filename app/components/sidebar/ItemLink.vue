@@ -11,12 +11,14 @@ defineProps<{
 }>()
 
 const route = useRoute()
+const { $breakpoints } = useNuxtApp()
 const { setMenu } = useLayout()
 </script>
 
 <template>
-  <NuxtLink :to="link" :target="target" class="flex-shrink-0">
-    <!-- @click="!$breakpoints.lg && setMenu(false)" -->
+  <NuxtLink :to="link" :target="target" class="flex-shrink-0"
+    @click="!$breakpoints.lg.value && setMenu(false)"
+  >
     <div :class="[
       'list__item px-2',
       {

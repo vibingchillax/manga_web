@@ -8,8 +8,8 @@ defineProps<{
   rightIconLink?: string
 }>()
 
-// const $breakpoints = { lg: false }
-// const { setMenu } = useLayout()
+const { $breakpoints } = useNuxtApp()
+const { setMenu } = useLayout()
 
 </script>
 
@@ -21,10 +21,12 @@ defineProps<{
 
     <div class="mx-2 font-bold">{{ title }}</div>
 
-    <NuxtLink v-if="rightIcon" :to="rightIconLink" class="ml-auto">
-      <!-- @click="!$breakpoints.lg && setMenu(false)" -->
+    <UButton v-if="rightIcon" :to="rightIconLink" class="ml-auto"
+      @click="!$breakpoints.lg.value && setMenu(false)" :icon="rightIcon" />
+    <!-- <NuxtLink v-if="rightIcon" :to="rightIconLink" class="ml-auto">
+      @click="!breakpoints.lg && setMenu(false)"
       <UIcon :name="rightIcon" color="currentColor" />
-    </NuxtLink>
+    </NuxtLink> -->
   </div>
 </template>
 <style lang="css" scoped>
