@@ -2,6 +2,7 @@
 import LanguageFilter from './LanguageFilter.vue';
 import ContentFilter from './ContentFilter.vue';
 import MOTD from './MOTD.vue';
+import IPFS from './IPFS.vue';
 </script>
 <template>
   <div class="flex">
@@ -12,6 +13,7 @@ import MOTD from './MOTD.vue';
         <LanguageFilter />
         <ContentFilter />
         <MOTD />
+        <IPFS />
       </div>
     </div>
   </div>

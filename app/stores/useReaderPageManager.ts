@@ -1,5 +1,6 @@
 import { getImageData } from "~/utils/getImageData";
 import { ReadStyleEnum, ViewStyleEnum } from "./useReaderMenu";
+import type { ScrapedPage } from "~~/shared/types";
 
 function debug(...e: any[]) {
   console.debug("%c[Reader Page Manager]", "color: #5a6", ...arguments)
@@ -59,7 +60,7 @@ interface FetchError {
 
 interface ImageData {
   chapterId: string;
-  data: string[];
+  data: ScrapedPage[];
   requestedAt: number;
 }
 
@@ -190,22 +191,27 @@ export const useReaderPageManager = defineStore("readerPageManager", {
       }, ttl);
       debug("Server loaded with ", ttl, "ms left");
 
-      this.pages = (this.imageData.data! as string[]).map(
-        (url, index) => this._constructManagedImage(url, `${index + 1}`)
-      );
+      const { gatewayUrl } = storeToRefs(usePreferencesStore())
+      this.pages = (this.imageData.data!).map((data, index) => {
+        const src = data.cid
+          ? `${gatewayUrl.value.replace(/\/$/, '')}/${data.cid.replace(/^\//, '')}`
+          : null
+
+        return this._constructManagedImage(data.originalUrl, src, `${index + 1}`)
+      })
     },
-    _constructManagedImage(url: string, pageNum: string): ManagedImage {
+    _constructManagedImage(url: string, ipfsUrl: string | null, pageNum: string): ManagedImage {
       const img: ManagedImage = reactive({
         fetching: false,
         loaded: false,
-        blobUrl: url, //use direct url for now, needs cors proxy if want to use blob
+        blobUrl: ipfsUrl ? null : url,
         spread: false,
         pageNum,
-        pageSrc: url,
+        pageSrc: ipfsUrl ? ipfsUrl : url,
         w: 0,
         h: 0,
         destroy: () => {
-          // if (img.blobUrl) URL.revokeObjectURL(img.blobUrl);
+          if (img.blobUrl) URL.revokeObjectURL(img.blobUrl);
         },
         retry: () => this._performImageFetch(img, false),
         load: () => this._performImageFetch(img) !== false,

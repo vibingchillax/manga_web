@@ -1,11 +1,14 @@
-import type { ScrapedPage } from "~~/shared/prisma/client"
+interface ChapterCache {
+  chapterId: string
+  pages: string[]
+}
 
 function debug(...e: any[]) {
     console.debug("%c[Reader Cache]", "color: #5a6", ...arguments)
 }
 
 export const useReaderCache = defineStore('readerCache', () => {
-  const serverCache = ref<ScrapedPage[]>([]), 
+  const serverCache = ref<ChapterCache[]>([]), 
   chapterCache = ref<ScrapedChapter[]>([]), 
   aggCache = ref<MangaAggregateResponse[]>([])
 

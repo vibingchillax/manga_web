@@ -83,6 +83,7 @@ export type ScrapedChapter = Resource<
     translatedLanguage: string;
     uploader: string | null;
     originalUrl: string;
+    pages: ScrapedPage[];
     branch: string | null;
     createdAt: string;
     updatedAt: string;
@@ -94,6 +95,11 @@ export type ScrapedChapter = Resource<
     | ScrapedScanlationGroup
   )
 >;
+
+export type ScrapedPage = {
+  originalUrl: string
+  cid: string | null
+}
 
 export type ScrapedScanlationGroup = Resource<
   "scraped_scanlation_group",

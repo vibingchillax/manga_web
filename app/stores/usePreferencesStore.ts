@@ -7,6 +7,8 @@ interface UserPreferences {
   showErotic: boolean
   showHentai: boolean
   proxyUrl: string
+  gatewayUrl: string
+  gatewayUrls: string[]
 }
 
 export const usePreferencesStore = defineStore('userPreferences', {
@@ -18,7 +20,9 @@ export const usePreferencesStore = defineStore('userPreferences', {
     showSuggestive: true,
     showErotic: true,
     showHentai: false,
-    proxyUrl: useAppConfig().proxyUrl
+    proxyUrl: useAppConfig().proxyUrl,
+    gatewayUrl: useAppConfig().kuboGatewayUrl,
+    gatewayUrls: [useAppConfig().kuboGatewayUrl, 'https://ipfs.io/ipfs']
   }),
   persist: {
     storage: localStorage

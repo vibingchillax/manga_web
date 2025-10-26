@@ -75,9 +75,12 @@ export function formatScrapedChapter(chapter: ScrapedChapter & { manga?: Scraped
       translatedLanguage: chapter.translatedLanguage,
       uploader: chapter.uploader,
       originalUrl: chapter.url,
+      pages: chapter.pages,
       branch: chapter.branch,
+      downloaded: chapter.downloaded,
       createdAt: chapter.createdAt,
       updatedAt: chapter.updatedAt,
+      downloadedAt: chapter.downloadedAt,
       publishAt: chapter.publishedAt,
     },
     relationships: [
