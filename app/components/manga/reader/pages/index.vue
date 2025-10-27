@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { HeaderStyleEnum, ReadStyleEnum, ViewStyleEnum } from '~/stores/useReaderMenu'
+import { HeaderStyleEnum, ProgressSideEnum, ReadStyleEnum, ViewStyleEnum } from '~/stores/useReaderMenu'
 import ManagedImage from './ManagedImage.vue'
 
-defineProps<{ immTarget?: HTMLElement }>()
+const props = defineProps<{ immTarget?: HTMLElement }>()
 
 const reader = useReaderStore()
 const pageManager = useReaderPageManager()
@@ -173,11 +173,11 @@ watch(currentProgress, val => {
     const rect = pagesEl.value!.getBoundingClientRect()
     const start = rect.top + window.scrollY
     const diff = rect.height - window.innerHeight - start
-    // if (immersive.value) {
-    //   props.immTarget?.scrollTo(0, val * props.immTarget.scrollHeight)
-    // } else {
-    window.scrollTo(0, start + val * diff)
-    // }
+    if (immersive.value) {
+      props.immTarget?.scrollTo(0, val * props.immTarget.scrollHeight)
+    } else {
+      window.scrollTo(0, start + val * diff)
+    }
   }
 })
 
@@ -237,15 +237,17 @@ onBeforeUnmount(() => {
         </template>
       </div>
     </div>
-    <!-- <template v-if="$breakpoints.md.value">
-      Cd
-      Od
+    <template v-if="$breakpoints.md.value">
+      <!-- <MangaReaderCursor /> -->
+      <MangaReaderOverlay />
     </template>
-    <div v-if="immersive && $breakpoints.sm.value">
-      Td
-    </div> -->
-    <!-- <ScrollToTop v-if="immersionBreak && !scrolling && viewStyle === ViewStyleEnum.LongStrip" @click.stop.prevent="scrollToTop" /> -->
-     <!-- Ie, Ka? -->
+    <MangaReaderImmersive v-if="immersive && $breakpoints.sm.value" />
+    <Transition>
+      <div v-if="immersionBreak && !scrolling && viewStyle === ViewStyleEnum.LongStrip" class="scroll-to-top"
+        :class="{ pad: progressSide === ProgressSideEnum.Bottom }" @click.stop.prevent="scrollToTop">
+        <UIcon name="i-lucide-chevron-up" />
+      </div>
+    </Transition>
   </div>
 </template>
 <style lang="css" scoped>
@@ -274,5 +276,54 @@ onBeforeUnmount(() => {
 
 .bw {
   filter: grayscale(100%);
+}
+
+.zoom-reset {
+  align-items: center;
+  border-radius: .375rem;
+  bottom: 3rem;
+  display: flex;
+  height: 2.5rem;
+  justify-content: space-evenly;
+  width: 8rem;
+  z-index: 30
+}
+
+.scroll-to-top,
+.zoom-reset {
+  background-color: rgb(var(--mw-accent));
+  left: 50%;
+  position: fixed;
+  transform: translate(-50%)
+}
+
+.scroll-to-top {
+  align-items: center;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  padding: .5rem;
+  transition: background-color .1s ease-in-out, opacity 75ms ease-in-out;
+  z-index: 10;
+  --tw-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1);
+  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+}
+
+.scroll-to-top:hover {
+  background-color: rgb(var(--mw-accent-10)) /* hover */
+}
+
+.scroll-to-top:active {
+  background-color: rgb(var(--mw-accent-10)) /* active */
+}
+
+.scroll-to-top {
+  bottom: var(--bottom-margin)
+}
+
+.scroll-to-top.pad {
+  bottom: calc(max(var(--bottom-nav-area), 3rem) + var(--bottom-margin))
 }
 </style>

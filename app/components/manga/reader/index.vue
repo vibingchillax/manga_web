@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MangaReaderPages } from '#components';
-import { ProgressSideEnum, ReadStyleEnum, TurnPagesEnum } from '~/stores/useReaderMenu';
+import { HeaderStyleEnum, ProgressSideEnum, ReadStyleEnum, TurnPagesEnum } from '~/stores/useReaderMenu';
 
 const root = ref<HTMLElement | null>(null);
 const readerChapter = ref<HTMLElement | null>(null);
@@ -37,6 +37,7 @@ const {
   immersiveTap,
   progressSide,
   viewStyle,
+  headerStyle,
   readStyle,
   turnPages,
   turnPagesByScrolling,
@@ -125,10 +126,10 @@ function handleClick(e: MouseEvent, isDouble = false) {
 
 defineShortcuts({
   arrowleft: () => { //todo, use keybinds
-    reader.incrementPageGroup(-1, router)
+    reader.incrementPageGroup(-1, router, readStyle.value === ReadStyleEnum.LTR)
   },
   arrowright: () => {
-    reader.incrementPageGroup(1, router)
+    reader.incrementPageGroup(1, router, readStyle.value === ReadStyleEnum.LTR)
   },
   m: () => {
     menuOpen.value = !menuOpen.value
@@ -148,7 +149,10 @@ watch(isFullscreen, (val) => {
 })
 </script>
 <template>
-  <div ref="root" class="mw--reader-wrap">
+  <div ref="root" class="mw--reader-wrap" :class="{
+    'header-shown': headerStyle === HeaderStyleEnum.Shown && !immersive,
+    'immersion-break': immersionBreak
+  }">
     <div v-if="showContentWarning && contentWarningVisible" class="mw--reader-warning">
       <h2>Content Warning</h2>
       <p>{{ manga?.attributes.title.en }} - Chapter contains filtered out content</p>
@@ -159,13 +163,18 @@ watch(isFullscreen, (val) => {
     <div v-else-if="is404" class="mw--reader-error">
       Chapter not found
     </div>
-    <div v-else class="mw--reader-chapter" ref="readerChapter" @scroll="" :class="[
-      settings.progressSide === ProgressSideEnum.Left ? 'left-progress' : '',
-      settings.progressSide === ProgressSideEnum.Right ? 'right-progress' : '',
-    ]">
+    <div v-else class="mw--reader-chapter" ref="readerChapter" @scroll="" :class="{
+      'left-progress': progressSide === ProgressSideEnum.Left && $breakpoints.sm.value,
+      'right-progress': progressSide === ProgressSideEnum.Right && $breakpoints.sm.value,
+      immersive,
+      // mobile: isMobileApp,
+      // 'mobile-ls': isMobileApp && viewStyle === ViewStyleEnum.LongStrip,
+      'mobile-ls': viewStyle === ViewStyleEnum.LongStrip,
+      'header-not-floating': $breakpoints.md.value && menuPinned && headerStyle === HeaderStyleEnum.Shown
+    }">
       <MangaReaderHeader />
-      <!-- <MangaReaderOverlay /> -->
-      <MangaReaderPages ref="pageContainer" @click="handleClick" @dblclick="(e: any) => handleClick(e, true)" />
+      <MangaReaderPages ref="pageContainer" :class="{ immersive }" :imm-target="readerChapter!"
+        @click="handleClick" @dblclick="(e: any) => handleClick(e, true)" />
       <MangaReaderProgressBar />
       <MangaReaderLongStripNextChapter />
     </div>
@@ -175,8 +184,7 @@ watch(isFullscreen, (val) => {
 <style lang="css" scoped>
 .mw--reader-wrap {
   display: grid;
-  grid-template-areas:
-    "chapter comments menu";
+  grid-template-areas: "chapter comments menu";
   grid-template-columns: auto min-content min-content;
   height: 100%;
   margin: 0 !important;
@@ -184,21 +192,39 @@ watch(isFullscreen, (val) => {
   overflow-x: clip;
   padding: 0 !important;
   width: 100%;
-  --header-padding: 0px;
+  --header-padding: 0px
+}
+
+.mw--reader-wrap.header-shown:not(.immersive) {
+  --header-padding: 56px
+}
+
+.mw--reader-warning {
+  align-items: center;
+  background-color: rgb(var(--mw-background));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  justify-content: center;
+  padding: 1.5rem;
+  position: fixed;
+  right: 0;
+  top: 0
 }
 
 .mw--reader-chapter {
   display: grid;
   grid-template-rows: min-content auto min-content min-content;
-  height: 100%;
+  height: 100%
+}
+
+.mw--reader-chapter.header-not-floating {
+  padding-top: var(--navbar-height)
 }
 
 .mw--reader-chapter {
-  grid-template-areas:
-    "header  "
-    "pages   "
-    "progress"
-    "next    ";
+  grid-template-areas: "header" "pages" "progress" "next"
 }
 
 .mw--reader-chapter.left-progress {
@@ -211,5 +237,9 @@ watch(isFullscreen, (val) => {
   grid-template-areas: "header header" "pages progress" "next next";
   grid-template-columns: auto 0;
   grid-template-rows: min-content auto min-content
+}
+
+.mw--reader-chapter.immersive {
+  overflow-y: auto
 }
 </style>
