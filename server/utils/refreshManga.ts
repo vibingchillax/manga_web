@@ -7,7 +7,7 @@ type MangaRequestBody = {
   mangadexId: string
 }
 
-export async function refreshMangas(mangaInput: MangaRequestBody) {
+export async function refreshManga(mangaInput: MangaRequestBody) {
 
   const scrapeNew = await sourcesInstance.runSourceForMangas({
     sourceId: mangaInput.sourceId,
@@ -45,7 +45,7 @@ export async function refreshMangas(mangaInput: MangaRequestBody) {
     where: {
       targetId_targetType: {
         targetId: mangaInput.mangadexId,
-        targetType: ScrapeTarget.mangas,
+        targetType: ScrapeTarget.manga,
       },
     },
     update: {
@@ -54,7 +54,7 @@ export async function refreshMangas(mangaInput: MangaRequestBody) {
     create: {
       id: randomUUID(),
       targetId: mangaInput.mangadexId,
-      targetType: ScrapeTarget.mangas,
+      targetType: ScrapeTarget.manga,
       refreshedAt: new Date()
     }
   })

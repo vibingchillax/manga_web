@@ -44,12 +44,12 @@ const relatedOrder = [
   "other",
 ]
 
-export const useRelatedMangas = async (manga: Manga) => {
+export const useRelatedManga = async (manga: Manga) => {
   const pref = usePreferencesStore()
   const { contentRating } = storeToRefs(pref)
 
-  const relatedMangas = manga.relationships?.filter(isManga) ?? []
-  const grouped = relatedMangas.reduce<Record<string, Relationship[]>>((acc, r) => {
+  const relatedMangaList = manga.relationships?.filter(isManga) ?? []
+  const grouped = relatedMangaList.reduce<Record<string, Relationship[]>>((acc, r) => {
     const key = r.related ?? "other"
     if (!acc[key]) acc[key] = []
     acc[key].push(r)
@@ -61,10 +61,10 @@ export const useRelatedMangas = async (manga: Manga) => {
     .map(type => ({
       type,
       label: relatedLabels[type] ?? type,
-      mangas: grouped[type],
+      manga: grouped[type],
     }))
 
-  const ids = relatedGroups.flatMap(r => r.mangas!.map(m => m.id!))
+  const ids = relatedGroups.flatMap(r => r.manga!.map(m => m.id!))
   const { data, pending, error } = await useMangadex("/manga", {
     query: {
       "ids[]": ids,
@@ -81,7 +81,7 @@ export const useRelatedMangas = async (manga: Manga) => {
 
   const result = relatedGroups.map(r => ({
     ...r,
-    mangas: r.mangas!.map(m => mangaMap.get(m.id!)).filter(Boolean),
+    manga: r.manga!.map(m => mangaMap.get(m.id!)).filter(Boolean),
   }))
 
   return { related: result, pending, error }

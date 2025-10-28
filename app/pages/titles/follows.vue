@@ -36,7 +36,7 @@ const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
 const activeTab = ref<'reading' | 'planToRead' | 'completed' | 'onHold' | 'rereading' | 'dropped'>('reading')
 
 let followsList = ref<{ mangaId: string, status: MangaFollowStatus }[] | undefined>()
-let mangasList = ref<{ result: string, response: string, data?: Manga[] } | undefined>()
+let mangaList = ref<{ result: string, response: string, data?: Manga[] } | undefined>()
 
 if (loggedIn.value) {
   const { data: fList } = await useFetch('/api/user/follows/manga', {
@@ -56,7 +56,7 @@ if (loggedIn.value) {
     },
     key: 'follows'
   })
-  mangasList.value = mList.value
+  mangaList.value = mList.value
 }
 
 
@@ -66,10 +66,10 @@ const followsMap = computed(() => {
   return map
 })
 
-const filteredMangas = computed(() => {
-  if (!mangasList.value?.data) return []
+const filteredManga = computed(() => {
+  if (!mangaList.value?.data) return []
   const map = followsMap.value
-  return mangasList.value.data.filter(manga => map.get(manga.id!) === activeTab.value)
+  return mangaList.value.data.filter(manga => map.get(manga.id!) === activeTab.value)
 })
 
 </script>
@@ -79,7 +79,7 @@ const filteredMangas = computed(() => {
     <!-- <div class="flex my-4 items-center"> -->
     <div class="flex my-4 flex-row justify-between gap-6">
       <div class="text-lg">
-        {{ filteredMangas.length }} title(s)
+        {{ filteredManga.length }} title(s)
       </div>
       <ListStyleControls v-model="active" />
     </div>
@@ -89,7 +89,7 @@ const filteredMangas = computed(() => {
         'grid-cols-2': active === 'normal',
         'manga-card-cover-only grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3': active === 'coverOnly'
       }">
-        <MangaCard v-for="(manga, index) in filteredMangas" :key="manga.id" :manga="manga" 
+        <MangaCard v-for="(manga, index) in filteredManga" :key="manga.id" :manga="manga" 
           :dense="active === 'dense'" :coverOnly="active === 'coverOnly'"
           :use256="active !== 'coverOnly'" showFlag
         />

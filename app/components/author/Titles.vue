@@ -14,7 +14,7 @@ const pending = ref(false)
 const error = ref<Error | null>(null)
 const total = ref(0)
 
-const mangas = ref<Manga[]>([])
+const mangaList = ref<Manga[]>([])
 
 const fetchData = async () => {
   pending.value = true
@@ -29,7 +29,7 @@ const fetchData = async () => {
         "contentRating[]": contentRating.value
       }
     })
-    mangas.value = response.data as Manga[]
+    mangaList.value = response.data as Manga[]
     total.value = response.total ?? 1
   } catch (err) {
     error.value = err as Error
@@ -77,7 +77,7 @@ watch(page, fetchData, { immediate: true })
         <div class="grid gap-2" :class="{
           'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3': active === 'coverOnly'
         }">
-          <MangaCard v-for="(manga, index) in mangas" :key="manga.id" :manga="manga" :dense="active === 'dense'"
+          <MangaCard v-for="(manga, index) in mangaList" :key="manga.id" :manga="manga" :dense="active === 'dense'"
             :coverOnly="active === 'coverOnly'" :use256="active !== 'coverOnly'" showFlag />
         </div>
         <div class="flex justify-center flex-wrap gap-2 mt-6">

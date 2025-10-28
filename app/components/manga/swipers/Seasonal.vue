@@ -20,7 +20,7 @@ const idList = computed(() => data.value?.data?.relationships
   ?.filter((r): r is { id: string; type: "manga" } => r.type === "manga" && !!r.id)
   .map(r => r.id) ?? []);
 
-const { data: mangasList, pending, error } = await useMangadex('/manga', {
+const { data: mangaList, pending, error } = await useMangadex('/manga', {
   query: {
     limit: 32,
     offset: 0,
@@ -55,7 +55,7 @@ const { data: mangasList, pending, error } = await useMangadex('/manga', {
         el: '.swiper-pagination',
         type: 'bullets'
       }" :mousewheel="true">
-        <swiper-slide v-for="(manga, index) in mangasList?.data" :key="index" style="max-width: 192px; flex: 0 0 auto;">
+        <swiper-slide v-for="(manga, index) in mangaList?.data" :key="index" style="max-width: 192px; flex: 0 0 auto;">
           <div>
             <MangaCover :manga="manga" noTitle showFlag fillHeight use256 class="aspect-[5/7]"/>
             <NuxtLink :to="useManga(manga).detailsUrl.value">

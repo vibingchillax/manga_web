@@ -16,7 +16,7 @@ const originalTitle = useManga(manga).title.value as string
 const title = ref<string>(originalTitle)
 
 const selectedSource = ref<SourceLabel>()
-const scrapedMangas = ref<ScrapedManga[]>([])
+const scrapedMangaList = ref<ScrapedManga[]>([])
 const scrapedChapters = ref<ScrapedChapter[]>([])
 const selectedManga = ref<ScrapedManga>()
 const hasFetched = ref(false)
@@ -30,16 +30,16 @@ async function scrapeFromSource() {
   if (loading.value || !selectedSource.value) return
   loading.value = true
   try {
-    const mangaRes = await $fetch('/api/scrape/mangas', {
+    const mangaRes = await $fetch('/api/scrape/manga', {
       method: 'POST',
       body: { title: title.value, sourceId: selectedSource.value.id, mangadexId: manga.id }
     })
 
     if (!(mangaRes.data.length)) throw new Error('Nothing found')
 
-    scrapedMangas.value = mangaRes.data as ScrapedManga[]
+    scrapedMangaList.value = mangaRes.data as ScrapedManga[]
     progressValue.value = 1
-    selectedManga.value = scrapedMangas.value[0]
+    selectedManga.value = scrapedMangaList.value[0]
   }
   catch (error) {
     toast.add({
@@ -131,10 +131,10 @@ watch(selectedManga, async (manga, old) => {
       </USelectMenu>
       <UModal title="Reselect manga to scrape">
         <UButton class="ml-2" variant="ghost" color="neutral" label="Incorrect match?"
-          v-if="hasFetched && scrapedMangas.length && scrapedChapters.length" />
+          v-if="hasFetched && scrapedMangaList.length && scrapedChapters.length" />
         <template #body>
           <div class="grid gap-2">
-            <div v-for="manga in scrapedMangas" :key="manga.id"
+            <div v-for="manga in scrapedMangaList" :key="manga.id"
               class="cursor-pointer transition-all duration-200 rounded-xl border-2 overflow-hidden" :class="[
                 selectedManga?.id === manga.id
                   ? 'border-amber-400 bg-amber-50/10 shadow-inner'
@@ -147,7 +147,7 @@ watch(selectedManga, async (manga, old) => {
       </UModal>
     </div>
     <div class="flex-grow mt-6">
-      <UProgress v-if="loading" v-model="progressValue" :max="['Fetching mangas...', 'Fetching chapters...']" />
+      <UProgress v-if="loading" v-model="progressValue" :max="['Fetching manga...', 'Fetching chapters...']" />
       <div v-if="!loading && hasFetched && scrapedChapters.length > 0">
         <ChaptersList v-for="([vol, chapters]) in groupedChapters" :key="vol" :volume="vol" :chapters="chapters" />
       </div>

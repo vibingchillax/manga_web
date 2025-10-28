@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
     if (!(result.length > 0)) {
       return {
         result: "ok",
-        data: (await refreshMangas(data)).map(formatScrapedManga)
+        data: (await refreshManga(data)).map(formatScrapedManga)
       }
     }
 
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       where: {
         targetId_targetType: {
           targetId: data.mangadexId,
-          targetType: ScrapeTarget.mangas
+          targetType: ScrapeTarget.manga
         }
       }
     })
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     const stale = Date.now() - lastRefreshed.getTime() > 1000 * 60 * 60
 
     if (stale) {
-      refreshMangas(data).catch((err: any) => {
+      refreshManga(data).catch((err: any) => {
         console.error(`Background refresh failed for manga title ${data.title} (${data.sourceId})`, err)
       })
     }

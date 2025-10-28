@@ -14,7 +14,7 @@ const idList = computed(() => data.value?.data?.relationships
   ?.filter((r): r is { id: string; type: "manga" } => r.type === "manga" && !!r.id)
   .map(r => r.id) ?? []);
 
-const { data: mangasList, pending, error } = await useMangadex('/manga', {
+const { data: mangaList, pending, error } = await useMangadex('/manga', {
   query: {
     limit: 32,
     offset: 0,
@@ -41,7 +41,7 @@ const active = ref<'dense' | 'normal' | 'coverOnly'>('coverOnly');
         'grid-cols-2': active === 'normal',
         'manga-card-cover-only grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3': active === 'coverOnly'
       }">
-        <MangaCard v-for="(manga, index) in mangasList?.data" :key="manga.id" :manga="manga"
+        <MangaCard v-for="(manga, index) in mangaList?.data" :key="manga.id" :manga="manga"
           :use256="active !== 'coverOnly'" showFlag
         />
       </div>
