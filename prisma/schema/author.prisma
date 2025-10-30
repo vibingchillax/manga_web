@@ -1,0 +1,23 @@
+model Author {
+  id        String   @id @db.Uuid
+  name      String
+  imageUrl  String?
+  biography Json?
+  twitter   String?
+  pixiv     String?
+  melonBook String?
+  fanBox    String?
+  booth     String?
+  nicoVideo String?
+  skeb      String?
+  fantia    String?
+  tumblr    String?
+  youtube   String?
+  weibo     String?
+  naver     String?
+  namicomi  String?
+  website   String?
+  version   Int      @default(1)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
+}

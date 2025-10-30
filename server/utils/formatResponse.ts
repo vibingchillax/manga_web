@@ -1,4 +1,4 @@
-import { ScanlationGroup, ScrapedChapter, ScrapedManga, User } from "~~/shared/prisma/client"
+import { Author, ScanlationGroup, ScrapedChapter, ScrapedManga, User } from "~~/shared/prisma/client"
 import { GroupRole, UserRole } from "~~/shared/prisma/enums"
 
 type SafeUser = {
@@ -9,6 +9,18 @@ type SafeUser = {
   groupMemberships?: {
     groupId: string
   }[]
+}
+
+export function formatAuthor(author: Author) {
+  const { id, ...rest } = author
+  return {
+    id: author.id,
+    type: "author",
+    attributes: {
+      ...rest
+    },
+    relationships: []
+  }
 }
 
 export function formatScrapedManga(manga: ScrapedManga) {
