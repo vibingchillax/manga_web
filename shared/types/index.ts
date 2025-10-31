@@ -147,3 +147,24 @@ export type User = Resource<
   },
   { id: string; type: string | "scanlation_group" }
 >;
+
+export type UploadedChapter = Resource<
+  "chapter",
+  {
+    title: string
+    volume: string
+    chapter: string
+    pages: any
+    translatedLanguage: string
+    uploader: string
+    version: number
+    createdAt: string
+    updatedAt: string
+    publishAt: string
+    readableAt: string
+  },
+  (
+    User |
+    ScanlationGroup
+  )
+>;

@@ -1,7 +1,14 @@
-import { Author, ScanlationGroup, ScrapedChapter, ScrapedManga, User } from "~~/shared/prisma/client"
+import {
+  Author,
+  ScanlationGroup,
+  ScrapedChapter,
+  ScrapedManga,
+  UploadedChapter,
+  User
+} from "~~/shared/prisma/client"
 import { GroupRole, UserRole } from "~~/shared/prisma/enums"
 
-type SafeUser = {
+export type SafeUser = {
   id: string
   username: string
   roles: UserRole[]
@@ -108,6 +115,42 @@ export function formatScrapedChapter(chapter: ScrapedChapter & { manga?: Scraped
         }
       }
     ].filter(Boolean)
+  }
+}
+
+export function formatUploadedChapter(
+  chapter: UploadedChapter & {
+    user?: SafeUser
+    groups?: ScanlationGroup[]
+  }) {
+  return {
+    id: chapter.id,
+    type: "chapter",
+    attributes: {
+      title: chapter.title,
+      volume: chapter.volume,
+      chapter: chapter.chapter,
+      pages: chapter.pages,
+      translatedLanguage: chapter.translatedLanguage,
+      uploader: chapter.uploader,
+      version: chapter.version,
+      createdAt: chapter.createdAt,
+      updatedAt: chapter.updatedAt,
+      publishAt: chapter.publishAt,
+      readableAt: chapter.readableAt,
+    },
+    relationships: [
+      ...(chapter.user
+        ? [formatUser(chapter.user)]
+        : []
+      ),
+      ...(chapter.groups
+        ? chapter.groups.map((g) => {
+          return formatGroup(g)
+        })
+        : []
+      )
+    ]
   }
 }
 
