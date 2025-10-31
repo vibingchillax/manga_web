@@ -1,15 +1,15 @@
 import { randomUUID } from "crypto"
-import * as z from 'zod'
+import { z } from 'zod'
 
 const commitSchema = z.object({
   chapterDraft: z.object({
     volume: z.string().optional().nullable(),
     chapter: z.string().optional().nullable(),
     title: z.string().optional().nullable(),
-    translatedLanguage: z.string().min(2).max(6),
-    publishAt: z.string().transform((val) => new Date(val))
+    translatedLanguage: zLang,
+    publishAt: zDateString
   }),
-  pageOrder: z.array(z.string().uuid())
+  pageOrder: z.array(zUuid)
 }) 
 
 export default defineEventHandler(async (event) => {
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   })
 
   const params = await getValidatedRouterParams(event, z.object({
-    sessionId: z.string().uuid()
+    sessionId: zUuid
   }).parse)
 
   const body = commitSchema.safeParse(await readBody(event))

@@ -1,9 +1,9 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatUser } from '~~/server/utils/formatResponse'
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(event, z.object({
-    id: z.string().uuid()
+    id: zUuid
   }).parse)
 
   const user = await prisma.user.findUnique({

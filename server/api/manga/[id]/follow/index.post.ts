@@ -1,5 +1,5 @@
 import { MangaFollowStatus } from "~~/shared/prisma/enums"
-import * as z from 'zod'
+import { z } from 'zod'
 
 const schema = z.object({
   status: z.nativeEnum(MangaFollowStatus)
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   })
 
   const params = await getValidatedRouterParams(event, z.object({
-    id: z.string().uuid()
+    id: zUuid
   }).parse)
 
   const body = schema.safeParse(await readBody(event))

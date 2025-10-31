@@ -1,10 +1,10 @@
-import * as z from 'zod'
+import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
 
   const params = await getValidatedRouterParams(event, z.object({
-    id: z.string().uuid()
+    id: zUuid
   }).parse)
 
   if (!user) throw createError({

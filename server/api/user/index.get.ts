@@ -1,18 +1,9 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatUser } from '~~/server/utils/formatResponse'
 
-const querySchema = z.object({
-  limit: z.coerce.number().min(0).max(100).optional(),
-  offset: z.coerce.number().optional(),
-  'ids[]': z
-    .union([z.string().uuid(), z.array(z.string().uuid())])
-    .optional()
-    .transform(val => {
-      if (!val) return undefined
-      return Array.isArray(val) ? val : [val]
-    }),
-  username: z.string().optional(),
-  'order[username]': z.enum(['asc', 'desc']).optional()
+const querySchema = baseQuerySchema.extend({
+  username: zName.optional(),
+  'order[username]': zOrderDirection.optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -25,8 +16,10 @@ export default defineEventHandler(async (event) => {
 
   const query = await getValidatedQuery(event, querySchema.safeParse)
 
+  const ids = query.data?.['ids[]'] as string[] | undefined
+
   const filters = {
-    id: query.data?.['ids[]'] ? { in: query.data['ids[]'] } : undefined,
+    id: ids ? { in: ids } : undefined,
     username: query.data?.username
       ? { contains: query.data.username }
       : undefined

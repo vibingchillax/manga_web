@@ -1,16 +1,13 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatScrapedChapter } from '~~/server/utils/formatResponse'
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(event, z.object({
-    id: z.string().uuid()
+    id: zUuid
   }).parse)
 
   const query = await getValidatedQuery(event, z.object({
-    'includes[]': z.union([z.string(), z.array(z.string())]).optional().transform(val => {
-      if (!val) return undefined
-      return Array.isArray(val) ? val : [val]
-    })
+    'includes[]': zArrayable(z.string()).optional()
   }).safeParse)
 
   const chapter = await prisma.scrapedChapter.findUnique({

@@ -1,4 +1,4 @@
-import * as z from "zod"
+import { z } from 'zod'
 import { UserRole } from "~~/shared/prisma/enums"
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   })
   
   const params = await getValidatedRouterParams(event, z.object({
-    id: z.string().uuid()
+    id: zUuid
   }).parse)
 
   await prisma.scanlationGroup.delete({

@@ -1,9 +1,9 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatGroup } from '~~/server/utils/formatResponse'
 
 export default defineEventHandler(async (event) => {
 
-  const params = await getValidatedRouterParams(event, z.object({ id: z.string().uuid() }).parse)
+  const params = await getValidatedRouterParams(event, z.object({ id: zUuid }).parse)
 
   const group = await prisma.scanlationGroup.findUnique({
     where: {

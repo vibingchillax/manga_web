@@ -1,11 +1,11 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { downloadImagesFromUrls } from '~~/server/utils/kubo'
 import path from 'path'
 import { ScrapedPage } from '~~/shared/types'
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(event, z.object({
-    id: z.string().uuid()
+    id: zUuid
   }).parse)
 
   const chapter = await prisma.scrapedChapter.findUnique({

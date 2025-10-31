@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   })
 
   const params = await getValidatedRouterParams(event, z.object({
-    id: z.string().uuid()
+    id: zUuid
   }).parse)
 
   const result = await prisma.mangaFollows.findUnique({

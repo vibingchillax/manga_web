@@ -1,20 +1,16 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatScrapedChapter } from '~~/server/utils/formatResponse';
 
 export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(event, z.object({
-    'ids[]': z.union([z.string().uuid(), z.array(z.string().uuid())]).transform(val => {
-      if (!val) return undefined
-      return Array.isArray(val) ? val : [val]
-    }),
-    'includes[]': z.union([z.string(), z.array(z.string())]).optional().transform(val => {
-      if (!val) return undefined
-      return Array.isArray(val) ? val : [val]
-    })
+    'ids[]': zArrayable(zUuid).optional(),
+    'includes[]': zArrayable(z.string()).optional()
   }).parse)
 
+  const ids = query['ids[]'] as string[] | undefined
+
   const chapters = await prisma.scrapedChapter.findMany({
-    where: { id: { in: query["ids[]"] } },
+    where: { id: { in: ids } },
     include: { manga: query["includes[]"]?.includes("manga") },
   });
 

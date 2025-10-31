@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatScrapedManga } from '~~/server/utils/formatResponse'
 import { ScrapeTarget } from '~~/shared/prisma/enums'
 

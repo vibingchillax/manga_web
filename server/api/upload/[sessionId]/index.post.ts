@@ -1,6 +1,6 @@
 import { kubo } from "~~/server/utils/kubo"
 import { randomUUID } from 'crypto'
-import * as z from 'zod'
+import { z } from 'zod'
 import { fileTypeFromBuffer } from 'file-type'
 
 const IMAGE_TYPES = [
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   })
 
   const params = await getValidatedRouterParams(event, z.object({
-    sessionId: z.string().uuid()
+    sessionId: zUuid
   }).parse)
 
   const data = await readMultipartFormData(event)

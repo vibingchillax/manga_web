@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto'
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatGroup } from '~~/server/utils/formatResponse'
 
-const ScanlationGroupCreateSchema = z.object({
-  name: z.string().min(1).max(100),
+export const ScanlationGroupSchema = z.object({
+  name: zName, 
   website: z.string().url().optional(),
   ircServer: z.string().max(100).optional(),
   ircChannel: z.string().max(100).optional(),
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const body = ScanlationGroupCreateSchema.safeParse(await readBody(event))
+  const body = ScanlationGroupSchema.safeParse(await readBody(event))
 
   if (!body.success) throw createError({
     statusCode: 400,

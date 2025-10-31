@@ -1,26 +1,15 @@
-import * as z from 'zod'
 import { formatGroup } from '~~/server/utils/formatResponse'
 
 export default defineEventHandler(async (event) => {
-  const query = await getValidatedQuery(event, z.object({
-    limit: z.coerce.number().min(0).max(100).optional(),
-    offset: z.coerce.number().optional(),
-    'ids[]': z.union([z.string().uuid(), z.array(z.string().uuid())]).optional()
-      .transform(val => {
-        if (!val) return undefined
-        return Array.isArray(val) ? val : [val]
-      }),
-    name: z.string().min(1).max(200).optional(),
-    focusedLanguage: z.string().min(2).max(6).optional(),
-    'includes[]': z.union([z.string(), z.array(z.string())]).optional()
-      .transform(val => {
-        if (!val) return undefined
-        return Array.isArray(val) ? val : [val]
-      })
+  const query = await getValidatedQuery(event, baseQuerySchema.extend({
+    name: zName.optional(),
+    focusedLanguage: zLang.optional() //why mangadex only allows to search 1 i have no idea
   }).safeParse)
 
+  const ids = query.data?.['ids[]'] as string[] | undefined
+
   const filters = {
-    id: query.data?.['ids[]'] ? { in: query.data['ids[]'] } : undefined,
+    id: ids ? { in: ids } : undefined,
     name: query.data?.name ? { contains: query.data.name } : undefined,
     focusedLanguages: query.data?.focusedLanguage
       ? { has: query.data.focusedLanguage }

@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import { z } from 'zod'
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
@@ -9,10 +9,10 @@ export default defineEventHandler(async (event) => {
   })
 
   const params = await getValidatedRouterParams(event, z.object({
-    sessionId: z.string().uuid()
+    sessionId: zUuid
   }).parse)
 
-  const body = z.array(z.string().uuid()).safeParse(await readBody(event))
+  const body = z.array(zUuid).safeParse(await readBody(event))
 
   if (!body.success) throw createError({
     statusCode: 400,

@@ -1,37 +1,14 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatGroup } from '~~/server/utils/formatResponse'
 import { GroupRole, UserRole } from '~~/shared/prisma/enums'
+import { ScanlationGroupSchema } from '../index.post'
 
-const ScanlationGroupUpdateSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  leader: z.string().uuid().optional(),
-  members: z.array(z.string().uuid()).optional(),
-  website: z.string().url().optional(),
-  ircServer: z.string().max(100).optional(),
-  ircChannel: z.string().max(100).optional(),
-  discord: z.string()
-    .regex(/^((https?:\/\/)?(www\.)?(discord\.(gg|com)\/(invite\/)?[A-Za-z0-9-]+))$/, {
-    })
-    .max(200).optional(),
-  contactEmail: z.string().email().optional(),
-  description: z.string().max(500).optional(),
-  twitter: z.string()
-    .regex(
-      /^(?:@)?(?:https?:\/\/(?:www\.)?twitter\.com\/)?([A-Za-z0-9_]{1,15})$/,
-    )
-    .transform(v => {
-      const match = v.match(/([A-Za-z0-9_]{1,15})$/)
-      return match ? match[1] : undefined
-    }).optional(),
-  mangaUpdates: z.string()
-    .url()
-    .regex(/^https?:\/\/(www\.)?mangaupdates\.com\//, {
-    })
-    .max(200).optional(),
-  focusedLanguages: z.array(z.string().min(2).max(6)).optional(),
+const ScanlationGroupUpdateSchema = ScanlationGroupSchema.extend({
+  leader: zUuid.optional(),
+  members: z.array(zUuid).optional(),
+  focusedLanguages: z.array(zLang).optional(),
   inactive: z.boolean().optional(),
   locked: z.boolean().optional(),
-  publishDelay: z.string().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -43,7 +20,7 @@ export default defineEventHandler(async (event) => {
   })
 
   const params = await getValidatedRouterParams(event, z.object({
-    id: z.string().uuid()
+    id: zUuid
   }).parse)
 
   const parseResult = ScanlationGroupUpdateSchema.safeParse(await readBody(event))

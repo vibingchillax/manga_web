@@ -1,10 +1,10 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatScrapedChapter } from '~~/server/utils/formatResponse'
 import { ScrapeTarget } from '~~/shared/prisma/enums'
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(event, z.object({
-    id: z.string().uuid()
+    id: zUuid
   }).parse)
   
   try {

@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatAuthor } from '~~/server/utils/formatResponse'
 import { PrismaClientKnownRequestError } from '~~/shared/prisma/internal/prismaNamespace'
 import { AuthorDataSchema } from '../index.post'
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const params = await getValidatedRouterParams(event, z.object({ id: z.string().uuid() }).parse)
+  const params = await getValidatedRouterParams(event, z.object({ id: zUuid }).parse)
   const body = await readValidatedBody(event, AuthorDataSchema.safeParse)
 
   if (!body.success) throw createError({

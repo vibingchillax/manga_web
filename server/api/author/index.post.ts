@@ -1,11 +1,11 @@
 import { randomUUID } from 'crypto'
-import * as z from 'zod'
+import { z } from 'zod'
 import { formatAuthor } from '~~/server/utils/formatResponse'
 import { makeDomainRegex } from '~~/server/utils/strings'
 
 export const AuthorDataSchema = z.object({
-  name: z.string().min(1).max(200),
-  biography: z.record(z.string().min(2).max(6), z.string().max(300)),
+  name: zName,
+  biography: z.record(zLang, z.string().max(300)).optional(),
   twitter: z
     .string()
     .regex(/^https?:\/\/(www\.)?twitter\.com(\/[A-Za-z0-9_]{1,15})?\/?$/, {

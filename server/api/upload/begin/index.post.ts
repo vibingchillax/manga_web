@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import * as z from 'zod'
+import { z } from 'zod'
 
 const beginSchema = z.object({
   groups: z.array(z.string().uuid({ message: "Group ID must be a valid UUID" }))
