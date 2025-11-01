@@ -10,7 +10,7 @@ const commitSchema = z.object({
     publishAt: zDateString
   }),
   pageOrder: z.array(zUuid)
-}) 
+})
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
@@ -64,7 +64,6 @@ export default defineEventHandler(async (event) => {
       pages: {
         originalUrl: useAppConfig().kuboGatewayUrl,
         data: orderedFiles.map(f => ({
-          originalFileName: f.originalFileName,
           cid: f.cid,
           fileSize: f.fileSize,
           mimeType: f.mimeType
@@ -81,12 +80,14 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  try {
-    await kubo.files.mkdir(`/manga_web/${deleted.mangaId}/${chapter.id}`, { parents: true })
-    await kubo.files.mv(`/manga_web/${deleted.mangaId}/${deleted.id}`,
-      `/manga_web/${deleted.mangaId}/${chapter.id}_${chapter.translatedLanguage}_v${chapter.volume ?? 'v'}_c${chapter.chapter ?? 'c'}`, { recursive: true })
-  } catch (e) {
-    console.warn('Failed to move files, might need manual cleanup', e)
+  const targetDir = `/manga_web/${deleted.mangaId}/${chapter.id}_${chapter.translatedLanguage}_v${chapter.volume ?? 'v'}_c${chapter.chapter ?? 'c'}`
+  await kubo.files.mkdir(targetDir, { parents: true })
+
+  for (let i = 0; i < orderedFiles.length; i++) {
+    const file = orderedFiles[i]
+    const ext = file.originalFileName.split(".").pop() || "bin"
+    const targetPath = `${targetDir}/${i + 1}-${randomUUID()}.${ext}`
+    await kubo.files.cp(`/ipfs/${file.cid}`, targetPath)
   }
 
   return { //formatUploadedChapter(chapter)

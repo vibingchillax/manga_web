@@ -2,6 +2,7 @@ import { kubo } from "~~/server/utils/kubo"
 import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import { fileTypeFromBuffer } from 'file-type'
+import sharp from 'sharp'
 
 const IMAGE_TYPES = [
   "image/jpeg",
@@ -9,6 +10,13 @@ const IMAGE_TYPES = [
   "image/png",
   "image/gif"
 ]
+
+const MAX_FILES_PER_REQUEST = 10
+const MAX_FILE_SIZE = 20 * 1024 * 1024       // 20 MB
+const MAX_FILES_PER_SESSION = 500
+const MAX_TOTAL_SIZE_PER_SESSION = 150 * 1024 * 1024  // 150 MB
+const MAX_WIDTH = 10000
+const MAX_HEIGHT = 10000
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
@@ -29,6 +37,11 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'No files uploaded'
   })
 
+  if (data.length > MAX_FILES_PER_REQUEST) throw createError({
+    statusCode: 400,
+    statusMessage: `Cannot upload more than ${MAX_FILES_PER_REQUEST} files per request`
+  })
+
   const session = await prisma.uploadSession.findUnique({
     where: {
       id: params.sessionId,
@@ -41,6 +54,15 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Invalid upload session id'
   })
 
+  const sessionStats = await prisma.uploadSessionFile.aggregate({
+    _count: true,
+    _sum: { fileSize: true },
+    where: { sessionId: session.id }
+  })
+
+  let currentFileCount = sessionStats._count || 0
+  let currentTotalSize = sessionStats._sum?.fileSize || 0
+
   const results: {
     filename: string,
     cid: string,
@@ -52,6 +74,18 @@ export default defineEventHandler(async (event) => {
 
   for (const file of data) {
     try {
+      if (currentFileCount + 1 > MAX_FILES_PER_SESSION) {
+        throw new Error(`Session file limit exceeded (${MAX_FILES_PER_SESSION})`)
+      }
+
+      if (file.data.length > MAX_FILE_SIZE) {
+        throw new Error(`File size exceeds ${MAX_FILE_SIZE / (1024*1024)}MB`)
+      }
+
+      if (currentTotalSize + file.data.length > MAX_TOTAL_SIZE_PER_SESSION) {
+        throw new Error(`Session total size limit exceeded (${MAX_TOTAL_SIZE_PER_SESSION / (1024*1024)}MB)`)
+      }
+
       const detect = await fileTypeFromBuffer(file.data)
       const mime = detect?.mime
 
@@ -59,17 +93,13 @@ export default defineEventHandler(async (event) => {
         throw new Error(`Invalid or unrecognized file type: ${mime ?? 'unknown'}. Allowed: JPEG, PNG, GIF.`)
       }
 
+      const metadata = await sharp(file.data).metadata()
+      if (metadata.width! > MAX_WIDTH || metadata.height! > MAX_HEIGHT) {
+        throw new Error(`Image dimensions exceed ${MAX_WIDTH}x${MAX_HEIGHT}. Actual: ${metadata.width}x${metadata.height}`)
+      }
+
       const result = await kubo.add(file.data) //TODO: compare add vs addAll perf
       const cid = result.cid.toString()
-      const targetDir = `/manga_web/${session.mangaId}/${session.id}`
-      const targetPath = `${targetDir}/${file.filename}`
-      try {
-        await kubo.files.rm(targetPath)
-      } catch {
-
-      }
-      await kubo.files.mkdir(targetDir, { parents: true })
-      await kubo.files.cp(`/ipfs/${cid}`, `${targetDir}/${file.filename}`) //rpc client missing force param!
 
       results.push({
         filename: file.filename ?? `unnamed-${Date.now()}.bin`,
@@ -79,7 +109,8 @@ export default defineEventHandler(async (event) => {
         status: 'success'
       })
     } catch (e) {
-      console.log(e)
+      console.error({ filename: file.filename, error: e })
+
       results.push({
         filename: file.filename ?? `unnamed-${Date.now()}.bin`,
         cid: '',

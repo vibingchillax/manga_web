@@ -12,18 +12,22 @@ export default defineEventHandler(async (event) => {
     sessionId: zUuid
   }).parse)
 
-  const session = await prisma.uploadSession.delete({
+  const files = await prisma.uploadSessionFile.findMany({
+    where: {
+      sessionId: params.sessionId
+    }
+  })
+
+  for (const file of files) {
+    await kubo.pin.rm(file.cid)
+  }
+
+  await prisma.uploadSession.delete({
     where: {
       id: params.sessionId,
       userId: user.id
     }
   })
-
-  try {
-    await kubo.files.rm(`/manga_web/${session.mangaId}/${session.id}`, { recursive: true })
-  } catch (e) {
-    console.warn("Failed to delete files from IPFS", e)
-  }
 
   return {
     result: "ok"
