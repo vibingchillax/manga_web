@@ -23,7 +23,7 @@ export const useScanlationGroup = (group: Ref<ScanlationGroup | undefined>) => {
   const twitter = computed(() => group.value?.attributes.twitter)
   const mangaUpdates = computed(() => group.value?.attributes.mangaUpdates)
   const publishDelay = computed(() => group.value?.attributes.publishDelay)
-  const focusedLanguages = computed(() => group.value?.attributes.focusedLanguage)
+  const focusedLanguages = computed(() => group.value?.attributes.focusedLanguages)
 
   const locked = computed(() => group.value?.attributes.locked)
   const inactive = computed(() => group.value?.attributes.inactive)

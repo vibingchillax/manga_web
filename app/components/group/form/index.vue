@@ -104,7 +104,7 @@ const toState = (group: ScanlationGroup) => ({
   description: group.attributes.description ?? undefined,
   twitter: group.attributes.twitter ?? undefined,
   mangaUpdates: group.attributes.mangaUpdates ?? undefined,
-  focusedLanguages: group.attributes.focusedLanguage ?? [],
+  focusedLanguages: group.attributes.focusedLanguages ?? [],
   locked: group.attributes.locked ?? false,
   publishDelay: group.attributes.publishDelay ?? 'P0D',
 })
@@ -174,7 +174,7 @@ watch(() => props.group, (group) => {
   state.description = group.attributes.description ?? undefined
   state.twitter = group.attributes.twitter ?? undefined
   state.mangaUpdates = group.attributes.mangaUpdates ?? undefined
-  state.focusedLanguages = group.attributes.focusedLanguage
+  state.focusedLanguages = group.attributes.focusedLanguages
   state.locked = group.attributes.locked
   state.publishDelay = group.attributes.publishDelay ?? 'P0D'
 

@@ -61,7 +61,7 @@ const { pages, pageItems } = storeToRefs(pageManager)
       <USkeleton v-else class="h-5 mb-1 rounded" :style="{ width: skeletonWidth2 }" />
     </div>
     <UButton v-if="shouldShowMobileReader" class="ml-auto -mr-2"
-      icon="i=lucide-menu" size="sm" @click="toggleMenuOpen" variant="ghost" color="neutral" />
+      icon="i-lucide-menu" size="sm" @click="toggleMenuOpen" variant="ghost" color="neutral" />
     <div class="reader--header-meta">
       <div v-if="chapterMeta.chapterIdentifier" class="reader--meta chapter">
         {{ chapterMeta.chapterIdentifier }}

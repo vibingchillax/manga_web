@@ -121,7 +121,7 @@ export type ScanlationGroup = Resource<
     description: string | null;
     twitter: string | null;
     mangaUpdates: string | null;
-    focusedLanguage: string[];
+    focusedLanguages: string[];
     locked: boolean;
     official: boolean;
     verified: boolean;
