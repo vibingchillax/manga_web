@@ -6,7 +6,7 @@ export const zTitle = z.string().min(1).max(200)
 export const zVolume = z.string().min(1).max(15)
 export const zChapter = z.string().min(1).max(15)
 
-export const zName = z.string().min(1).max(200)
+export const zName = z.string().min(0).max(200)
 
 export const zContentRating = z.enum(["safe", "suggestive", "erotica", "pornographic"])
 
@@ -35,6 +35,6 @@ export const zOrderDirection = z.enum(["asc", "desc"])
 export const baseQuerySchema = z.object({
   limit: zLimit,
   offset: zOffset,
-  "ids[]": zArrayable(zUuid),
-  "includes[]": zArrayable(z.string()),
+  "ids[]": zArrayable(zUuid).optional(),
+  "includes[]": zArrayable(z.string()).optional(),
 })

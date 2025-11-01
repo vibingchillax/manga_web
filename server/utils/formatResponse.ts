@@ -22,7 +22,7 @@ export function formatAuthor(author: Author) {
   const { id, ...rest } = author
   return {
     id: author.id,
-    type: "author",
+    type: "author" as const,
     attributes: {
       ...rest
     },
@@ -33,7 +33,7 @@ export function formatAuthor(author: Author) {
 export function formatScrapedManga(manga: ScrapedManga) {
   return {
     id: manga.id,
-    type: "scraped_manga",
+    type: "scraped_manga" as const,
     attributes: {
       mangadexId: manga.mangaDexId,
       sourceId: manga.sourceId,
@@ -59,21 +59,21 @@ export function formatScrapedManga(manga: ScrapedManga) {
     relationships: [
       ...manga.author.map(a => ({
         id: "scraped",
-        type: "author",
+        type: "author" as const,
         attributes: {
           name: a
         }
       })),
       ...manga.artist.map(a => ({
         id: "scraped",
-        type: "artist",
+        type: "artist" as const,
         attributes: {
           name: a
         }
       })),
       {
         id: "scraped",
-        type: "scraped_cover_art",
+        type: "scraped_cover_art" as const,
         attributes: {
           url: manga.coverUrl
         }
@@ -85,7 +85,7 @@ export function formatScrapedManga(manga: ScrapedManga) {
 export function formatScrapedChapter(chapter: ScrapedChapter & { manga?: ScrapedManga }) {
   return {
     id: chapter.id,
-    type: "scraped_chapter",
+    type: "scraped_chapter" as const,
     attributes: {
       sourceId: chapter.sourceId,
       title: chapter.title,
@@ -105,11 +105,11 @@ export function formatScrapedChapter(chapter: ScrapedChapter & { manga?: Scraped
     relationships: [
       chapter.manga ? formatScrapedManga(chapter.manga) : {
         id: chapter.mangaId,
-        type: "scraped_manga"
+        type: "scraped_manga" as const
       },
       chapter.scanlationGroup && {
         id: "scraped",
-        type: "scraped_scanlation_group",
+        type: "scraped_scanlation_group" as const,
         attributes: {
           name: chapter.scanlationGroup
         }
@@ -123,29 +123,19 @@ export function formatUploadedChapter(
     user?: SafeUser
     groups?: ScanlationGroup[]
   }) {
+
+  const { id, user, groups, mangaId, ...rest } = chapter
   return {
-    id: chapter.id,
-    type: "chapter",
-    attributes: {
-      title: chapter.title,
-      volume: chapter.volume,
-      chapter: chapter.chapter,
-      pages: chapter.pages,
-      translatedLanguage: chapter.translatedLanguage,
-      uploader: chapter.uploader,
-      version: chapter.version,
-      createdAt: chapter.createdAt,
-      updatedAt: chapter.updatedAt,
-      publishAt: chapter.publishAt,
-      readableAt: chapter.readableAt,
-    },
+    id: id,
+    type: "chapter" as const,
+    attributes: rest,
     relationships: [
-      ...(chapter.user
-        ? [formatUser(chapter.user)]
+      ...(user
+        ? [formatUser(user)]
         : []
       ),
-      ...(chapter.groups
-        ? chapter.groups.map((g) => {
+      ...(groups
+        ? groups.map((g) => {
           return formatGroup(g)
         })
         : []
@@ -157,35 +147,16 @@ export function formatUploadedChapter(
 export function formatGroup(group: ScanlationGroup & {
   members?: { user: SafeUser, role: GroupRole }[]
 }) {
+
+  const { id, members, ...rest } = group
   return {
-    id: group.id,
-    type: "scanlation_group",
-    attributes: {
-      name: group.name,
-      altNames: group.altNames,
-      website: group.website,
-      ircServer: group.ircServer,
-      ircChannel: group.ircChannel,
-      discord: group.discord,
-      contactEmail: group.contactEmail,
-      description: group.description,
-      twitter: group.twitter,
-      mangaUpdates: group.mangaUpdates,
-      focusedLanguage: group.focusedLanguages,
-      locked: group.locked,
-      official: group.official,
-      verified: group.verified,
-      inactive: group.inactive,
-      exLicensed: group.exLicensed,
-      publishDelay: group.publishDelay,
-      version: group.version,
-      createdAt: group.createdAt,
-      updatedAt: group.updatedAt
-    },
+    id: id,
+    type: "scanlation_group" as const,
+    attributes: rest,
     relationships: [
-      ...group.members?.map(m => ({
+      ...members?.map(m => ({
         id: m.user.id,
-        type: m.role === GroupRole.leader ? "leader" : "member",
+        type: m.role === GroupRole.leader ? "leader" as const : "member" as const,
         attributes: {
           username: m.user.username,
           roles: m.user.roles
@@ -198,7 +169,7 @@ export function formatGroup(group: ScanlationGroup & {
 export function formatUser(user: SafeUser) {
   return {
     id: user.id,
-    type: "user",
+    type: "user" as const,
     attributes: {
       username: user.username,
       roles: user.roles,
@@ -206,7 +177,7 @@ export function formatUser(user: SafeUser) {
     relationships: [
       ...user.groupMemberships?.map(g => ({
         id: g.groupId,
-        type: "scanlation_group"
+        type: "scanlation_group" as const
       })) || []
     ]
   }
