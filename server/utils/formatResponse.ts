@@ -1,5 +1,6 @@
 import {
   Author,
+  CoverArt,
   ScanlationGroup,
   ScrapedChapter,
   ScrapedManga,
@@ -27,6 +28,27 @@ export function formatAuthor(author: Author) {
       ...rest
     },
     relationships: []
+  }
+}
+
+export function formatCoverArt(cover: CoverArt & { user?: SafeUser | null }) {
+  const { id, mangaId, uploader, user, ...rest } = cover
+  return {
+    id: id,
+    type: "cover_art" as const,
+    attributes: {
+      ...rest
+    },
+    relationships: [
+      {
+        id: mangaId,
+        type: "manga" as const
+      },
+      {
+        id: uploader,
+        type: "user" as const
+      }
+    ]
   }
 }
 

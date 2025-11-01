@@ -1,0 +1,13 @@
+model CoverArt {
+  id          String   @id @db.Uuid
+  mangaId     String   @db.Uuid
+  volume      String?
+  file        Json
+  description String?
+  locale      String
+  uploader    String?  @db.Uuid
+  version     Int      @default(1)
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  user        User?    @relation(fields: [uploader], references: [id], onDelete: SetNull)
+}
