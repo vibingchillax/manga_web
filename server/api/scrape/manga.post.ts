@@ -13,35 +13,27 @@ const scrapeMangaSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const body = scrapeMangaSchema.safeParse(await readBody(event))
-
-  if (!body.success) throw createError({
-    statusCode: 400,
-    statusMessage: 'Invalid request data',
-    data: body.error.flatten()
-  })
-
-  const data = body.data
+  const body = await readValidatedBody(event, scrapeMangaSchema.parse)
 
   try {
     const result = await prisma.scrapedManga.findMany({
       where: {
-        sourceId: data.sourceId,
-        mangaDexId: data.mangadexId
+        sourceId: body.sourceId,
+        mangaDexId: body.mangadexId
       }
     })
 
     if (!(result.length > 0)) {
       return {
         result: "ok",
-        data: (await refreshManga(data)).map(formatScrapedManga)
+        data: (await refreshManga(body)).map(formatScrapedManga)
       }
     }
 
     const status = await prisma.scrapeStatus.findUnique({
       where: {
         targetId_targetType: {
-          targetId: data.mangadexId,
+          targetId: body.mangadexId,
           targetType: ScrapeTarget.manga
         }
       }
@@ -51,8 +43,8 @@ export default defineEventHandler(async (event) => {
     const stale = Date.now() - lastRefreshed.getTime() > 1000 * 60 * 60
 
     if (stale) {
-      refreshManga(data).catch((err: any) => {
-        console.error(`Background refresh failed for manga title ${data.title} (${data.sourceId})`, err)
+      refreshManga(body).catch((err: any) => {
+        console.error(`Background refresh failed for manga title ${body.title} (${body.sourceId})`, err)
       })
     }
 

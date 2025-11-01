@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
   const query = await getValidatedQuery(event, z.object({
     'includes[]': zArrayable(z.string()).optional()
-  }).safeParse)
+  }).parse)
 
   const author = await prisma.author.findUnique({
     where: {

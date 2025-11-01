@@ -18,23 +18,15 @@ export default defineEventHandler(async (event) => {
     statusMessage: "Not authenticated"
   })
 
-  const body = beginSchema.safeParse(await readBody(event))
-
-  if (!body.success) throw createError({
-    statusCode: 400,
-    statusMessage: "Invalid request data",
-    data: body.error.flatten()
-  })
-
-  const data = body.data
+  const body = await readValidatedBody(event, beginSchema.parse)
 
   const session = await prisma.uploadSession.create({
     data: {
       id: randomUUID(),
-      mangaId: data.manga,
+      mangaId: body.manga,
       userId: user.id,
       groups: {
-        create: data.groups.map((gid) => ({
+        create: body.groups.map((gid) => ({
           group: {
             connect: { id: gid }
           }

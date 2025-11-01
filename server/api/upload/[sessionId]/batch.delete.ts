@@ -12,19 +12,11 @@ export default defineEventHandler(async (event) => {
     sessionId: zUuid
   }).parse)
 
-  const body = z.array(zUuid).safeParse(await readBody(event))
-
-  if (!body.success) throw createError({
-    statusCode: 400,
-    statusMessage: 'Invalid request body',
-    data: body.error.flatten()
-  })
-
-  const data = body.data
+  const body = await readValidatedBody(event, z.array(zUuid).parse)
 
   await prisma.uploadSessionFile.deleteMany({
     where: {
-      id: { in: data },
+      id: { in: body },
       sessionId: params.sessionId
     }
   })

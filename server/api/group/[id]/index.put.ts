@@ -23,14 +23,7 @@ export default defineEventHandler(async (event) => {
     id: zUuid
   }).parse)
 
-  const parseResult = ScanlationGroupUpdateSchema.safeParse(await readBody(event))
-  if (!parseResult.success) throw createError({
-    statusCode: 400,
-    statusMessage: 'Invalid request data',
-    data: parseResult.error.flatten()
-  })
-
-  const data = parseResult.data
+  const data = await readValidatedBody(event, ScanlationGroupUpdateSchema.parse)
 
   const currentGroup = await prisma.scanlationGroup.findUnique({
     where: { id: params.id },

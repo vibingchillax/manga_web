@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { formatAuthor } from '~~/server/utils/formatResponse'
 import { PrismaClientKnownRequestError } from '~~/shared/prisma/internal/prismaNamespace'
 import { AuthorDataSchema } from '../index.post'
+import { UserRole } from '~~/shared/prisma/enums'
 
 export default defineEventHandler(async (event) => {
   const user = await getAuthenticatedUser(event)
@@ -11,39 +12,20 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const params = await getValidatedRouterParams(event, z.object({ id: zUuid }).parse)
-  const body = await readValidatedBody(event, AuthorDataSchema.safeParse)
-
-  if (!body.success) throw createError({
-    statusCode: 400,
-    statusMessage: 'Invalid request data',
-    data: body.error.flatten()
+  if (!user.roles.includes(UserRole.admin)) throw createError({
+    statusCode: 403,
+    statusMessage: "Forbidden"
   })
 
-  const data = body.data
+  const params = await getValidatedRouterParams(event, z.object({ id: zUuid }).parse)
+  const body = await readValidatedBody(event, AuthorDataSchema.parse)
 
   try {
     const author = await prisma.author.update({
       where: {
         id: params.id
       },
-      data: {
-        name: data.name,
-        biography: data.biography,
-        twitter: data.twitter,
-        pixiv: data.pixiv,
-        melonBook: data.melonBook,
-        fanBox: data.fanBox,
-        booth: data.booth,
-        nicoVideo: data.nicoVideo,
-        skeb: data.skeb,
-        fantia: data.fantia,
-        tumblr: data.tumblr,
-        youtube: data.youtube,
-        weibo: data.weibo,
-        naver: data.naver,
-        website: data.website
-      }
+      data: body
     })
 
     return formatAuthor(author)

@@ -16,24 +16,21 @@ export default defineEventHandler(async (event) => {
 
   const query = await getValidatedQuery(event, z.object({
     'includes[]': zArrayable(z.string()).optional()
-  }).safeParse)
-
-  if (query.data?.['includes[]']?.includes("manga")) {
-  }
+  }).parse)
 
   const result = await prisma.uploadedChapter.findUnique({ 
     where: {
       id: params.id
     },
     include: {
-      user: query.data?.['includes[]']?.includes("user") ? {
+      user: query['includes[]']?.includes("user") ? {
         select: {
           id: true,
           username: true,
           roles: true,
         }
       } : undefined,
-      groups: query.data?.['includes[]']?.includes("scanlation_group") ? {
+      groups: query['includes[]']?.includes("scanlation_group") ? {
         include: {
           group: true
         }

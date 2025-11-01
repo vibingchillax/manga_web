@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     id: z.string().uuid()
   }).parse)
 
-  const body = await readValidatedBody(event, ChapterUpdateSchema.safeParse)
+  const body = await readValidatedBody(event, ChapterUpdateSchema.parse)
 
   try {
     const chapter = await prisma.uploadedChapter.update({
@@ -35,13 +35,13 @@ export default defineEventHandler(async (event) => {
         id: params.id
       },
       data: {
-        title: body.data?.title,
-        volume: body.data?.volume,
-        chapter: body.data?.chapter,
-        translatedLanguage: body.data?.translatedLanguage,
-        groups: body.data?.groups
+        title: body.title,
+        volume: body.volume,
+        chapter: body.chapter,
+        translatedLanguage: body.translatedLanguage,
+        groups: body.groups
           ? {
-            set: body.data.groups.map(id => ({ chapterId_groupId: { groupId: id, chapterId: params.id } }))
+            set: body.groups.map(id => ({ chapterId_groupId: { groupId: id, chapterId: params.id } }))
           } : undefined
       }
     })

@@ -4,22 +4,22 @@ export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(event, baseQuerySchema.extend({
     name: zName.optional(),
     focusedLanguage: zLang.optional() //why mangadex only allows to search 1 i have no idea
-  }).safeParse)
+  }).parse)
 
-  const ids = query.data?.['ids[]'] as string[] | undefined
+  const ids = query['ids[]'] as string[] | undefined
 
   const filters = {
     id: ids ? { in: ids } : undefined,
-    name: query.data?.name ? { contains: query.data.name } : undefined,
-    focusedLanguages: query.data?.focusedLanguage
-      ? { has: query.data.focusedLanguage }
+    name: query.name ? { contains: query.name } : undefined,
+    focusedLanguages: query.focusedLanguage
+      ? { has: query.focusedLanguage }
       : undefined
   }
 
   const [groups, total] = await Promise.all([
     await prisma.scanlationGroup.findMany({
-      take: query.data?.limit ?? 10,
-      skip: query.data?.offset ?? 0,
+      take: query.limit ?? 10,
+      skip: query.offset ?? 0,
       where: filters,
       include: {
           members: {
@@ -44,8 +44,8 @@ export default defineEventHandler(async (event) => {
   return {
     result: 'ok',
     data: groups.map(formatGroup),
-    limit: query.data?.limit ?? 10,
-    offset: query.data?.offset ?? 0,
+    limit: query.limit ?? 10,
+    offset: query.offset ?? 0,
     count: total
   }
 })

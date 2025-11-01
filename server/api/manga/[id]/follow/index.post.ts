@@ -17,15 +17,7 @@ export default defineEventHandler(async (event) => {
     id: zUuid
   }).parse)
 
-  const body = schema.safeParse(await readBody(event))
-
-  if (!body.success) throw createError({
-    statusCode: 400,
-    statusMessage: 'Invalid request data',
-    data: body.error.flatten()
-  })
-
-  const status = body.data.status
+  const body = await readValidatedBody(event, schema.parse)
 
   await prisma.mangaFollows.upsert({
     where: {
@@ -35,12 +27,12 @@ export default defineEventHandler(async (event) => {
       }
     },
     update: {
-      status: status ?? 'reading'
+      status: body.status ?? 'reading'
     },
     create: {
       userId: user.id,
       mangaId: params.id,
-      status: status ?? 'reading'
+      status: body.status ?? 'reading'
     }
   })
 

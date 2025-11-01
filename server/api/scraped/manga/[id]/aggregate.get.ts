@@ -7,9 +7,9 @@ export default defineEventHandler(async (event) => {
 
   const query = await getValidatedQuery(event, z.object({
     'translatedLanguage[]': zArrayable(zLang).optional()
-  }).safeParse)
+  }).parse)
 
-  const translatedLanguage = query.data?.['translatedLanguage[]'] as string[]
+  const translatedLanguage = query['translatedLanguage[]'] as string[]
 
   const chapters = await prisma.scrapedChapter.findMany({
     where: {

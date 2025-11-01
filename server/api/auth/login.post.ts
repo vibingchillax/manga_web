@@ -6,17 +6,9 @@ const loginSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const login = loginSchema.safeParse(body);
+  const body = await readValidatedBody(event, loginSchema.parse);
 
-  if (!login.success) {
-    return {
-      result: "error",
-      message: login.error.errors[0]?.message || "Invalid body"
-    }
-  }
-
-  const { identifier, password } = login.data;
+  const { identifier, password } = body
 
   let user = null;
   if (identifier.includes('@')) {

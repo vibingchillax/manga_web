@@ -37,29 +37,12 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const body = ScanlationGroupSchema.safeParse(await readBody(event))
-
-  if (!body.success) throw createError({
-    statusCode: 400,
-    statusMessage: 'Invalid request data',
-    data: body.error.flatten()
-  })
-
-  const data = body.data
+  const body = await readValidatedBody(event, ScanlationGroupSchema.parse)
 
   const group = await prisma.scanlationGroup.create({
     data: {
       id: randomUUID(),
-      name: data.name,
-      website: data.website,
-      ircServer: data.ircServer,
-      ircChannel: data.ircChannel,
-      discord: data.discord,
-      contactEmail: data.contactEmail,
-      description: data.description,
-      twitter: data.twitter,
-      mangaUpdates: data.mangaUpdates,
-      publishDelay: data.publishDelay,
+      ...body
     }
   })
 

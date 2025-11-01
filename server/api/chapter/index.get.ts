@@ -27,41 +27,41 @@ export default defineEventHandler(async (event) => {
     'order[volume]': zOrderDirection.optional(),
     'order[chapter]': zOrderDirection.optional(),
 
-  }).safeParse)
+  }).parse)
 
-  const ids = query.data?.["ids[]"] as string[] | undefined
-  const volumes = query.data?.["volume[]"] as string[] | undefined
-  const translatedLanguages = query.data?.["translatedLanguage[]"] as string[] | undefined
-  const groups = query.data?.["groups[]"] as string[] | undefined
-  const excludedUploaders = query.data?.["excludedUploaders[]"] as string[] | undefined
-  const excludedGroups = query.data?.["excludedGroups[]"] as string[] | undefined
+  const ids = query["ids[]"] as string[] | undefined
+  const volumes = query["volume[]"] as string[] | undefined
+  const translatedLanguages = query["translatedLanguage[]"] as string[] | undefined
+  const groups = query["groups[]"] as string[] | undefined
+  const excludedUploaders = query["excludedUploaders[]"] as string[] | undefined
+  const excludedGroups = query["excludedGroups[]"] as string[] | undefined
 
   const filters: UploadedChapterWhereInput = {
     id: ids ? { in: ids } : undefined,
-    title: query.data?.title
-      ? { contains: query.data.title, mode: "insensitive" }
+    title: query.title
+      ? { contains: query.title, mode: "insensitive" }
       : undefined,
-    uploader: query.data?.uploader,
-    mangaId: query.data?.manga,
+    uploader: query.uploader,
+    mangaId: query.manga,
     volume: volumes ? { in: volumes } : undefined,
-    chapter: query.data?.chapter,
+    chapter: query.chapter,
     translatedLanguage: translatedLanguages
       ? { in: translatedLanguages }
       : undefined,
-    // originalLanguage: query.data?.["originalLanguage[]"]
-    //   ? { in: query.data["originalLanguage[]"] }
+    // originalLanguage: query.["originalLanguage[]"]
+    //   ? { in: query."originalLanguage[]"] }
     //   : undefined,
-    // contentRating: query.data?.["contentRating[]"]
-    //   ? { in: query.data["contentRating[]"] }
+    // contentRating: query.["contentRating[]"]
+    //   ? { in: query."contentRating[]"] }
     //   : undefined,
-    createdAt: query.data?.createdAtSince
-      ? { gte: new Date(query.data.createdAtSince) }
+    createdAt: query.createdAtSince
+      ? { gte: new Date(query.createdAtSince) }
       : undefined,
-    updatedAt: query.data?.updatedAtSince
-      ? { gte: new Date(query.data.updatedAtSince) }
+    updatedAt: query.updatedAtSince
+      ? { gte: new Date(query.updatedAtSince) }
       : undefined,
-    publishAt: query.data?.publishAtSince
-      ? { gte: new Date(query.data.publishAtSince) }
+    publishAt: query.publishAtSince
+      ? { gte: new Date(query.publishAtSince) }
       : undefined,
   };
 
@@ -69,16 +69,16 @@ export default defineEventHandler(async (event) => {
   //   filters.originalLanguage = { notIn: query.data["excludedOriginalLanguage[]"] };
   // }
 
-  if (query.data?.["excludedUploaders[]"]?.length) {
+  if (query["excludedUploaders[]"]?.length) {
     filters.uploader = { notIn: excludedUploaders };
   }
 
-  if (query.data?.["groups[]"]?.length || query.data?.["excludedGroups[]"]?.length) {
+  if (query["groups[]"]?.length || query["excludedGroups[]"]?.length) {
     filters.groups = {};
-    if (query.data?.["groups[]"]?.length) {
+    if (query["groups[]"]?.length) {
       filters.groups["some"] = { groupId: { in: groups } };
     }
-    if (query.data?.["excludedGroups[]"]?.length) {
+    if (query["excludedGroups[]"]?.length) {
       filters.groups["none"] = { groupId: { in: excludedGroups } };
     }
   }
@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
     "chapter",
   ] as const).forEach((field) => {
     const key = `order[${field}]` as const;
-    const dir = query.data?.[key];
+    const dir = query[key];
     if (dir) {
       orderBy.push({ [field]: dir });
     }
@@ -102,18 +102,18 @@ export default defineEventHandler(async (event) => {
 
   const [chapters, total]: [ChapterQueryResult[], number] = await Promise.all([
     await prisma.uploadedChapter.findMany({
-      take: query.data?.limit ?? 10,
-      skip: query.data?.offset ?? 0,
+      take: query.limit ?? 10,
+      skip: query.offset ?? 0,
       where: filters,
       include: {
-        user: query.data?.['includes[]']?.includes("user") ? {
+        user: query['includes[]']?.includes("user") ? {
           select: {
             id: true,
             username: true,
             roles: true,
           }
         } : undefined,
-        groups: query.data?.['includes[]']?.includes("scanlation_group") ? {
+        groups: query['includes[]']?.includes("scanlation_group") ? {
           include: {
             group: true
           }
@@ -145,8 +145,8 @@ export default defineEventHandler(async (event) => {
   return {
     result: 'ok',
     data: formattedChapters,
-    limit: query.data?.limit ?? 10,
-    offset: query.data?.offset ?? 0,
+    limit: query.limit ?? 10,
+    offset: query.offset ?? 0,
     count: total
   };
 })

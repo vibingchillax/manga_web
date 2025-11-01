@@ -8,14 +8,14 @@ export default defineEventHandler(async (event) => {
 
   const query = await getValidatedQuery(event, z.object({
     'includes[]': zArrayable(z.string()).optional()
-  }).safeParse)
+  }).parse)
 
   const chapter = await prisma.scrapedChapter.findUnique({
     where: {
       id: params.id
     },
     include: {
-      manga: query.data?.['includes[]']?.includes("manga")
+      manga: query['includes[]']?.includes("manga")
     }
   })
 

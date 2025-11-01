@@ -24,15 +24,7 @@ export default defineEventHandler(async (event) => {
     sessionId: zUuid
   }).parse)
 
-  const body = commitSchema.safeParse(await readBody(event))
-
-  if (!body.success) throw createError({
-    statusCode: 400,
-    statusMessage: "Invalid request body",
-    data: body.error.flatten()
-  })
-
-  const data = body.data
+  const body = await readValidatedBody(event, commitSchema.parse)
 
   const session = await prisma.uploadSession.findUnique({
     where: {
@@ -54,7 +46,7 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'No files uploaded yet'
   })
 
-  const orderedFiles = data.pageOrder.map(idOrName => {
+  const orderedFiles = body.pageOrder.map(idOrName => {
     const file = session.files.find(f => f.id === idOrName || f.originalFileName === idOrName)
     if (!file) throw createError({ statusCode: 400, statusMessage: `File ${idOrName} not found in session` })
     return file
@@ -64,10 +56,10 @@ export default defineEventHandler(async (event) => {
     data: {
       id: randomUUID(),
       mangaId: session.mangaId,
-      title: data.chapterDraft.title,
-      volume: data.chapterDraft.volume,
-      chapter: data.chapterDraft.chapter,
-      translatedLanguage: data.chapterDraft.translatedLanguage,
+      title: body.chapterDraft.title,
+      volume: body.chapterDraft.volume,
+      chapter: body.chapterDraft.chapter,
+      translatedLanguage: body.chapterDraft.translatedLanguage,
       uploader: user.id,
       pages: {
         originalUrl: useAppConfig().kuboGatewayUrl,
@@ -78,7 +70,7 @@ export default defineEventHandler(async (event) => {
           mimeType: f.mimeType
         }))
       },
-      publishAt: data.chapterDraft.publishAt
+      publishAt: body.chapterDraft.publishAt
     }
   })
 
@@ -97,7 +89,7 @@ export default defineEventHandler(async (event) => {
     console.warn('Failed to move files, might need manual cleanup', e)
   }
 
-  return {
+  return { //formatUploadedChapter(chapter)
     id: chapter.id,
     type: "chapter",
     attributes: {

@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { formatUser } from '~~/server/utils/formatResponse'
 
 const querySchema = baseQuerySchema.extend({
@@ -14,24 +13,24 @@ export default defineEventHandler(async (event) => {
     statusMessage: "Not authenticated"
   })
 
-  const query = await getValidatedQuery(event, querySchema.safeParse)
+  const query = await getValidatedQuery(event, querySchema.parse)
 
-  const ids = query.data?.['ids[]'] as string[] | undefined
+  const ids = query['ids[]'] as string[] | undefined
 
   const filters = {
     id: ids ? { in: ids } : undefined,
-    username: query.data?.username
-      ? { contains: query.data.username }
+    username: query.username
+      ? { contains: query.username }
       : undefined
   }
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
-      take: query.data?.limit ?? 10,
-      skip: query.data?.offset ?? 0,
+      take: query.limit ?? 10,
+      skip: query.offset ?? 0,
       where: filters,
-      orderBy: query.data?.['order[username]']
-        ? { username: query.data['order[username]'] }
+      orderBy: query['order[username]']
+        ? { username: query['order[username]'] }
         : undefined,
       select: {
         id: true,
@@ -45,8 +44,8 @@ export default defineEventHandler(async (event) => {
   return {
     result: "ok",
     data: users.map(formatUser),
-    limit: query.data?.limit ?? 10,
-    offset: query.data?.offset ?? 0,
+    limit: query.limit ?? 10,
+    offset: query.offset ?? 0,
     count: total
   }
 })

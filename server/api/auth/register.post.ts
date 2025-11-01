@@ -10,20 +10,11 @@ const registerSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
-  const register = registerSchema.safeParse(body)
+  const body = await readValidatedBody(event, registerSchema.parse)
 
-  if (!register.success) {
-    return {
-      result: "error",
-      message: register.error.errors[0]?.message || "Invalid body"
-    }
-  }
-
-  const data = register.data
   const existingUser = await prisma.user.findUnique({
     where: {
-      email: data.email
+      email: body.email
     }
   })
 
@@ -34,7 +25,7 @@ export default defineEventHandler(async (event) => {
 
   const existingUsername = await prisma.user.findUnique({
     where: {
-      username: data.username
+      username: body.username
     }
   })
 
@@ -46,9 +37,9 @@ export default defineEventHandler(async (event) => {
   const user = await prisma.user.create({
     data: {
       id: randomUUID(),
-      email: data.email,
-      username: data.username,
-      password: await hashPassword(data.password)
+      email: body.email,
+      username: body.username,
+      password: await hashPassword(body.password)
     }
   })
 

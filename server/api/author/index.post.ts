@@ -67,34 +67,12 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Not logged in'
   })
 
-  const body = await readValidatedBody(event, AuthorDataSchema.safeParse)
-
-  if (!body.success) throw createError({
-    statusCode: 400,
-    statusMessage: 'Invalid request data',
-    data: body.error.flatten()
-  })
-
-  const data = body.data
+  const body = await readValidatedBody(event, AuthorDataSchema.parse)
 
   const author = await prisma.author.create({
     data: {
       id: randomUUID(),
-      name: data.name,
-      biography: data.biography,
-      twitter: data.twitter,
-      pixiv: data.pixiv,
-      melonBook: data.melonBook,
-      fanBox: data.fanBox,
-      booth: data.booth,
-      nicoVideo: data.nicoVideo,
-      skeb: data.skeb,
-      fantia: data.fantia,
-      tumblr: data.tumblr,
-      youtube: data.youtube,
-      weibo: data.weibo,
-      naver: data.naver,
-      website: data.website
+      ...body
     }
   })
 
