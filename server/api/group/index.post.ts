@@ -46,5 +46,8 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return formatGroup(group)
+  return {
+    result: "ok",
+    data: formatGroup(group)
+  }
 })

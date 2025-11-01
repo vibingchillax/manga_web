@@ -22,5 +22,8 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Author not found'
   })
 
-  return formatAuthor(author)
+  return {
+    result: 'ok',
+    data: formatAuthor(author)
+  }
 })

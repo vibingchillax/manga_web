@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     'includes[]': zArrayable(z.string()).optional()
   }).parse)
 
-  const result = await prisma.uploadedChapter.findUnique({ 
+  const result = await prisma.uploadedChapter.findUnique({
     where: {
       id: params.id
     },
@@ -51,15 +51,18 @@ export default defineEventHandler(async (event) => {
     chapter.groups?.map((g) => g.group!).filter(Boolean) ?? []
 
 
-  return formatUploadedChapter({
-    ...chapter,
-    user: chapter.user
-      ? {
-        id: chapter.user.id,
-        username: chapter.user.username,
-        roles: chapter.user.roles,
-      } satisfies SafeUser
-      : undefined,
-    groups: flattenedGroups
-  })
+  return {
+    result: "ok",
+    data: formatUploadedChapter({
+      ...chapter,
+      user: chapter.user
+        ? {
+          id: chapter.user.id,
+          username: chapter.user.username,
+          roles: chapter.user.roles,
+        } satisfies SafeUser
+        : undefined,
+      groups: flattenedGroups
+    })
+  }
 })

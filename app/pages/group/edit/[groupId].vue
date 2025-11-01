@@ -32,14 +32,14 @@ const canEdit = computed(() => loggedIn.value &&
 async function submit(e: Partial<GroupSchema>) {
   loading.value = true
   try {
-    const result = await $fetch(`/api/group/${groupId.value}`, {
+    const response = await $fetch(`/api/group/${groupId.value}`, {
       method: "PUT",
       body: {
         ...e
       }
     })
 
-    if (!result) {
+    if (!(response.result === 'ok')) {
       throw Error
     }
 
@@ -48,7 +48,7 @@ async function submit(e: Partial<GroupSchema>) {
       description: 'Your group has been edited successfully',
       color: 'success'
     })
-    router.push(`/group/${result.id}`)
+    router.push(`/group/${response.data.id}`)
     return
   } catch (error) {
     toast.add({

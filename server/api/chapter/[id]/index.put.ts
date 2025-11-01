@@ -46,7 +46,10 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    return formatUploadedChapter(chapter)
+    return {
+      result: "ok",
+      data: formatUploadedChapter(chapter)
+    }
 
   } catch (err) {
     if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {

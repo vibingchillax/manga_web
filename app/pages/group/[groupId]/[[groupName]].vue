@@ -42,12 +42,12 @@ async function deleteGroup() {
 async function loadGroup() {
   loading.value = true
   try {
-    const data = await $fetch<ScanlationGroup>(`/api/group/${groupId.value}`, {
+    const response = await $fetch(`/api/group/${groupId.value}`, {
       query: {
         'includes[]': ['member']
       }
     })
-    group.value = data
+    group.value = response.data
   } catch {
   } finally {
     loading.value = false

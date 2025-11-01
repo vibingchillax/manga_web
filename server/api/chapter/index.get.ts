@@ -118,7 +118,8 @@ export default defineEventHandler(async (event) => {
             group: true
           }
         } : undefined
-      }
+      },
+      orderBy: orderBy
     }),
 
     await prisma.uploadedChapter.count({

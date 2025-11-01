@@ -76,5 +76,8 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return formatAuthor(author)
+  return {
+    result: "ok",
+    data: formatAuthor(author)
+  }
 })

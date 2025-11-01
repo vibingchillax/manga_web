@@ -28,7 +28,10 @@ export default defineEventHandler(async (event) => {
       data: body
     })
 
-    return formatAuthor(author)
+    return {
+      result: 'ok',
+      data: formatAuthor(author)
+    }
   } catch (err) {
     if (err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
       throw createError({

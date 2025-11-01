@@ -30,5 +30,8 @@ export default defineEventHandler(async (event) => {
     statusMessage: 'Group not found'
   })
 
-  return formatGroup(group)
+  return {
+    result: "ok",
+    data: formatGroup(group)
+  }
 })

@@ -8,20 +8,20 @@ const toast = useToast()
 async function submit(e: Partial<GroupSchema>) {
   loading.value = true
   try {
-    const result = await $fetch('/api/group', {
+    const response = await $fetch('/api/group', {
       method: "POST",
       body: {
         ...e
       }
     })
-    if (result.id) {
+    if (response.result === "ok") {
       loading.value = false
       toast.add({
         title: 'Group created',
         description: 'Your group has been created successfully',
         color: 'success'
       })
-      router.push(`/group/${result.id}`)
+      router.push(`/group/${response.data.id}`)
       return
     }
   } catch (error) {

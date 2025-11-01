@@ -104,5 +104,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return formatGroup(result)
+  return {
+    result: "ok",
+    data: formatGroup(result)
+  }
 })
