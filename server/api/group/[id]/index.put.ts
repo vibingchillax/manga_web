@@ -44,7 +44,10 @@ export default defineEventHandler(async (event) => {
     where: { id: params.id },
     data: {
       ...scalarUpdate,
-      focusedLanguages: scalarUpdate.focusedLanguages ? { set: scalarUpdate.focusedLanguages } : undefined
+      focusedLanguages: scalarUpdate.focusedLanguages ? { set: scalarUpdate.focusedLanguages } : undefined,
+      version: {
+        increment: 1
+      }
     }
   })
 

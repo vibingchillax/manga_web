@@ -30,7 +30,12 @@ export default defineEventHandler(async (event) => {
       where: {
         id: params.id
       },
-      data: body
+      data: {
+        ...body,
+        version: {
+          increment: 1
+        }
+      }
     })
 
     return {

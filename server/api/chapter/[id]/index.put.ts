@@ -42,7 +42,10 @@ export default defineEventHandler(async (event) => {
         groups: body.groups
           ? {
             set: body.groups.map(id => ({ chapterId_groupId: { groupId: id, chapterId: params.id } }))
-          } : undefined
+          } : undefined,
+        version: {
+          increment: 1
+        }
       }
     })
 
