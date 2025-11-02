@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'auth'
-})
+  layout: "auth",
+});
 </script>
 <template>
   <AuthLogin />

@@ -1,19 +1,20 @@
 export default defineEventHandler(async (event) => {
-  const user = await getAuthenticatedUser(event)
+  const user = await getAuthenticatedUser(event);
 
-  if (!user) throw createError({
-    statusCode: 401,
-    statusMessage: 'Not logged in'
-  })
+  if (!user)
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Not logged in",
+    });
 
   const follows = await prisma.mangaFollows.findMany({
     where: {
-      userId: user.id
-    }
-  })
+      userId: user.id,
+    },
+  });
 
-  return follows.map(s => ({
+  return follows.map((s) => ({
     mangaId: s.mangaId,
-    status: s.status
-  }))
-})
+    status: s.status,
+  }));
+});

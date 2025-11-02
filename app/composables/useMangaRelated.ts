@@ -1,7 +1,7 @@
-import type { Relationship } from "~~/shared/types"
+import type { Relationship } from "~~/shared/types";
 
 function isManga(r: Relationship) {
-  return r.type === "manga"
+  return r.type === "manga";
 }
 
 const relatedLabels: Record<string, string> = {
@@ -22,7 +22,7 @@ const relatedLabels: Record<string, string> = {
   alternate_story: "Alternate Story",
   alternate_version: "Alternate Version",
   other: "Other",
-}
+};
 
 const relatedOrder = [
   "monochrome",
@@ -42,47 +42,50 @@ const relatedOrder = [
   "alternate_story",
   "alternate_version",
   "other",
-]
+];
 
 export const useRelatedManga = async (manga: Manga) => {
-  const pref = usePreferencesStore()
-  const { contentRating } = storeToRefs(pref)
+  const pref = usePreferencesStore();
+  const { contentRating } = storeToRefs(pref);
 
-  const relatedMangaList = manga.relationships?.filter(isManga) ?? []
-  const grouped = relatedMangaList.reduce<Record<string, Relationship[]>>((acc, r) => {
-    const key = r.related ?? "other"
-    if (!acc[key]) acc[key] = []
-    acc[key].push(r)
-    return acc
-  }, {})
+  const relatedMangaList = manga.relationships?.filter(isManga) ?? [];
+  const grouped = relatedMangaList.reduce<Record<string, Relationship[]>>(
+    (acc, r) => {
+      const key = r.related ?? "other";
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(r);
+      return acc;
+    },
+    {},
+  );
 
   const relatedGroups = relatedOrder
-    .filter(type => grouped[type])
-    .map(type => ({
+    .filter((type) => grouped[type])
+    .map((type) => ({
       type,
       label: relatedLabels[type] ?? type,
       manga: grouped[type],
-    }))
+    }));
 
-  const ids = relatedGroups.flatMap(r => r.manga!.map(m => m.id!))
+  const ids = relatedGroups.flatMap((r) => r.manga!.map((m) => m.id!));
   const { data, pending, error } = await useMangadex("/manga", {
     query: {
       "ids[]": ids,
       "includes[]": ["cover_art"],
       "contentRating[]": contentRating.value,
-      limit: 100
+      limit: 100,
     },
     watch: [contentRating],
-    key: `manga-related-${manga.id}`
-  })
+    key: `manga-related-${manga.id}`,
+  });
 
-  const mangaMap = new Map<string, Manga>()
-  data.value?.data?.forEach((m: Manga) => mangaMap.set(m.id!, m))
+  const mangaMap = new Map<string, Manga>();
+  data.value?.data?.forEach((m: Manga) => mangaMap.set(m.id!, m));
 
-  const result = relatedGroups.map(r => ({
+  const result = relatedGroups.map((r) => ({
     ...r,
-    manga: r.manga!.map(m => mangaMap.get(m.id!)).filter(Boolean),
-  }))
+    manga: r.manga!.map((m) => mangaMap.get(m.id!)).filter(Boolean),
+  }));
 
-  return { related: result, pending, error }
-}
+  return { related: result, pending, error };
+};

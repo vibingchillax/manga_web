@@ -1,14 +1,17 @@
-import { z } from 'zod'
-import { formatUser } from '~~/server/utils/formatResponse'
+import { z } from "zod";
+import { formatUser } from "~~/server/utils/formatResponse";
 
 export default defineEventHandler(async (event) => {
-  const params = await getValidatedRouterParams(event, z.object({
-    id: zUuid
-  }).parse)
+  const params = await getValidatedRouterParams(
+    event,
+    z.object({
+      id: zUuid,
+    }).parse,
+  );
 
   const user = await prisma.user.findUnique({
     where: {
-      id: params.id
+      id: params.id,
     },
     select: {
       id: true,
@@ -16,19 +19,20 @@ export default defineEventHandler(async (event) => {
       roles: true,
       groupMemberships: {
         select: {
-          groupId: true
-        }
-      }
+          groupId: true,
+        },
+      },
     },
-  })
+  });
 
-  if (!user) throw createError({
-    statusCode: 404,
-    statusMessage: "User not found"
-  })
+  if (!user)
+    throw createError({
+      statusCode: 404,
+      statusMessage: "User not found",
+    });
 
   return {
     result: "ok",
-    data: formatUser(user)
-  }
-})
+    data: formatUser(user),
+  };
+});

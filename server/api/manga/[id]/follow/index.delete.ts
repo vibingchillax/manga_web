@@ -1,27 +1,31 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export default defineEventHandler(async (event) => {
-  const user = await getAuthenticatedUser(event)
+  const user = await getAuthenticatedUser(event);
 
-  const params = await getValidatedRouterParams(event, z.object({
-    id: zUuid
-  }).parse)
+  const params = await getValidatedRouterParams(
+    event,
+    z.object({
+      id: zUuid,
+    }).parse,
+  );
 
-  if (!user) throw createError({
-    statusCode: 401,
-    statusMessage: 'Not logged in'
-  })
+  if (!user)
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Not logged in",
+    });
 
   await prisma.mangaFollows.delete({
     where: {
       userId_mangaId: {
         userId: user.id,
-        mangaId: params.id
-      }
+        mangaId: params.id,
+      },
     },
-  })
+  });
 
   return {
-    status: 'ok'
-  }
-})
+    status: "ok",
+  };
+});

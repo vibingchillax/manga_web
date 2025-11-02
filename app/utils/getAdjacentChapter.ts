@@ -4,25 +4,23 @@ const safeCompare = (a?: string, b?: string) => {
   return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
 };
 
-const isSkipped = (direction: number,
+const isSkipped = (
+  direction: number,
   chapterA: { chapter: string; volume: string },
-  chapterB: { chapter: string; volume: string }) => {
+  chapterB: { chapter: string; volume: string },
+) => {
   if (
     direction === -1 ||
     !chapterA ||
     !chapterB ||
     chapterA.chapter === "none" ||
     chapterB.chapter === "none" ||
-    (
-      chapterA.chapter === chapterB.chapter &&
-      (
-        chapterA.volume === chapterB.volume ||
+    (chapterA.chapter === chapterB.chapter &&
+      (chapterA.volume === chapterB.volume ||
         !chapterA.volume ||
         !chapterB.volume ||
         chapterA.volume === "none" ||
-        chapterB.volume === "none"
-      )
-    )
+        chapterB.volume === "none"))
   ) {
     return false;
   }
@@ -38,8 +36,10 @@ const isSkipped = (direction: number,
 
   // Consider skipped if volume difference is at least 1
   if (
-    chapterA.volume && chapterA.volume !== "none" &&
-    chapterB.volume && chapterB.volume !== "none" &&
+    chapterA.volume &&
+    chapterA.volume !== "none" &&
+    chapterB.volume &&
+    chapterB.volume !== "none" &&
     Math.abs(volumeANum - volumeBNum) >= 1.100005
   ) {
     return true;
@@ -47,23 +47,31 @@ const isSkipped = (direction: number,
 
   return !(
     Math.abs(chapterANum - chapterBNum) <= 1.100005 ||
-    (direction === 1 && volumeBNum === 0 && Math.abs(chapterANum - chapterBNum) <= 1.100005) ||
-    (direction === 1 && volumeANum === 0 && Math.abs(chapterANum - chapterBNum) <= 1.100005) ||
+    (direction === 1 &&
+      volumeBNum === 0 &&
+      Math.abs(chapterANum - chapterBNum) <= 1.100005) ||
+    (direction === 1 &&
+      volumeANum === 0 &&
+      Math.abs(chapterANum - chapterBNum) <= 1.100005) ||
     (direction === 1 && volumeBNum === volumeANum + 1 && chapterBNum <= 1.1) ||
     (direction === 1 && volumeANum === volumeBNum + 1 && chapterANum <= 1.1)
   );
-}
+};
 
 export const getAdjacentChapter = (
-  aggregate: MangaAggregateResponse, volumeNum: string | null, chapterNum: string | null, direction: 1 | -1):
-  AdjacentChapter | null => {
+  aggregate: MangaAggregateResponse,
+  volumeNum: string | null,
+  chapterNum: string | null,
+  direction: 1 | -1,
+): AdjacentChapter | null => {
+  volumeNum ??= "none";
+  chapterNum ??= "none";
 
-  volumeNum ??= "none"
-  chapterNum ??= "none"
+  const sortedVolumes = Object.entries(aggregate).sort((a, b) =>
+    safeCompare(a[0], b[0]),
+  );
 
-  const sortedVolumes = Object.entries(aggregate).sort((a, b) => safeCompare(a[0], b[0]));
-
-  let volumeIndex = sortedVolumes.map(v => v[0]).indexOf(volumeNum);
+  let volumeIndex = sortedVolumes.map((v) => v[0]).indexOf(volumeNum);
   if (volumeIndex === -1) return null;
 
   let chapterIndex;
@@ -72,10 +80,12 @@ export const getAdjacentChapter = (
     const volumeEntry = sortedVolumes[volumeIndex];
     if (!volumeEntry) return null;
 
-    const chapters = Object.entries(volumeEntry[1].chapters).sort((a, b) => safeCompare(a[0], b[0]));
+    const chapters = Object.entries(volumeEntry[1].chapters).sort((a, b) =>
+      safeCompare(a[0], b[0]),
+    );
 
     if (chapterIndex === undefined) {
-      chapterIndex = chapters.map(c => c[0]).indexOf(chapterNum);
+      chapterIndex = chapters.map((c) => c[0]).indexOf(chapterNum);
       if (chapterIndex === -1) return null;
       chapterIndex += direction;
     }
@@ -98,13 +108,17 @@ export const getAdjacentChapter = (
       return {
         chapter: chapter.chapter,
         id: chapter.id,
-        skipped: isSkipped(direction, { chapter: chapter.chapter, volume: volumeEntry[0] }, { chapter: chapterNum, volume: volumeNum })
+        skipped: isSkipped(
+          direction,
+          { chapter: chapter.chapter, volume: volumeEntry[0] },
+          { chapter: chapterNum, volume: volumeNum },
+        ),
       };
     }
 
     // Move to next/previous chapter
     chapterIndex += direction;
-    if (direction > 0) chapterIndex = 0, volumeIndex++;
+    if (direction > 0) ((chapterIndex = 0), volumeIndex++);
     else {
       if (volumeIndex === 0) return null;
       const volumeEntry = sortedVolumes[--volumeIndex];
@@ -112,5 +126,5 @@ export const getAdjacentChapter = (
       chapterIndex = Object.entries(volumeEntry[1].chapters).length - 1;
     }
   } while (volumeIndex < sortedVolumes.length);
-  return null
-}
+  return null;
+};

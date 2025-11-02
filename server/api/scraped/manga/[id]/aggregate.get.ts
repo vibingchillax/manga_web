@@ -1,37 +1,44 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export default defineEventHandler(async (event) => {
-  const params = await getValidatedRouterParams(event, z.object({
-    id: zUuid
-  }).parse)
+  const params = await getValidatedRouterParams(
+    event,
+    z.object({
+      id: zUuid,
+    }).parse,
+  );
 
-  const query = await getValidatedQuery(event, z.object({
-    'translatedLanguage[]': zArrayable(zLang).optional()
-  }).parse)
+  const query = await getValidatedQuery(
+    event,
+    z.object({
+      "translatedLanguage[]": zArrayable(zLang).optional(),
+    }).parse,
+  );
 
-  const translatedLanguage = query['translatedLanguage[]'] as string[]
+  const translatedLanguage = query["translatedLanguage[]"] as string[];
 
   const chapters = await prisma.scrapedChapter.findMany({
     where: {
       mangaId: params.id,
-      translatedLanguage: translatedLanguage ? { in: translatedLanguage }
-        : undefined
+      translatedLanguage: translatedLanguage
+        ? { in: translatedLanguage }
+        : undefined,
     },
     orderBy: {
-      chapter: 'desc'
-    }
-  })
-  const volumes: Record<string, any> = {}
+      chapter: "desc",
+    },
+  });
+  const volumes: Record<string, any> = {};
 
   for (const ch of chapters) {
-    const volume = ch.volume ?? 'none';
-    const chapterKey = ch.chapter ?? 'none';
+    const volume = ch.volume ?? "none";
+    const chapterKey = ch.chapter ?? "none";
 
     if (!volumes[volume]) {
       volumes[volume] = {
         volume,
         count: 0,
-        chapters: {}
+        chapters: {},
       };
     }
 
@@ -40,7 +47,7 @@ export default defineEventHandler(async (event) => {
         chapter: chapterKey,
         id: ch.id,
         others: [],
-        count: 0
+        count: 0,
       };
     } else {
       volumes[volume].chapters[chapterKey].others.push(ch.id);
@@ -51,4 +58,4 @@ export default defineEventHandler(async (event) => {
   }
 
   return volumes;
-})
+});

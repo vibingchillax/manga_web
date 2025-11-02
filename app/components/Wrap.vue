@@ -1,12 +1,15 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
-  is?: string
-  wrap?: boolean
-}>(), { is: 'div', wrap: false })
+withDefaults(
+  defineProps<{
+    is?: string;
+    wrap?: boolean;
+  }>(),
+  { is: "div", wrap: false },
+);
 </script>
 <template>
-  <component v-if="wrap" :is="is" v-bind="$attrs">
-    <slot v-bind="$attrs"></slot>
+  <component :is="is" v-if="wrap" v-bind="$attrs">
+    <slot v-bind="$attrs" />
   </component>
-  <slot v-else v-bind="$attrs"></slot>
+  <slot v-else v-bind="$attrs" />
 </template>

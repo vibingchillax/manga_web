@@ -1,12 +1,12 @@
 <script setup lang="ts">
-const preferences = usePreferencesStore()
-const { gatewayUrl, gatewayUrls } = storeToRefs(preferences)
+const preferences = usePreferencesStore();
+const { gatewayUrl, gatewayUrls } = storeToRefs(preferences);
 
 function onCreate(item: string) {
   if (!gatewayUrls.value.includes(item)) {
-    preferences.gatewayUrls.push(item)
+    preferences.gatewayUrls.push(item);
   }
-  gatewayUrl.value = item
+  gatewayUrl.value = item;
 }
 </script>
 <template>
@@ -18,11 +18,17 @@ function onCreate(item: string) {
     </div>
     <div class="flex md:flex-row flex-col justify-between gap-4 mt-4">
       <div class="text-sm opacity-80 md:max-w-1/2">
-        Select which IPFS gateway to load images from, or use your own gateway by
-        entering the URL in the search bar
+        Select which IPFS gateway to load images from, or use your own gateway
+        by entering the URL in the search bar
       </div>
-      <USelectMenu v-model="gatewayUrl" create-item class="w-56" @create="onCreate"
-        :items="gatewayUrls" :ui="{ content: 'min-w-fit' }" />
+      <USelectMenu
+        v-model="gatewayUrl"
+        create-item
+        class="w-56"
+        :items="gatewayUrls"
+        :ui="{ content: 'min-w-fit' }"
+        @create="onCreate"
+      />
     </div>
   </div>
 </template>

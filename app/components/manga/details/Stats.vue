@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { Manga } from '~~/shared/types';
+import type { Manga } from "~~/shared/types";
 const props = defineProps<{
-  manga: Manga
-}>()
+  manga: Manga;
+}>();
 </script>
-<template>
-</template>
+<template></template>

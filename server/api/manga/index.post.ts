@@ -1,7 +1,7 @@
-import { z } from "zod"
-import { randomUUID } from "crypto"
-import { formatManga } from "~~/server/utils/formatResponse"
-import { zExternalSite } from "~~/shared/utils/zodHelper"
+import { z } from "zod";
+import { randomUUID } from "crypto";
+import { formatManga } from "~~/server/utils/formatResponse";
+import { zExternalSite } from "~~/shared/utils/zodHelper";
 
 export const MangaSchema = z.object({
   title: zLocalizedString,
@@ -21,17 +21,18 @@ export const MangaSchema = z.object({
   chapterNumberResetOnNewVolume: z.boolean().optional(),
   tags: zUniqueUuidArray.optional(),
   primaryCover: zUuid,
-})
+});
 
 export default defineEventHandler(async (event) => {
-  const user = await getAuthenticatedUser(event)
+  const user = await getAuthenticatedUser(event);
 
-  if (!user) throw createError({
-    statusCode: 401,
-    statusMessage: "Not authenticated"
-  })
+  if (!user)
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Not authenticated",
+    });
 
-  const body = await readValidatedBody(event, MangaSchema.parse)
+  const body = await readValidatedBody(event, MangaSchema.parse);
 
   const created = await prisma.manga.create({
     data: {
@@ -50,22 +51,22 @@ export default defineEventHandler(async (event) => {
       chapterNumberResetOnNewVolume: body.chapterNumberResetOnNewVolume,
 
       authors: {
-        connect: body.authors.map((id) => ({ id }))
+        connect: body.authors.map((id) => ({ id })),
       },
       artists: {
-        connect: body.artists.map((id) => ({ id }))
+        connect: body.artists.map((id) => ({ id })),
       },
       tags: {
-        connect: body.tags?.map((id) => ({ id }))
+        connect: body.tags?.map((id) => ({ id })),
       },
       primaryCover: {
-        connect: { id: body.primaryCover }
-      }
-    }
-  })
+        connect: { id: body.primaryCover },
+      },
+    },
+  });
 
   return {
     result: "ok",
-    data: formatManga(created)
-  }
-})
+    data: formatManga(created),
+  };
+});

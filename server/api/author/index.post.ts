@@ -1,7 +1,7 @@
-import { randomUUID } from 'crypto'
-import { z } from 'zod'
-import { formatAuthor } from '~~/server/utils/formatResponse'
-import { makeDomainRegex } from '~~/server/utils/strings'
+import { randomUUID } from "crypto";
+import { z } from "zod";
+import { formatAuthor } from "~~/server/utils/formatResponse";
+import { makeDomainRegex } from "~~/server/utils/strings";
 
 export const AuthorDataSchema = z.object({
   name: zName,
@@ -9,7 +9,7 @@ export const AuthorDataSchema = z.object({
   twitter: z
     .string()
     .regex(/^https?:\/\/(www\.)?twitter\.com(\/[A-Za-z0-9_]{1,15})?\/?$/, {
-      message: "Invalid Twitter URL"
+      message: "Invalid Twitter URL",
     })
     .optional(),
   pixiv: z
@@ -18,7 +18,9 @@ export const AuthorDataSchema = z.object({
     .optional(),
   melonBook: z
     .string()
-    .regex(makeDomainRegex("melonbooks\\.co\\.jp"), { message: "Invalid MelonBooks URL" })
+    .regex(makeDomainRegex("melonbooks\\.co\\.jp"), {
+      message: "Invalid MelonBooks URL",
+    })
     .optional(),
   fanBox: z
     .string()
@@ -30,7 +32,9 @@ export const AuthorDataSchema = z.object({
     .optional(),
   nicoVideo: z
     .string()
-    .regex(makeDomainRegex("nicovideo\\.jp"), { message: "Invalid NicoVideo URL" })
+    .regex(makeDomainRegex("nicovideo\\.jp"), {
+      message: "Invalid NicoVideo URL",
+    })
     .optional(),
   skeb: z
     .string()
@@ -46,38 +50,43 @@ export const AuthorDataSchema = z.object({
     .optional(),
   youtube: z
     .string()
-    .regex(/^https?:\/\/(www\.)?youtube\.com(\/|$)/, { message: "Invalid YouTube URL" })
+    .regex(/^https?:\/\/(www\.)?youtube\.com(\/|$)/, {
+      message: "Invalid YouTube URL",
+    })
     .optional(),
   weibo: z
     .string()
-    .regex(makeDomainRegex("weibo\\.(com|cn)"), { message: "Invalid Weibo URL" })
+    .regex(makeDomainRegex("weibo\\.(com|cn)"), {
+      message: "Invalid Weibo URL",
+    })
     .optional(),
   naver: z
     .string()
     .regex(makeDomainRegex("naver\\.com"), { message: "Invalid Naver URL" })
     .optional(),
   website: z.string().url().optional(),
-})
+});
 
 export default defineEventHandler(async (event) => {
-  const user = await getAuthenticatedUser(event)
+  const user = await getAuthenticatedUser(event);
 
-  if (!user) throw createError({
-    statusCode: 401,
-    statusMessage: 'Not logged in'
-  })
+  if (!user)
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Not logged in",
+    });
 
-  const body = await readValidatedBody(event, AuthorDataSchema.parse)
+  const body = await readValidatedBody(event, AuthorDataSchema.parse);
 
   const author = await prisma.author.create({
     data: {
       id: randomUUID(),
-      ...body
-    }
-  })
+      ...body,
+    },
+  });
 
   return {
     result: "ok",
-    data: formatAuthor(author)
-  }
-})
+    data: formatAuthor(author),
+  };
+});

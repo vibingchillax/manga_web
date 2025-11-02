@@ -1,46 +1,59 @@
 <script setup lang="ts">
-import type { Manga } from '~~/shared/types';
+import type { Manga } from "~~/shared/types";
 
 const props = defineProps<{ manga: Manga }>();
-const manga = props.manga
-const { title, detailsUrl, cover, publicationStatus } = useManga(manga)
+const manga = props.manga;
+const { title, detailsUrl, cover, publicationStatus } = useManga(manga);
 </script>
 <template>
   <NuxtLink class="manga-card-dense" :href="detailsUrl">
     <div class="dense-manga-container">
-      <MangaCover class="cover" :manga="manga" noTitle fillHeight :use256="true" />
-      <div class="font-bold text-lg line-clamp-1 break-all" style="grid-area: title;">
+      <MangaCover
+        class="cover"
+        :manga="manga"
+        no-title
+        fill-height
+        :use256="true"
+      />
+      <div
+        class="font-bold text-lg line-clamp-1 break-all"
+        style="grid-area: title"
+      >
         {{ title }}
       </div>
-      <MangaStatus :status="publicationStatus ?? 'ongoing'" small class="mr-auto"
-        style="grid-area: status;" />
+      <MangaStatus
+        :status="publicationStatus ?? 'ongoing'"
+        small
+        class="mr-auto"
+        style="grid-area: status"
+      />
     </div>
   </NuxtLink>
 </template>
 <style lang="css" scoped>
 .dense-manga-container {
   background: rgb(var(--mw-accent));
-  border-radius: .25rem;
-  -moz-column-gap: .5rem;
-  column-gap: .5rem;
+  border-radius: 0.25rem;
+  -moz-column-gap: 0.5rem;
+  column-gap: 0.5rem;
   display: grid;
   grid-template-areas:
     "cover title "
     "cover stats "
     "cover status";
   grid-template-columns: 56px auto;
-  padding: .375rem;
-  transition: background .1s ease-out;
+  padding: 0.375rem;
+  transition: background 0.1s ease-out;
 }
 
-@media (any-hover:hover) {
+@media (any-hover: hover) {
   .dense-manga-container:hover {
-    background: rgb(var(--mw-accent-20))
+    background: rgb(var(--mw-accent-20));
   }
 }
 
 .dense-manga-container:active {
-  background: rgb(var(--mw-accent-20)) /* mw-accent-active */
+  background: rgb(var(--mw-accent-20)); /* mw-accent-active */
 }
 
 .cover {

@@ -1,45 +1,48 @@
 <script setup lang="ts">
-import type { TabsItem } from '@nuxt/ui';
-import Covers from './Covers.vue';
-import Comments from './Comments.vue';
-import type { Manga, Relationship } from '~~/shared/types';
-import ScrapedChapters from './ScrapedChapters.vue';
-import UploadedChapters from './UploadedChapters.vue';
-import Related from './Related.vue';
+import type { TabsItem } from "@nuxt/ui";
+import Covers from "./Covers.vue";
+import Comments from "./Comments.vue";
+import type { Manga, Relationship } from "~~/shared/types";
+import ScrapedChapters from "./ScrapedChapters.vue";
+import UploadedChapters from "./UploadedChapters.vue";
+import Related from "./Related.vue";
 
 const props = defineProps<{
-  manga: Manga
-}>()
+  manga: Manga;
+}>();
 
 const hasRelated = computed(() =>
   (props.manga.relationships ?? []).some(
-    (r: Relationship) => r.type === "manga"
-  )
-)
+    (r: Relationship) => r.type === "manga",
+  ),
+);
 
 const items = computed<TabsItem[]>(() => [
   {
-    label: 'Uploaded Chapters',
-    slot: 'uploaded_chapters',
+    label: "Uploaded Chapters",
+    slot: "uploaded_chapters",
   },
   {
-    label: 'Scraped Chapters',
-    slot: 'scraped_chapters',
+    label: "Scraped Chapters",
+    slot: "scraped_chapters",
   },
   {
-    label: 'Comments',
-    slot: 'comments',
+    label: "Comments",
+    slot: "comments",
   },
   {
-    label: 'Art',
-    slot: 'covers',
+    label: "Art",
+    slot: "covers",
   },
-  ...(hasRelated.value ? [
-    {
-      label: 'Related',
-      slot: 'related',
-    }] : [])
-])
+  ...(hasRelated.value
+    ? [
+        {
+          label: "Related",
+          slot: "related",
+        },
+      ]
+    : []),
+]);
 </script>
 <template>
   <u-tabs :items="items" :unmount-on-hide="false">

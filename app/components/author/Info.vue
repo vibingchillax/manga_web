@@ -1,30 +1,33 @@
 <script setup lang="ts">
-import type { Author } from '~~/shared/types';
+import type { Author } from "~~/shared/types";
 
 const props = defineProps<{
-  author: Author
-}>()
+  author: Author;
+}>();
 
 const socials = computed(() => {
-  const links: { href: string, name: string, icon: string }[] = []
-  const attrs = props.author.attributes
-  SOCIAL_LINKS.forEach(l => {
+  const links: { href: string; name: string; icon: string }[] = [];
+  const attrs = props.author.attributes;
+  SOCIAL_LINKS.forEach((l) => {
     if (attrs && attrs[l.apiCode as keyof typeof attrs]) {
       links.push({
         href: attrs[l.apiCode as keyof typeof attrs] as string,
         name: l.name,
-        icon: l.icon
-      })
+        icon: l.icon,
+      });
     }
-  })
-  return links
-})
+  });
+  return links;
+});
 </script>
 <template>
   <div>
     <div class="font-medium mb-2">Biography</div>
 
-    <MDC v-if="author.attributes?.biography?.en" :value="author.attributes.biography?.en" />
+    <MDC
+      v-if="author.attributes?.biography?.en"
+      :value="author.attributes.biography?.en"
+    />
     <div v-else class="italic">No biography</div>
 
     <div v-if="socials.length > 0" class="my-6">

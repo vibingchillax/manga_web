@@ -48,9 +48,9 @@ info:
     If you believe you found a security issue in our API, please check our [security.txt](/security.txt) to get in touch privately.
 
 servers:
-  - url: 'https://api.mangadex.org'
+  - url: "https://api.mangadex.org"
     description: Production
-  - url: 'https://api.mangadex.dev'
+  - url: "https://api.mangadex.dev"
     description: Public development environment
 paths:
   /ping:
@@ -62,7 +62,7 @@ paths:
         - Infrastructure
       security: []
       responses:
-        '200':
+        "200":
           description: Pong
           content:
             text/plain:
@@ -75,18 +75,18 @@ paths:
       tags:
         - Manga
       responses:
-        '200':
+        "200":
           description: Manga list
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaList'
-        '400':
+                $ref: "#/components/schemas/MangaList"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-search-manga
       description: Search a list of Manga.
       parameters:
@@ -292,19 +292,19 @@ paths:
           name: order
           style: deepObject
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionManga'
+            $ref: "#/components/schemas/ReferenceExpansionManga"
           in: query
           name: includes[]
         - schema:
             type: string
-            enum: ['0', '1', 'true', 'false']
+            enum: ["0", "1", "true", "false"]
           in: query
           name: hasAvailableChapters
         - name: hasUnavailableChapters
           in: query
           schema:
             type: string
-            enum: ['0', '1']
+            enum: ["0", "1"]
         - schema:
             type: string
             format: uuid
@@ -322,34 +322,34 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: Manga Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaResponse'
-        '400':
+                $ref: "#/components/schemas/MangaResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MangaCreate'
+              $ref: "#/components/schemas/MangaCreate"
         description: The size of the body is limited to 64KB.
       description: Create a new Manga.
       tags:
         - Manga
-  '/manga/{id}/aggregate':
+  "/manga/{id}/aggregate":
     parameters:
       - schema:
           type: string
@@ -382,7 +382,7 @@ paths:
           in: query
           name: groups[]
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -418,7 +418,7 @@ paths:
                                   format: uuid
                               count:
                                 type: integer
-  '/manga/{id}':
+  "/manga/{id}":
     parameters:
       - schema:
           type: string
@@ -433,28 +433,28 @@ paths:
         - Manga
       parameters:
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionManga'
+            $ref: "#/components/schemas/ReferenceExpansionManga"
           in: query
           name: includes[]
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaResponse'
-        '403':
+                $ref: "#/components/schemas/MangaResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Manga no content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-manga-id
       description: Get Manga.
       security: []
@@ -469,36 +469,36 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaResponse'
-        '400':
+                $ref: "#/components/schemas/MangaResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       requestBody:
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/MangaEdit'
+                - $ref: "#/components/schemas/MangaEdit"
                 - type: object
                   properties:
                     artists:
@@ -522,24 +522,24 @@ paths:
       summary: Delete Manga
       operationId: delete-manga-id
       responses:
-        '200':
+        "200":
           description: Manga has been deleted.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '403':
+                $ref: "#/components/schemas/Response"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Manga
   /auth/login:
@@ -555,30 +555,30 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
-        '400':
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: post-auth-login
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Login'
+              $ref: "#/components/schemas/Login"
         description: The size of the body is limited to 2KB.
       security: []
       deprecated: true
@@ -591,12 +591,12 @@ paths:
       tags:
         - Authentication
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CheckResponse'
+                $ref: "#/components/schemas/CheckResponse"
       operationId: get-auth-check
   /auth/logout:
     post:
@@ -604,18 +604,18 @@ paths:
       tags:
         - Authentication
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LogoutResponse'
-        '503':
+                $ref: "#/components/schemas/LogoutResponse"
+        "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: post-auth-logout
       deprecated: true
   /auth/refresh:
@@ -631,36 +631,36 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RefreshResponse'
-        '400':
+                $ref: "#/components/schemas/RefreshResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: post-auth-refresh
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RefreshToken'
+              $ref: "#/components/schemas/RefreshToken"
         description: The size of the body is limited to 2KB.
       security: []
       deprecated: true
@@ -698,7 +698,7 @@ paths:
           in: query
         - name: includes[]
           schema:
-            $ref: '#/components/schemas/ReferenceExpansionApiClient'
+            $ref: "#/components/schemas/ReferenceExpansionApiClient"
           in: query
         - name: order
           schema:
@@ -724,12 +724,12 @@ paths:
           in: query
           style: deepObject
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiClientList'
+                $ref: "#/components/schemas/ApiClientList"
     post:
       summary: Create ApiClient
       operationId: post-create-apiclient
@@ -746,26 +746,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApiClientCreate'
+              $ref: "#/components/schemas/ApiClientCreate"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiClientResponse'
-        '400':
+                $ref: "#/components/schemas/ApiClientResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /client/{id}:
     parameters:
       - schema:
@@ -783,21 +783,21 @@ paths:
       parameters:
         - name: includes[]
           schema:
-            $ref: '#/components/schemas/ReferenceExpansionApiClient'
+            $ref: "#/components/schemas/ReferenceExpansionApiClient"
           in: query
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiClientResponse'
-        '404':
+                $ref: "#/components/schemas/ApiClientResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       summary: Edit ApiClient
       operationId: post-edit-apiclient
@@ -814,32 +814,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApiClientEdit'
+              $ref: "#/components/schemas/ApiClientEdit"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiClientResponse'
-        '400':
+                $ref: "#/components/schemas/ApiClientResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
       operationId: delete-apiclient
       summary: Delete Api Client
@@ -852,7 +852,7 @@ paths:
             pattern: ^\d+$
           in: query
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -862,18 +862,18 @@ paths:
                   result:
                     type: string
                     default: ok
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /client/{id}/secret:
     parameters:
@@ -890,7 +890,7 @@ paths:
       tags:
         - ApiClient
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -903,12 +903,12 @@ paths:
                       - ok
                   data:
                     type: string
-        '403':
+        "403":
           description: Client not found, not active or user is not the owner
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     post:
       summary: Regenerate Client Secret
       operationId: post-regenerate-apiclient-secret
@@ -927,7 +927,7 @@ paths:
             schema:
               type: object
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -940,12 +940,12 @@ paths:
                       - ok
                   data:
                     type: string
-        '403':
+        "403":
           description: Client not found, not active or user is not the owner
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /group:
     get:
@@ -953,24 +953,24 @@ paths:
       tags:
         - ScanlationGroup
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScanlationGroupList'
-        '400':
+                $ref: "#/components/schemas/ScanlationGroupList"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-search-group
       parameters:
         - schema:
@@ -1002,7 +1002,7 @@ paths:
           in: query
           name: focusedLanguage
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionScanlationGroup'
+            $ref: "#/components/schemas/ReferenceExpansionScanlationGroup"
           in: query
           name: includes[]
         - schema:
@@ -1050,33 +1050,33 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScanlationGroupResponse'
-        '400':
+                $ref: "#/components/schemas/ScanlationGroupResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - ScanlationGroup
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateScanlationGroup'
+              $ref: "#/components/schemas/CreateScanlationGroup"
         description: The size of the body is limited to 16KB.
-  '/group/{id}':
+  "/group/{id}":
     parameters:
       - schema:
           type: string
@@ -1091,28 +1091,28 @@ paths:
         - ScanlationGroup
       parameters:
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionScanlationGroup'
+            $ref: "#/components/schemas/ReferenceExpansionScanlationGroup"
           in: query
           name: includes[]
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScanlationGroupResponse'
-        '403':
+                $ref: "#/components/schemas/ScanlationGroupResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: ScanlationGroup not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-group-id
       security: []
     put:
@@ -1126,63 +1126,63 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScanlationGroupResponse'
-        '400':
+                $ref: "#/components/schemas/ScanlationGroupResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - ScanlationGroup
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ScanlationGroupEdit'
+              $ref: "#/components/schemas/ScanlationGroupEdit"
         description: The size of the body is limited to 8KB.
     delete:
       summary: Delete Scanlation Group
       operationId: delete-group-id
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '403':
+                $ref: "#/components/schemas/Response"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - ScanlationGroup
-  '/group/{id}/follow':
+  "/group/{id}/follow":
     parameters:
       - schema:
           type: string
@@ -1194,36 +1194,36 @@ paths:
       summary: Follow Scanlation Group
       operationId: post-group-id-follow
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '404':
+                $ref: "#/components/schemas/Response"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - ScanlationGroup
     delete:
       summary: Unfollow Scanlation Group
       operationId: delete-group-id-follow
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '404':
+                $ref: "#/components/schemas/Response"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - ScanlationGroup
   /list:
@@ -1238,33 +1238,33 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomListResponse'
-        '400':
+                $ref: "#/components/schemas/CustomListResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - CustomList
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomListCreate'
+              $ref: "#/components/schemas/CustomListCreate"
         description: The size of the body is limited to 8KB.
-  '/list/{id}':
+  "/list/{id}":
     parameters:
       - schema:
           type: string
@@ -1278,18 +1278,18 @@ paths:
       tags:
         - CustomList
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomListResponse'
-        '404':
+                $ref: "#/components/schemas/CustomListResponse"
+        "404":
           description: CustomList not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-list-id
       security: []
     put:
@@ -1303,63 +1303,63 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomListResponse'
-        '400':
+                $ref: "#/components/schemas/CustomListResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - CustomList
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomListEdit'
+              $ref: "#/components/schemas/CustomListEdit"
       description: The size of the body is limited to 8KB.
     delete:
       summary: Delete CustomList
       operationId: delete-list-id
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '403':
+                $ref: "#/components/schemas/Response"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - CustomList
-  '/list/{id}/follow':
+  "/list/{id}/follow":
     parameters:
       - schema:
           type: string
@@ -1379,7 +1379,7 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -1394,24 +1394,24 @@ paths:
                 example:
                   value:
                     result: ok
-        '400':
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - CustomList
       requestBody:
@@ -1424,7 +1424,7 @@ paths:
       summary: Unfollow CustomList
       operationId: unfollow-list-id
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -1439,18 +1439,18 @@ paths:
                 example:
                   value:
                     result: ok
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - CustomList
       requestBody:
@@ -1459,7 +1459,7 @@ paths:
             schema:
               type: object
       description: The request body is empty
-  '/manga/{id}/list/{listId}':
+  "/manga/{id}/list/{listId}":
     parameters:
       - schema:
           type: string
@@ -1479,48 +1479,48 @@ paths:
       summary: Add Manga in CustomList
       operationId: post-manga-id-list-listId
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '403':
+                $ref: "#/components/schemas/Response"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - CustomList
     delete:
       summary: Remove Manga in CustomList
       operationId: delete-manga-id-list-listId
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '403':
+                $ref: "#/components/schemas/Response"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - CustomList
   /user/list:
@@ -1529,12 +1529,12 @@ paths:
       tags:
         - CustomList
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomListList'
+                $ref: "#/components/schemas/CustomListList"
       operationId: get-user-list
       parameters:
         - schema:
@@ -1550,7 +1550,7 @@ paths:
           in: query
           name: offset
       description: This will list public and private CustomList
-  '/user/{id}/list':
+  "/user/{id}/list":
     parameters:
       - schema:
           type: string
@@ -1564,12 +1564,12 @@ paths:
       tags:
         - CustomList
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomListList'
+                $ref: "#/components/schemas/CustomListList"
       operationId: get-user-id-list
       parameters:
         - schema:
@@ -1586,18 +1586,18 @@ paths:
           name: offset
       description: This will list only public CustomList
       security: []
-  '/user':
+  "/user":
     get:
       summary: User list
       tags:
         - User
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserList'
+                $ref: "#/components/schemas/UserList"
       operationId: get-user
       parameters:
         - schema:
@@ -1629,11 +1629,11 @@ paths:
             properties:
               username:
                 type: string
-                enum: ['asc', 'desc']
+                enum: ["asc", "desc"]
           in: query
           name: order
           style: deepObject
-  '/user/{id}':
+  "/user/{id}":
     parameters:
       - schema:
           type: string
@@ -1647,12 +1647,12 @@ paths:
       tags:
         - User
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
+                $ref: "#/components/schemas/UserResponse"
       operationId: get-user-id
       security: []
     delete:
@@ -1660,12 +1660,12 @@ paths:
       tags:
         - User
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       operationId: delete-user-id
       deprecated: true
   /user/delete/{code}:
@@ -1682,12 +1682,12 @@ paths:
       tags:
         - User
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       operationId: post-user-delete-code
       security: []
       deprecated: true
@@ -1698,24 +1698,24 @@ paths:
       description: Chapter list. If you want the Chapters of a given Manga, please check the feed endpoints.
       operationId: get-chapter
       responses:
-        '200':
+        "200":
           description: Chapter list
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChapterList'
-        '400':
+                $ref: "#/components/schemas/ChapterList"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       parameters:
         - schema:
             type: integer
@@ -1916,7 +1916,7 @@ paths:
       tags:
         - Chapter
       security: []
-  '/chapter/{id}':
+  "/chapter/{id}":
     parameters:
       - schema:
           type: string
@@ -1931,28 +1931,28 @@ paths:
         - Chapter
       parameters:
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionChapter'
+            $ref: "#/components/schemas/ReferenceExpansionChapter"
           in: query
           name: includes[]
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChapterResponse'
-        '403':
+                $ref: "#/components/schemas/ChapterResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Chapter not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-chapter-id
       security: []
     put:
@@ -1966,35 +1966,35 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChapterResponse'
-        '400':
+                $ref: "#/components/schemas/ChapterResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChapterEdit'
+              $ref: "#/components/schemas/ChapterEdit"
         description: The size of the body is limited to 32KB.
       tags:
         - Chapter
@@ -2002,30 +2002,30 @@ paths:
       summary: Delete Chapter
       operationId: delete-chapter-id
       responses:
-        '200':
+        "200":
           description: Chapter has been deleted.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '400':
+                $ref: "#/components/schemas/Response"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Chapter
   /user/follows/manga/feed:
@@ -2034,24 +2034,24 @@ paths:
       tags:
         - Feed
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChapterList'
-        '400':
+                $ref: "#/components/schemas/ChapterList"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: User not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-user-follows-manga-feed
       parameters: &feedParameters
         - schema:
@@ -2174,7 +2174,7 @@ paths:
           name: order
           style: deepObject
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionChapter'
+            $ref: "#/components/schemas/ReferenceExpansionChapter"
           in: query
           name: includes[]
         - schema: *triStateFilter
@@ -2205,40 +2205,40 @@ paths:
       tags:
         - Feed
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChapterList'
-        '400':
+                $ref: "#/components/schemas/ChapterList"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-list-id-feed
       parameters: *feedParameters
       security: []
-  '/manga/{id}/follow':
+  "/manga/{id}/follow":
     parameters:
       - schema:
           type: string
@@ -2250,36 +2250,36 @@ paths:
       summary: Unfollow Manga
       operationId: delete-manga-id-follow
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '404':
+                $ref: "#/components/schemas/Response"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Manga
     post:
       summary: Follow Manga
       operationId: post-manga-id-follow
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '404':
+                $ref: "#/components/schemas/Response"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Manga
   /cover:
@@ -2288,24 +2288,24 @@ paths:
       tags:
         - Cover
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CoverList'
-        '400':
+                $ref: "#/components/schemas/CoverList"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-cover
       parameters:
         - schema:
@@ -2348,7 +2348,7 @@ paths:
             type: array
             items:
               type: string
-              pattern: '^[a-z]{2}(-[a-z]{2})?$'
+              pattern: "^[a-z]{2}(-[a-z]{2})?$"
           in: query
           name: locales[]
           description: Locales of cover art (limited to 100 per request)
@@ -2374,7 +2374,7 @@ paths:
           name: order
           style: deepObject
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionCoverArt'
+            $ref: "#/components/schemas/ReferenceExpansionCoverArt"
           in: query
           name: includes[]
       security: []
@@ -2409,7 +2409,7 @@ paths:
                   type: string
                   format: binary
                 volume:
-                  $ref: '#/components/schemas/CoverVolume'
+                  $ref: "#/components/schemas/CoverVolume"
                 description:
                   type: string
                   nullable: false
@@ -2418,24 +2418,24 @@ paths:
                   nullable: false
                   pattern: ^[a-z]{2}(-[a-z]{2})?$
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CoverResponse'
-        '400':
+                $ref: "#/components/schemas/CoverResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     get:
       summary: Get Cover
       tags:
@@ -2443,34 +2443,34 @@ paths:
       operationId: get-cover-id
       parameters:
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionCoverArt'
+            $ref: "#/components/schemas/ReferenceExpansionCoverArt"
           in: query
           name: includes[]
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CoverResponse'
-        '400':
+                $ref: "#/components/schemas/CoverResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: CoverArt not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       security: []
     put:
       summary: Edit Cover
@@ -2488,75 +2488,75 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CoverEdit'
+              $ref: "#/components/schemas/CoverEdit"
         description: The size of the body is limited to 2KB.
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CoverResponse'
-        '400':
+                $ref: "#/components/schemas/CoverResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
       summary: Delete Cover
       tags:
         - Cover
       operationId: delete-cover
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '400':
+                $ref: "#/components/schemas/Response"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
   /author:
     get:
       summary: Author list
       tags:
         - Author
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthorList'
-        '400':
+                $ref: "#/components/schemas/AuthorList"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-author
       parameters:
         - schema:
@@ -2588,12 +2588,12 @@ paths:
             properties:
               name:
                 type: string
-                enum: ['asc', 'desc']
+                enum: ["asc", "desc"]
           in: query
           name: order
           style: deepObject
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionAuthor'
+            $ref: "#/components/schemas/ReferenceExpansionAuthor"
           in: query
           name: includes[]
       security: []
@@ -2608,33 +2608,33 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthorResponse'
-        '400':
+                $ref: "#/components/schemas/AuthorResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Author
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthorCreate'
+              $ref: "#/components/schemas/AuthorCreate"
         description: The size of the body is limited to 8KB.
-  '/author/{id}':
+  "/author/{id}":
     parameters:
       - schema:
           type: string
@@ -2649,28 +2649,28 @@ paths:
         - Author
       parameters:
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionAuthor'
+            $ref: "#/components/schemas/ReferenceExpansionAuthor"
           in: query
           name: includes[]
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthorResponse'
-        '403':
+                $ref: "#/components/schemas/AuthorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Author no content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-author-id
       security: []
     put:
@@ -2684,35 +2684,35 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthorResponse'
-        '400':
+                $ref: "#/components/schemas/AuthorResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthorEdit'
+              $ref: "#/components/schemas/AuthorEdit"
         description: The size of the body is limited to 8KB.
       tags:
         - Author
@@ -2720,24 +2720,24 @@ paths:
       summary: Delete Author
       operationId: delete-author-id
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '403':
+                $ref: "#/components/schemas/Response"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Author
   /legacy/mapping:
@@ -2752,25 +2752,25 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: This response will give you an array of mappings of resource identifiers ; the `data.attributes.newId` field corresponds to the new UUID.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MappingIdResponse'
-        '400':
+                $ref: "#/components/schemas/MappingIdResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Legacy
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MappingIdBody'
+              $ref: "#/components/schemas/MappingIdBody"
         description: The size of the body is limited to 10KB.
       security: []
   /manga/{id}/feed:
@@ -2787,18 +2787,18 @@ paths:
       tags:
         - Manga
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChapterList'
-        '400':
+                $ref: "#/components/schemas/ChapterList"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-manga-id-feed
       parameters: *feedParameters
       security: []
@@ -2813,7 +2813,7 @@ paths:
     get:
       summary: Manga read markers
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2854,10 +2854,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChapterReadMarkerBatch'
+              $ref: "#/components/schemas/ChapterReadMarkerBatch"
         description: The size of the body is limited to 10KB.
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2896,7 +2896,7 @@ paths:
           description: Group results by manga ids
           required: false
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -2945,16 +2945,16 @@ paths:
       tags:
         - Manga
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaResponse'
+                $ref: "#/components/schemas/MangaResponse"
       operationId: get-manga-random
       parameters:
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionManga'
+            $ref: "#/components/schemas/ReferenceExpansionManga"
           in: query
           name: includes[]
         - schema:
@@ -3000,7 +3000,7 @@ paths:
           in: query
           name: excludedTagsMode
       security: []
-  '/at-home/server/{chapterId}':
+  "/at-home/server/{chapterId}":
     parameters:
       - schema:
           type: string
@@ -3014,7 +3014,7 @@ paths:
       tags:
         - AtHome
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3055,12 +3055,12 @@ paths:
                       - x1-ab2b7c8f30c843aa3a53c29bc8c0e204fba4ab3e75985d761921eb6a52ff6159.jpg
                       - x2-3e057d937e01696adce2ac2865f62f6f6a15f03cef43d929b88e99a4b8482e03.jpg
                       - x3-128742088f99806b022bbc8006554456f2a20d0d176d7f3264a65ff9a549d0dd.jpg
-        '404':
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-at-home-server-chapterId
       parameters:
         - schema:
@@ -3083,12 +3083,12 @@ paths:
       tags:
         - Manga
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TagResponse'
+                $ref: "#/components/schemas/TagResponse"
       operationId: get-manga-tag
       security: []
   /user/me:
@@ -3097,12 +3097,12 @@ paths:
       tags:
         - User
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
+                $ref: "#/components/schemas/UserResponse"
       operationId: get-user-me
   /user/follows/group:
     get:
@@ -3110,12 +3110,12 @@ paths:
       tags:
         - Follows
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScanlationGroupList'
+                $ref: "#/components/schemas/ScanlationGroupList"
       operationId: get-user-follows-group
       parameters:
         - schema:
@@ -3131,7 +3131,7 @@ paths:
           in: query
           name: offset
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionScanlationGroup'
+            $ref: "#/components/schemas/ReferenceExpansionScanlationGroup"
           in: query
           name: includes[]
   /user/follows/group/{id}:
@@ -3148,18 +3148,18 @@ paths:
       tags:
         - Follows
       responses:
-        '200':
+        "200":
           description: The User follow that Group
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '404':
+                $ref: "#/components/schemas/Response"
+        "404":
           description: The User doesn't follow that Group
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       operationId: get-user-follows-group-id
   /user/follows/user:
     get:
@@ -3167,12 +3167,12 @@ paths:
       tags:
         - Follows
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserList'
+                $ref: "#/components/schemas/UserList"
       operationId: get-user-follows-user
       parameters:
         - schema:
@@ -3201,18 +3201,18 @@ paths:
       tags:
         - Follows
       responses:
-        '200':
+        "200":
           description: The User follow that User
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '404':
+                $ref: "#/components/schemas/Response"
+        "404":
           description: The User doesn't follow that User
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       operationId: get-user-follows-user-id
   /user/follows/manga:
     get:
@@ -3220,12 +3220,12 @@ paths:
       tags:
         - Follows
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaList'
+                $ref: "#/components/schemas/MangaList"
       operationId: get-user-follows-manga
       parameters:
         - schema:
@@ -3241,7 +3241,7 @@ paths:
           in: query
           name: offset
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionManga'
+            $ref: "#/components/schemas/ReferenceExpansionManga"
           in: query
           name: includes[]
   /user/follows/manga/{id}:
@@ -3258,18 +3258,18 @@ paths:
       tags:
         - Follows
       responses:
-        '200':
+        "200":
           description: The User follow that Manga
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '404':
+                $ref: "#/components/schemas/Response"
+        "404":
           description: The User doesn't follow that Manga
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       operationId: get-user-follows-manga-id
   /user/follows/list:
     get:
@@ -3277,12 +3277,12 @@ paths:
       tags:
         - Follows
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomListList'
+                $ref: "#/components/schemas/CustomListList"
       operationId: get-user-follows-list
       parameters:
         - schema:
@@ -3311,18 +3311,18 @@ paths:
       tags:
         - Follows
       responses:
-        '200':
+        "200":
           description: The User follow that CustomList
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '404':
+                $ref: "#/components/schemas/Response"
+        "404":
           description: The User doesn't follow that CustomList
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       operationId: get-user-follows-list-id
   /manga/status:
     get:
@@ -3344,7 +3344,7 @@ paths:
           name: status
           description: Used to filter the list by given status
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3379,7 +3379,7 @@ paths:
                     result: ok
                     statuses:
                       b019ea5d-5fe6-44d4-abbc-f546f210884d: reading
-  '/manga/{id}/status':
+  "/manga/{id}/status":
     parameters:
       - schema:
           type: string
@@ -3391,7 +3391,7 @@ paths:
       summary: Get a Manga reading status
       operationId: get-manga-id-status
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3413,18 +3413,18 @@ paths:
                 example:
                   result: ok
                   status: reading
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Manga
     post:
@@ -3438,31 +3438,31 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '400':
+                $ref: "#/components/schemas/Response"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Manga
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateMangaStatus'
+              $ref: "#/components/schemas/UpdateMangaStatus"
         description: Using a `null` value in `status` field will remove the Manga reading status. The size of the body is limited to 2KB.
 
   /manga/draft/{id}:
@@ -3474,31 +3474,31 @@ paths:
         in: path
         required: true
       - schema:
-          $ref: '#/components/schemas/ReferenceExpansionManga'
+          $ref: "#/components/schemas/ReferenceExpansionManga"
         in: query
         name: includes[]
     get:
       summary: Get a specific Manga Draft
       operationId: get-manga-id-draft
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaResponse'
-        '403':
+                $ref: "#/components/schemas/MangaResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       security:
         - Bearer: []
       tags:
@@ -3525,30 +3525,30 @@ paths:
               additionalProperties: false
         description: A Manga Draft that is to be submitted must have at least one cover in the original language, must be in the "draft" state and must be passed the correct version in the request body.
       responses:
-        '201':
+        "201":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaResponse'
-        '400':
+                $ref: "#/components/schemas/MangaResponse"
+        "400":
           description: BadRequest
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       security:
         - Bearer: []
       tags:
@@ -3558,24 +3558,24 @@ paths:
       summary: Get a list of Manga Drafts
       operationId: get-manga-drafts
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaResponse'
-        '403':
+                $ref: "#/components/schemas/MangaResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       security:
         - Bearer: []
       tags:
@@ -3630,7 +3630,7 @@ paths:
         name: order
         style: deepObject
       - schema:
-          $ref: '#/components/schemas/ReferenceExpansionManga'
+          $ref: "#/components/schemas/ReferenceExpansionManga"
         in: query
         name: includes[]
 
@@ -3647,8 +3647,8 @@ paths:
           in: header
           required: true
       responses:
-        '200':
-          description: 'OK: Captcha has been solved'
+        "200":
+          description: "OK: Captcha has been solved"
           content:
             application/json:
               schema:
@@ -3659,18 +3659,18 @@ paths:
                     enum:
                       - ok
                       - error
-        '400':
-          description: 'Bad Request: Captcha challenge result was wrong, the Captcha Verification service was down or other, refer to the error message and the errorCode inside the error context'
+        "400":
+          description: "Bad Request: Captcha challenge result was wrong, the Captcha Verification service was down or other, refer to the error message and the errorCode inside the error context"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: post-captcha-solve
       requestBody:
         content:
           application/json:
             schema:
-              description: ''
+              description: ""
               type: object
               properties:
                 captchaChallenge:
@@ -3705,7 +3705,7 @@ paths:
       summary: Get a list of report reasons
       operationId: get-report-reasons-by-category
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -3733,7 +3733,7 @@ paths:
                           type: object
                           properties:
                             reason:
-                              $ref: '#/components/schemas/LocalizedString'
+                              $ref: "#/components/schemas/LocalizedString"
                             detailsRequired:
                               type: boolean
                             category:
@@ -3753,24 +3753,24 @@ paths:
                     type: integer
                   total:
                     type: integer
-        '400':
+        "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Report
   /report:
@@ -3778,24 +3778,24 @@ paths:
       summary: Get a list of reports by the user
       operationId: get-reports
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportListResponse'
-        '400':
+                $ref: "#/components/schemas/ReportListResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Report
       parameters:
@@ -3858,7 +3858,7 @@ paths:
           name: order
           style: deepObject
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionReport'
+            $ref: "#/components/schemas/ReferenceExpansionReport"
           in: query
           name: includes[]
     post:
@@ -3872,30 +3872,30 @@ paths:
           in: header
           required: true
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '400':
+                $ref: "#/components/schemas/Response"
+        "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       requestBody:
         content:
           application/json:
@@ -3930,24 +3930,24 @@ paths:
       summary: Get the current User upload session
       operationId: get-upload-session
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UploadSession'
-        '403':
+                $ref: "#/components/schemas/UploadSession"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Upload
   /upload/begin:
@@ -3965,15 +3965,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BeginUploadSession'
+              $ref: "#/components/schemas/BeginUploadSession"
         description: The size of the body is limited to 4KB.
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UploadSession'
+                $ref: "#/components/schemas/UploadSession"
       tags:
         - Upload
   /upload/begin/{chapterId}:
@@ -3998,27 +3998,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BeginEditSession'
+              $ref: "#/components/schemas/BeginEditSession"
         description: The size of the body is limited to 1KB.
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UploadSession'
-        '400':
+                $ref: "#/components/schemas/UploadSession"
+        "400":
           description: Bad Request if Chapter's Manga is unpublished
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized if user does not have upload permissions or has no rights to edit the chapter (needs to be uploader or group member)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Upload
   /upload/{uploadSessionId}:
@@ -4049,7 +4049,7 @@ paths:
                   type: string
                   format: binary
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -4064,29 +4064,29 @@ paths:
                   errors:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Error'
+                      $ref: "#/components/schemas/Error"
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/UploadSessionFile'
-        '400':
+                      $ref: "#/components/schemas/UploadSessionFile"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Upload
     delete:
       summary: Abandon upload session
       operationId: abandon-upload-session
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       tags:
         - Upload
   /upload/{uploadSessionId}/commit:
@@ -4111,15 +4111,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CommitUploadSession'
+              $ref: "#/components/schemas/CommitUploadSession"
         description: The size of the body is limited to 4KB.
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Chapter'
+                $ref: "#/components/schemas/Chapter"
       tags:
         - Upload
   /upload/{uploadSessionId}/{uploadSessionFileId}:
@@ -4140,12 +4140,12 @@ paths:
       summary: Delete an uploaded image from the Upload Session
       operationId: delete-uploaded-session-file
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       tags:
         - Upload
   /upload/{uploadSessionId}/batch:
@@ -4177,12 +4177,12 @@ paths:
                 minItems: 1
         description: The size of the body is limited to 20KB.
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       tags:
         - Upload
   /upload/check-approval-required:
@@ -4200,26 +4200,26 @@ paths:
                   format: uuid
                 locale:
                   type: string
-                  pattern: '^[a-z]{2}(-[a-z]{2})?$'
+                  pattern: "^[a-z]{2}(-[a-z]{2})?$"
         description: The size of the body is limited to 4KB.
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - type: object
                     properties:
                       requiresApproval:
                         type: boolean
-        '404':
+        "404":
           description: Manga not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
       tags:
         - Upload
   /manga/{mangaId}/relation:
@@ -4236,22 +4236,22 @@ paths:
         - Manga
       parameters:
         - schema:
-            $ref: '#/components/schemas/ReferenceExpansionMangaRelation'
+            $ref: "#/components/schemas/ReferenceExpansionMangaRelation"
           in: query
           name: includes[]
       responses:
-        '200':
+        "200":
           description: Manga relation list
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaRelationList'
-        '400':
+                $ref: "#/components/schemas/MangaRelationList"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       operationId: get-manga-relation
       security: []
     post:
@@ -4265,29 +4265,29 @@ paths:
           in: header
           required: true
       responses:
-        '200':
+        "200":
           description: Manga relation created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MangaRelationResponse'
-        '400':
+                $ref: "#/components/schemas/MangaRelationResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MangaRelationCreate'
+              $ref: "#/components/schemas/MangaRelationCreate"
         description: The size of the body is limited to 8KB.
       description: Create a new Manga relation.
       tags:
@@ -4310,24 +4310,24 @@ paths:
       summary: Delete Manga relation
       operationId: delete-manga-relation-id
       responses:
-        '200':
+        "200":
           description: Manga relation has been deleted.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '403':
+                $ref: "#/components/schemas/Response"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Manga
   /rating:
@@ -4345,7 +4345,7 @@ paths:
       summary: Get your ratings
       operationId: get-rating
       responses:
-        '200':
+        "200":
           description: Self-rating list
           content:
             application/json:
@@ -4354,7 +4354,7 @@ paths:
                 properties:
                   result:
                     type: string
-                    default: 'ok'
+                    default: "ok"
                   ratings:
                     type: object
                     additionalProperties:
@@ -4371,18 +4371,18 @@ paths:
                     f9c33607-9180-4ba6-b85c-e4b5faee7192:
                       rating: 7
                       createdAt: "2021-12-27T08:47:37+00:00"
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Rating
   /rating/{mangaId}:
@@ -4407,48 +4407,48 @@ paths:
                   minimum: 1
                   maximum: 10
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '403':
+                $ref: "#/components/schemas/Response"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Rating
     delete:
       summary: Delete Manga rating
       operationId: delete-rating-manga-id
       responses:
-        '200':
+        "200":
           description: Manga rating was deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-        '403':
+                $ref: "#/components/schemas/Response"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Rating
 
@@ -4464,7 +4464,7 @@ paths:
       summary: Get statistics about given chapter
       operationId: get-statistics-chapter-uuid
       responses:
-        '200':
+        "200":
           description: Statistics
           content:
             application/json:
@@ -4473,14 +4473,14 @@ paths:
                 properties:
                   result:
                     type: string
-                    default: 'ok'
+                    default: "ok"
                   statistics:
                     type: object
                     additionalProperties:
                       type: object
                       properties:
                         comments:
-                          $ref: '#/components/schemas/StatisticsDetailsComments'
+                          $ref: "#/components/schemas/StatisticsDetailsComments"
                 example:
                   result: ok
                   statistics:
@@ -4505,7 +4505,7 @@ paths:
       summary: Get statistics about given chapters
       operationId: get-statistics-chapters
       responses:
-        '200':
+        "200":
           description: Statistics
           content:
             application/json:
@@ -4514,14 +4514,14 @@ paths:
                 properties:
                   result:
                     type: string
-                    default: 'ok'
+                    default: "ok"
                   statistics:
                     type: object
                     additionalProperties:
                       type: object
                       properties:
                         comments:
-                          $ref: '#/components/schemas/StatisticsDetailsComments'
+                          $ref: "#/components/schemas/StatisticsDetailsComments"
                 example:
                   result: ok
                   statistics:
@@ -4544,7 +4544,7 @@ paths:
       summary: Get statistics about given scanlation group
       operationId: get-statistics-group-uuid
       responses:
-        '200':
+        "200":
           description: Statistics
           content:
             application/json:
@@ -4553,14 +4553,14 @@ paths:
                 properties:
                   result:
                     type: string
-                    default: 'ok'
+                    default: "ok"
                   statistics:
                     type: object
                     additionalProperties:
                       type: object
                       properties:
                         comments:
-                          $ref: '#/components/schemas/StatisticsDetailsComments'
+                          $ref: "#/components/schemas/StatisticsDetailsComments"
                 example:
                   result: ok
                   statistics:
@@ -4585,7 +4585,7 @@ paths:
       summary: Get statistics about given groups
       operationId: get-statistics-groups
       responses:
-        '200':
+        "200":
           description: Statistics
           content:
             application/json:
@@ -4594,14 +4594,14 @@ paths:
                 properties:
                   result:
                     type: string
-                    default: 'ok'
+                    default: "ok"
                   statistics:
                     type: object
                     additionalProperties:
                       type: object
                       properties:
                         comments:
-                          $ref: '#/components/schemas/StatisticsDetailsComments'
+                          $ref: "#/components/schemas/StatisticsDetailsComments"
                 example:
                   result: ok
                   statistics:
@@ -4624,7 +4624,7 @@ paths:
       summary: Get statistics about given Manga
       operationId: get-statistics-manga-uuid
       responses:
-        '200':
+        "200":
           description: Statistics
           content:
             application/json:
@@ -4633,14 +4633,14 @@ paths:
                 properties:
                   result:
                     type: string
-                    default: 'ok'
+                    default: "ok"
                   statistics:
                     type: object
                     additionalProperties:
                       type: object
                       properties:
                         comments:
-                          $ref: '#/components/schemas/StatisticsDetailsComments'
+                          $ref: "#/components/schemas/StatisticsDetailsComments"
                         rating:
                           type: object
                           properties:
@@ -4719,7 +4719,7 @@ paths:
       summary: Find statistics about given Manga
       operationId: get-statistics-manga
       responses:
-        '200':
+        "200":
           description: Statistics
           content:
             application/json:
@@ -4728,14 +4728,14 @@ paths:
                 properties:
                   result:
                     type: string
-                    default: 'ok'
+                    default: "ok"
                   statistics:
                     type: object
                     additionalProperties:
                       type: object
                       properties:
                         comments:
-                          $ref: '#/components/schemas/StatisticsDetailsComments'
+                          $ref: "#/components/schemas/StatisticsDetailsComments"
                         rating:
                           type: object
                           properties:
@@ -4777,25 +4777,25 @@ paths:
       summary: Get latest Settings template
       operationId: get-settings-template
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 description: JSON Schema to validate settings
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Manga no content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Settings
     post:
@@ -4808,19 +4808,19 @@ paths:
               type: object
               description: A JSON Schema to validate settings
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 description: JSON Schema to validate settings
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Settings
   /settings/template/{version}:
@@ -4835,25 +4835,25 @@ paths:
       summary: Get Settings template by version id
       operationId: get-settings-template-version
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 description: JSON Schema to validate settings
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Manga no content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Settings
   /settings:
@@ -4861,7 +4861,7 @@ paths:
       summary: Get an User Settings
       operationId: get-settings
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -4881,18 +4881,18 @@ paths:
                     type: string
                     format: uuid
                     description: Settings template UUID
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Manga no content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Settings
     post:
@@ -4910,9 +4910,9 @@ paths:
                 updatedAt:
                   type: string
                   format: date-time
-                  description: 'Format: 2022-03-14T13:19:37'
+                  description: "Format: 2022-03-14T13:19:37"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -4932,18 +4932,18 @@ paths:
                     type: string
                     format: uuid
                     description: Settings template UUID
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Manga no content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Settings
   /user/history:
@@ -4951,7 +4951,7 @@ paths:
       summary: Get users reading history
       operationId: get-reading-history
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -4971,18 +4971,18 @@ paths:
                         readDate:
                           type: string
                           format: date-time
-        '403':
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Manga no content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - ReadMarker
   /forums/thread:
@@ -5008,42 +5008,42 @@ paths:
                   format: uuid
                   description: The id of the resource
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForumsThreadResponse'
-        '403':
+                $ref: "#/components/schemas/ForumsThreadResponse"
+        "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: If the resource for which the thread creation was requested does not exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
       tags:
         - Forums
 
 components:
   schemas:
     MangaRequest:
-      description: ''
+      description: ""
       type: object
       title: MangaRequest
       properties:
         title:
-          $ref: '#/components/schemas/LocalizedString'
+          $ref: "#/components/schemas/LocalizedString"
         altTitles:
           type: array
           items:
-            $ref: '#/components/schemas/LocalizedString'
+            $ref: "#/components/schemas/LocalizedString"
         description:
-          $ref: '#/components/schemas/LocalizedString'
+          $ref: "#/components/schemas/LocalizedString"
         authors:
           type: array
           items:
@@ -5060,7 +5060,7 @@ components:
             type: string
         originalLanguage:
           type: string
-          pattern: '^[a-z]{2}(-[a-z]{2})?$'
+          pattern: "^[a-z]{2}(-[a-z]{2})?$"
         lastVolume:
           type: string
           nullable: true
@@ -5129,7 +5129,7 @@ components:
           type: string
           default: entity
         data:
-          $ref: '#/components/schemas/Manga'
+          $ref: "#/components/schemas/Manga"
     ChapterResponse:
       title: ChapterResponse
       type: object
@@ -5143,7 +5143,7 @@ components:
           type: string
           default: entity
         data:
-          $ref: '#/components/schemas/Chapter'
+          $ref: "#/components/schemas/Chapter"
     Relationship:
       title: Relationship
       type: object
@@ -5155,7 +5155,25 @@ components:
           type: string
         related:
           type: string
-          enum: ['monochrome', 'main_story', 'adapted_from', 'based_on', 'prequel', 'side_story', 'doujinshi', 'same_franchise', 'shared_universe', 'sequel', 'spin_off', 'alternate_story', 'alternate_version', 'preserialization', 'colored', 'serialization']
+          enum:
+            [
+              "monochrome",
+              "main_story",
+              "adapted_from",
+              "based_on",
+              "prequel",
+              "side_story",
+              "doujinshi",
+              "same_franchise",
+              "shared_universe",
+              "sequel",
+              "spin_off",
+              "alternate_story",
+              "alternate_version",
+              "preserialization",
+              "colored",
+              "serialization",
+            ]
           description: Related Manga type, only present if you are on a Manga entity and a Manga relationship
         attributes:
           description: If Reference Expansion is applied, contains objects attributes
@@ -5170,8 +5188,8 @@ components:
           type: chapter
           attributes:
             title: Chapter title
-            volume: '1'
-            chapter: '15.1'
+            volume: "1"
+            chapter: "15.1"
             uploader:
               id: 23d52040-3a77-4ffe-84dd-6dbf259e32ed
               type: user
@@ -5185,7 +5203,7 @@ components:
                 type: scanlation_group
                 attributes: []
             translatedLanguage: en
-            externalUrl: 'http://some-external-url.tld'
+            externalUrl: "http://some-external-url.tld"
             version: 1
       properties:
         id:
@@ -5196,11 +5214,11 @@ components:
           enum:
             - chapter
         attributes:
-          $ref: '#/components/schemas/ChapterAttributes'
+          $ref: "#/components/schemas/ChapterAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     Manga:
       title: Manga
       type: object
@@ -5213,11 +5231,11 @@ components:
           enum:
             - manga
         attributes:
-          $ref: '#/components/schemas/MangaAttributes'
+          $ref: "#/components/schemas/MangaAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     ErrorResponse:
       title: ErrorResponse
       type: object
@@ -5228,7 +5246,7 @@ components:
         errors:
           type: array
           items:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     Error:
       title: Error
       type: object
@@ -5265,7 +5283,7 @@ components:
           description: Count of readable images for this chapter
         translatedLanguage:
           type: string
-          pattern: '^[a-z]{2}(-[a-z]{2})?$'
+          pattern: "^[a-z]{2}(-[a-z]{2})?$"
         uploader:
           type: string
           format: uuid
@@ -5293,13 +5311,13 @@ components:
       type: object
       properties:
         title:
-          $ref: '#/components/schemas/LocalizedString'
+          $ref: "#/components/schemas/LocalizedString"
         altTitles:
           type: array
           items:
-            $ref: '#/components/schemas/LocalizedString'
+            $ref: "#/components/schemas/LocalizedString"
         description:
-          $ref: '#/components/schemas/LocalizedString'
+          $ref: "#/components/schemas/LocalizedString"
         isLocked:
           type: boolean
         links:
@@ -5347,17 +5365,17 @@ components:
           type: array
           items:
             type: string
-            pattern: '^[a-z]{2}(-[a-z]{2})?$'
+            pattern: "^[a-z]{2}(-[a-z]{2})?$"
         latestUploadedChapter:
           type: string
           format: uuid
         tags:
           type: array
           items:
-            $ref: '#/components/schemas/Tag'
+            $ref: "#/components/schemas/Tag"
         state:
           type: string
-          enum: ['draft', 'submitted', 'published', 'rejected']
+          enum: ["draft", "submitted", "published", "rejected"]
         version:
           type: integer
           minimum: 1
@@ -5367,7 +5385,7 @@ components:
           type: string
     MangaCreate:
       allOf:
-        - $ref: '#/components/schemas/MangaRequest'
+        - $ref: "#/components/schemas/MangaRequest"
         - required:
             - title
             - status
@@ -5375,12 +5393,12 @@ components:
             - contentRating
     MangaEdit:
       allOf:
-        - $ref: '#/components/schemas/MangaRequest'
+        - $ref: "#/components/schemas/MangaRequest"
         - required:
             - version
     ChapterEdit:
       allOf:
-        - $ref: '#/components/schemas/ChapterRequest'
+        - $ref: "#/components/schemas/ChapterRequest"
         - required:
             - version
     Response:
@@ -5428,7 +5446,7 @@ components:
     CheckResponse:
       title: CheckResponse
       type: object
-      description: ''
+      description: ""
       properties:
         result:
           type: string
@@ -5521,7 +5539,7 @@ components:
           type: string
           default: entity
         data:
-          $ref: '#/components/schemas/ScanlationGroup'
+          $ref: "#/components/schemas/ScanlationGroup"
     ScanlationGroup:
       title: ScanlationGroup
       type: object
@@ -5534,11 +5552,11 @@ components:
           enum:
             - scanlation_group
         attributes:
-          $ref: '#/components/schemas/ScanlationGroupAttributes'
+          $ref: "#/components/schemas/ScanlationGroupAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     ScanlationGroupAttributes:
       title: ScanlationGroupAttributes
       type: object
@@ -5548,7 +5566,7 @@ components:
         altNames:
           type: array
           items:
-            $ref: '#/components/schemas/LocalizedString'
+            $ref: "#/components/schemas/LocalizedString"
         website:
           type: string
           nullable: true
@@ -5571,7 +5589,7 @@ components:
           type: string
           nullable: true
           format: uri
-          pattern: '^https?://'
+          pattern: "^https?://"
         mangaUpdates:
           type: string
           nullable: true
@@ -5583,7 +5601,7 @@ components:
           nullable: true
           items:
             type: string
-            pattern: '^[a-z]{2}(-[a-z]{2})?$'
+            pattern: "^[a-z]{2}(-[a-z]{2})?$"
         locked:
           type: boolean
         official:
@@ -5598,7 +5616,7 @@ components:
           type: string
           example: "P4D"
           description: "Should respected ISO 8601 duration specification: https://en.wikipedia.org/wiki/ISO_8601#Durations"
-          pattern: '^(P([1-9]|[1-9][0-9])D)?(P?([1-9])W)?(P?T(([1-9]|1[0-9]|2[0-4])H)?(([1-9]|[1-5][0-9]|60)M)?(([1-9]|[1-5][0-9]|60)S)?)?$'
+          pattern: "^(P([1-9]|[1-9][0-9])D)?(P?([1-9])W)?(P?T(([1-9]|1[0-9]|2[0-4])H)?(([1-9]|[1-5][0-9]|60)M)?(([1-9]|[1-5][0-9]|60)S)?)?$"
         version:
           type: integer
           minimum: 1
@@ -5618,11 +5636,11 @@ components:
           enum:
             - user
         attributes:
-          $ref: '#/components/schemas/UserAttributes'
+          $ref: "#/components/schemas/UserAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     UserAttributes:
       title: UserAttributes
       type: object
@@ -5714,7 +5732,7 @@ components:
           type: string
           nullable: true
           format: uri
-          pattern: '^https?://'
+          pattern: "^https?://"
         mangaUpdates:
           type: string
           nullable: true
@@ -5726,7 +5744,7 @@ components:
           nullable: true
           items:
             type: string
-            pattern: '^[a-z]{2}(-[a-z]{2})?$'
+            pattern: "^[a-z]{2}(-[a-z]{2})?$"
         inactive:
           type: boolean
         locked:
@@ -5793,7 +5811,7 @@ components:
           type: string
           default: entity
         data:
-          $ref: '#/components/schemas/CustomList'
+          $ref: "#/components/schemas/CustomList"
     CustomList:
       title: CustomList
       type: object
@@ -5806,11 +5824,11 @@ components:
           enum:
             - custom_list
         attributes:
-          $ref: '#/components/schemas/CustomListAttributes'
+          $ref: "#/components/schemas/CustomListAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     CustomListAttributes:
       title: CustomListAttributes
       type: object
@@ -5835,7 +5853,7 @@ components:
           type: string
           default: entity
         data:
-          $ref: '#/components/schemas/Cover'
+          $ref: "#/components/schemas/Cover"
     Cover:
       title: Cover
       type: object
@@ -5848,11 +5866,11 @@ components:
           enum:
             - cover_art
         attributes:
-          $ref: '#/components/schemas/CoverAttributes'
+          $ref: "#/components/schemas/CoverAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     CoverAttributes:
       title: CoverAttributes
       type: object
@@ -5880,7 +5898,7 @@ components:
       type: object
       properties:
         volume:
-          $ref: '#/components/schemas/CoverVolume'
+          $ref: "#/components/schemas/CoverVolume"
         description:
           type: string
           nullable: true
@@ -5889,7 +5907,7 @@ components:
         locale:
           type: string
           nullable: true
-          pattern: '^[a-z]{2}(-[a-z]{2})?$'
+          pattern: "^[a-z]{2}(-[a-z]{2})?$"
         version:
           type: integer
           minimum: 1
@@ -5918,7 +5936,7 @@ components:
           type: string
           default: entity
         data:
-          $ref: '#/components/schemas/Author'
+          $ref: "#/components/schemas/Author"
     Author:
       title: Author
       type: object
@@ -5931,11 +5949,11 @@ components:
           enum:
             - author
         attributes:
-          $ref: '#/components/schemas/AuthorAttributes'
+          $ref: "#/components/schemas/AuthorAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     AuthorAttributes:
       title: AuthorAttributes
       type: object
@@ -5946,7 +5964,7 @@ components:
           type: string
           nullable: true
         biography:
-          $ref: '#/components/schemas/LocalizedString'
+          $ref: "#/components/schemas/LocalizedString"
         twitter:
           type: string
           nullable: true
@@ -6031,7 +6049,7 @@ components:
         name:
           type: string
         biography:
-          $ref: '#/components/schemas/LocalizedString'
+          $ref: "#/components/schemas/LocalizedString"
         twitter:
           type: string
           nullable: true
@@ -6110,7 +6128,7 @@ components:
         name:
           type: string
         biography:
-          $ref: '#/components/schemas/LocalizedString'
+          $ref: "#/components/schemas/LocalizedString"
         twitter:
           type: string
           nullable: true
@@ -6188,7 +6206,7 @@ components:
           type: string
           default: entity
         data:
-          $ref: '#/components/schemas/ApiClient'
+          $ref: "#/components/schemas/ApiClient"
     ApiClient:
       title: ApiClient
       type: object
@@ -6201,11 +6219,11 @@ components:
           enum:
             - api_client
         attributes:
-          $ref: '#/components/schemas/ApiClientAttributes'
+          $ref: "#/components/schemas/ApiClientAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     ApiClientAttributes:
       title: ApiClientAttributes
       type: object
@@ -6301,7 +6319,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/MappingId'
+            $ref: "#/components/schemas/MappingId"
         limit:
           type: integer
         offset:
@@ -6320,11 +6338,11 @@ components:
           enum:
             - mapping_id
         attributes:
-          $ref: '#/components/schemas/MappingIdAttributes'
+          $ref: "#/components/schemas/MappingIdAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     MappingIdAttributes:
       title: MappingIdAttributes
       type: object
@@ -6354,7 +6372,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Tag'
+            $ref: "#/components/schemas/Tag"
         limit:
           type: integer
         offset:
@@ -6373,19 +6391,19 @@ components:
           enum:
             - tag
         attributes:
-          $ref: '#/components/schemas/TagAttributes'
+          $ref: "#/components/schemas/TagAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     TagAttributes:
       title: TagAttributes
       type: object
       properties:
         name:
-          $ref: '#/components/schemas/LocalizedString'
+          $ref: "#/components/schemas/LocalizedString"
         description:
-          $ref: '#/components/schemas/LocalizedString'
+          $ref: "#/components/schemas/LocalizedString"
         group:
           type: string
           enum:
@@ -6408,7 +6426,7 @@ components:
           type: string
           default: entity
         data:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
     SendAccountActivationCode:
       type: object
       title: SendAccountActivationCode
@@ -6455,12 +6473,12 @@ components:
           maxLength: 255
           nullable: true
         volume:
-          $ref: '#/components/schemas/ChapterVolume'
+          $ref: "#/components/schemas/ChapterVolume"
         chapter:
-          $ref: '#/components/schemas/ChapterVolume'
+          $ref: "#/components/schemas/ChapterVolume"
         translatedLanguage:
           type: string
-          pattern: '^[a-z]{2}(-[a-z]{2})?$'
+          pattern: "^[a-z]{2}(-[a-z]{2})?$"
         groups:
           type: array
           maxItems: 10
@@ -6485,7 +6503,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Cover'
+            $ref: "#/components/schemas/Cover"
         limit:
           type: integer
         offset:
@@ -6505,7 +6523,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Author'
+            $ref: "#/components/schemas/Author"
         limit:
           type: integer
         offset:
@@ -6525,7 +6543,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/ApiClient'
+            $ref: "#/components/schemas/ApiClient"
         limit:
           type: integer
         offset:
@@ -6545,7 +6563,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Chapter'
+            $ref: "#/components/schemas/Chapter"
         limit:
           type: integer
         offset:
@@ -6565,7 +6583,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/ScanlationGroup'
+            $ref: "#/components/schemas/ScanlationGroup"
         limit:
           type: integer
         offset:
@@ -6574,12 +6592,12 @@ components:
           type: integer
     MangaRelationCreate:
       allOf:
-        - $ref: '#/components/schemas/MangaRelationRequest'
+        - $ref: "#/components/schemas/MangaRelationRequest"
         - required:
             - targetManga
             - relation
     MangaRelationRequest:
-      description: ''
+      description: ""
       type: object
       title: MangaRelationRequest
       properties:
@@ -6588,7 +6606,25 @@ components:
           format: uuid
         relation:
           type: string
-          enum: ['monochrome', 'main_story', 'adapted_from', 'based_on', 'prequel', 'side_story', 'doujinshi', 'same_franchise', 'shared_universe', 'sequel', 'spin_off', 'alternate_story', 'alternate_version', 'preserialization', 'colored', 'serialization']
+          enum:
+            [
+              "monochrome",
+              "main_story",
+              "adapted_from",
+              "based_on",
+              "prequel",
+              "side_story",
+              "doujinshi",
+              "same_franchise",
+              "shared_universe",
+              "sequel",
+              "spin_off",
+              "alternate_story",
+              "alternate_version",
+              "preserialization",
+              "colored",
+              "serialization",
+            ]
     MangaRelationList:
       title: MangaRelationList
       type: object
@@ -6602,7 +6638,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/MangaRelation'
+            $ref: "#/components/schemas/MangaRelation"
         limit:
           type: integer
         offset:
@@ -6622,7 +6658,7 @@ components:
           type: string
           default: entity
         data:
-          $ref: '#/components/schemas/MangaRelation'
+          $ref: "#/components/schemas/MangaRelation"
     MangaRelation:
       title: MangaRelation
       type: object
@@ -6635,18 +6671,36 @@ components:
           enum:
             - manga_relation
         attributes:
-          $ref: '#/components/schemas/MangaRelationAttributes'
+          $ref: "#/components/schemas/MangaRelationAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     MangaRelationAttributes:
       title: MangaRelationAttributes
       type: object
       properties:
         relation:
           type: string
-          enum: ['monochrome', 'main_story', 'adapted_from', 'based_on', 'prequel', 'side_story', 'doujinshi', 'same_franchise', 'shared_universe', 'sequel', 'spin_off', 'alternate_story', 'alternate_version', 'preserialization', 'colored', 'serialization']
+          enum:
+            [
+              "monochrome",
+              "main_story",
+              "adapted_from",
+              "based_on",
+              "prequel",
+              "side_story",
+              "doujinshi",
+              "same_franchise",
+              "shared_universe",
+              "sequel",
+              "spin_off",
+              "alternate_story",
+              "alternate_version",
+              "preserialization",
+              "colored",
+              "serialization",
+            ]
         version:
           type: integer
           minimum: 1
@@ -6663,7 +6717,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Manga'
+            $ref: "#/components/schemas/Manga"
         limit:
           type: integer
         offset:
@@ -6683,7 +6737,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/CustomList'
+            $ref: "#/components/schemas/CustomList"
         limit:
           type: integer
         offset:
@@ -6703,7 +6757,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/User'
+            $ref: "#/components/schemas/User"
         limit:
           type: integer
         offset:
@@ -6722,7 +6776,7 @@ components:
           enum:
             - upload_session
         attributes:
-          $ref: '#/components/schemas/UploadSessionAttributes'
+          $ref: "#/components/schemas/UploadSessionAttributes"
     UploadSessionAttributes:
       title: UploadSessionAttributes
       type: object
@@ -6752,7 +6806,7 @@ components:
           enum:
             - upload_session_file
         attributes:
-          $ref: '#/components/schemas/UploadSessionFileAttributes'
+          $ref: "#/components/schemas/UploadSessionFileAttributes"
     UploadSessionFileAttributes:
       title: UploadSessionFileAttributes
       type: object
@@ -6850,7 +6904,7 @@ components:
       type: object
       properties:
         chapterDraft:
-          $ref: '#/components/schemas/ChapterDraft'
+          $ref: "#/components/schemas/ChapterDraft"
         pageOrder:
           description: ordered list of Upload Session File ids
           type: array
@@ -6865,16 +6919,16 @@ components:
       type: object
       properties:
         volume:
-          $ref: '#/components/schemas/ChapterVolume'
+          $ref: "#/components/schemas/ChapterVolume"
         chapter:
-          $ref: '#/components/schemas/ChapterVolume'
+          $ref: "#/components/schemas/ChapterVolume"
         title:
           nullable: true
           type: string
           maxLength: 255
         translatedLanguage:
           type: string
-          pattern: '^[a-z]{2}(-[a-z]{2})?$'
+          pattern: "^[a-z]{2}(-[a-z]{2})?$"
         externalUrl:
           nullable: true
           type: string
@@ -6904,7 +6958,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Report'
+            $ref: "#/components/schemas/Report"
         limit:
           type: integer
         offset:
@@ -6923,11 +6977,11 @@ components:
           enum:
             - report
         attributes:
-          $ref: '#/components/schemas/ReportAttributes'
+          $ref: "#/components/schemas/ReportAttributes"
         relationships:
           type: array
           items:
-            $ref: '#/components/schemas/Relationship'
+            $ref: "#/components/schemas/Relationship"
     ReportAttributes:
       title: ReportAttributes
       type: object

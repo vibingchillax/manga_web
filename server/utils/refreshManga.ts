@@ -1,26 +1,26 @@
-import { randomUUID } from 'crypto'
-import { ScrapeTarget } from '~~/shared/prisma/enums'
+import { randomUUID } from "crypto";
+import { ScrapeTarget } from "~~/shared/prisma/enums";
 
 type MangaRequestBody = {
-  sourceId: string
-  title: string
-  mangadexId: string
-}
+  sourceId: string;
+  title: string;
+  mangadexId: string;
+};
 
 export async function refreshManga(mangaInput: MangaRequestBody) {
-
   const scrapeNew = await sourcesInstance.runSourceForMangas({
     sourceId: mangaInput.sourceId,
-    titleInput: mangaInput.title
-  })
+    titleInput: mangaInput.title,
+  });
 
-  if (!(scrapeNew.length > 0)) throw createError({
-    statusCode: 404,
-    statusMessage: `No manga found from ${mangaInput.sourceId} for ${mangaInput.title}`
-  })
+  if (!(scrapeNew.length > 0))
+    throw createError({
+      statusCode: 404,
+      statusMessage: `No manga found from ${mangaInput.sourceId} for ${mangaInput.title}`,
+    });
 
   const created = await prisma.scrapedManga.createManyAndReturn({
-    data: scrapeNew.map(manga => ({
+    data: scrapeNew.map((manga) => ({
       id: randomUUID(),
       mangaDexId: mangaInput.mangadexId,
       sourceId: manga.sourceId,
@@ -36,10 +36,10 @@ export async function refreshManga(mangaInput: MangaRequestBody) {
       year: manga.year,
       contentRating: manga.contentRating,
       tags: manga.tags,
-      originalLanguage: manga.originalLanguage
+      originalLanguage: manga.originalLanguage,
     })),
-    skipDuplicates: true
-  })
+    skipDuplicates: true,
+  });
 
   await prisma.scrapeStatus.upsert({
     where: {
@@ -49,16 +49,15 @@ export async function refreshManga(mangaInput: MangaRequestBody) {
       },
     },
     update: {
-      refreshedAt: new Date()
+      refreshedAt: new Date(),
     },
     create: {
       id: randomUUID(),
       targetId: mangaInput.mangadexId,
       targetType: ScrapeTarget.manga,
-      refreshedAt: new Date()
-    }
-  })
+      refreshedAt: new Date(),
+    },
+  });
 
-  return created
-
+  return created;
 }

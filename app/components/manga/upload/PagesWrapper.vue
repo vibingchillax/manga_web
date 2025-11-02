@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { UploadPage } from './Pages.vue';
-import JSZip from 'jszip'
+import type { UploadPage } from "./Pages.vue";
+import JSZip from "jszip";
 
-const toast = useToast()
+const toast = useToast();
 
 const props = defineProps<{
   disabled?: boolean;
   shouldReslice?: boolean;
 }>();
 
-const pages = defineModel<UploadPage[]>({required: true})
+const pages = defineModel<UploadPage[]>({ required: true });
 
 const emit = defineEmits<{
   (e: "removePages", pages: UploadPage[]): void;
@@ -21,7 +21,11 @@ defineExpose({
 });
 
 const IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
-const ZIP_TYPES = ["application/zip", "application/x-zip-compressed", "multipart/x-zip"];
+const ZIP_TYPES = [
+  "application/zip",
+  "application/x-zip-compressed",
+  "multipart/x-zip",
+];
 const ACCEPTED_TYPES = [...IMAGE_TYPES, ...ZIP_TYPES];
 const ACCEPTED_EXTS = ["cbz"];
 const IMAGE_MIME: Record<string, string> = {
@@ -48,7 +52,9 @@ function loadImage(src: string) {
 }
 
 function sortByFileName(arr: UploadPage[]): UploadPage[] {
-  return arr.sort((a,b) => a.file.name.localeCompare(b.file.name, undefined, { numeric: true }));
+  return arr.sort((a, b) =>
+    a.file.name.localeCompare(b.file.name, undefined, { numeric: true }),
+  );
 }
 
 async function unzipAndFilter(file: File) {
@@ -57,7 +63,8 @@ async function unzipAndFilter(file: File) {
   const tasks: Promise<File>[] = [];
 
   zip.forEach((relativePath, entry) => {
-    if (!entry || entry.dir || SKIP_FILES.some(f => relativePath.includes(f))) return;
+    if (!entry || entry.dir || SKIP_FILES.some((f) => relativePath.includes(f)))
+      return;
 
     const name = relativePath.split("/").pop()!;
     const ext = name.split(".").pop()!.toLowerCase();
@@ -66,12 +73,18 @@ async function unzipAndFilter(file: File) {
       return;
     }
     tasks.push(
-      entry.async("blob").then(blob => new File([blob], name, { type: IMAGE_MIME[ext], lastModified: entry.date.getTime() }))
+      entry.async("blob").then(
+        (blob) =>
+          new File([blob], name, {
+            type: IMAGE_MIME[ext],
+            lastModified: entry.date.getTime(),
+          }),
+      ),
     );
   });
 
   return [tasks, skipped] as const;
-};
+}
 
 async function addFiles(newFiles: File[], message?: string) {
   busyCount.value++;
@@ -80,23 +93,27 @@ async function addFiles(newFiles: File[], message?: string) {
   return processedFiles;
 }
 
-async function processFiles(files: File[], message?: string, pushToPages = true): Promise<UploadPage[]> {
+async function processFiles(
+  files: File[],
+  message?: string,
+  pushToPages = true,
+): Promise<UploadPage[]> {
   if (files.length === 0) return [];
 
   const pagesToAdd: UploadPage[] = [];
 
   for (const file of files) {
-    let failReason = '';
-    let preview = '';
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    let failReason = "";
+    let preview = "";
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
 
     if (!ACCEPTED_TYPES.includes(file.type) && !ACCEPTED_EXTS.includes(ext)) {
       toast.add({
         title: "Warning",
         color: "warning",
-        description: 'Some files were skipped.',
+        description: "Some files were skipped.",
         duration: 10000,
-      })
+      });
       continue;
     }
 
@@ -106,12 +123,16 @@ async function processFiles(files: File[], message?: string, pushToPages = true)
         toast.add({
           title: "Warning",
           color: "warning",
-          description: 'Some files were skipped.',
+          description: "Some files were skipped.",
           duration: 10000,
-        })
+        });
       }
       const resolvedFiles = await Promise.all(extractedFiles);
-      const nestedPages = await processFiles(resolvedFiles, 'Automatically extracted from archive', false);
+      const nestedPages = await processFiles(
+        resolvedFiles,
+        "Automatically extracted from archive",
+        false,
+      );
       pagesToAdd.push(...nestedPages);
       continue;
     }
@@ -120,28 +141,34 @@ async function processFiles(files: File[], message?: string, pushToPages = true)
       try {
         preview = URL.createObjectURL(file);
         const img = await loadImage(preview);
-        if (img.width > 10000) failReason = 'File over 10k pixels wide';
+        if (img.width > 10000) failReason = "File over 10k pixels wide";
         if (img.height > 10000) {
           if (props.shouldReslice) {
-            const slices = await reslicePages([{ image: img, filename: file.name }]);
-            const slicedPages = await processFiles(slices, 'Automatically sliced', false);
+            const slices = await reslicePages([
+              { image: img, filename: file.name },
+            ]);
+            const slicedPages = await processFiles(
+              slices,
+              "Automatically sliced",
+              false,
+            );
             pagesToAdd.push(...slicedPages);
             continue;
           } else {
-            failReason = 'File over 10k pixels tall';
+            failReason = "File over 10k pixels tall";
           }
         }
       } catch {
         toast.add({
-          title: 'Warning',
-          color: 'warning',
-          description: 'Some files were skipped.',
-          duration: 10000
-        })
+          title: "Warning",
+          color: "warning",
+          description: "Some files were skipped.",
+          duration: 10000,
+        });
         continue;
       }
     } else {
-      failReason = 'File size over 50MB';
+      failReason = "File size over 50MB";
     }
 
     const page: UploadPage = {
@@ -156,7 +183,7 @@ async function processFiles(files: File[], message?: string, pushToPages = true)
       message,
       state: failReason ? UploadState.Fail : UploadState.Pending,
       promise: Promise.resolve(),
-      resolve: () => {}
+      resolve: () => {},
     };
 
     if (!failReason) {
@@ -170,50 +197,66 @@ async function processFiles(files: File[], message?: string, pushToPages = true)
 
   if (pushToPages) {
     pages.value.push(...pagesToAdd);
-    emit('newFiles', pagesToAdd.filter(p => p.state === UploadState.Pending));
+    emit(
+      "newFiles",
+      pagesToAdd.filter((p) => p.state === UploadState.Pending),
+    );
   }
 
   return pagesToAdd;
 }
 
 function removePages(files: UploadPage[], emitEvent = true) {
-  const idsToRemove = files.map(f => f.id);
-  pages.value = pages.value.filter(f => !idsToRemove.includes(f.id));
-  files.forEach(f => f.preview && URL.revokeObjectURL(f.preview));
+  const idsToRemove = files.map((f) => f.id);
+  pages.value = pages.value.filter((f) => !idsToRemove.includes(f.id));
+  files.forEach((f) => f.preview && URL.revokeObjectURL(f.preview));
   if (emitEvent) emit("removePages", files);
-};
+}
 
 function removePage(file: UploadPage, emitEvent = true) {
   removePages([file], emitEvent);
 }
 function removeAll(emitEvent = false) {
-  removePages(pages.value.filter(f => f.state !== UploadState.PendingRemoval && f.state !== UploadState.Removed), emitEvent);
+  removePages(
+    pages.value.filter(
+      (f) =>
+        f.state !== UploadState.PendingRemoval &&
+        f.state !== UploadState.Removed,
+    ),
+    emitEvent,
+  );
 }
 function removeFailed() {
-  removePages(pages.value.filter(f => f.state === UploadState.Fail));
+  removePages(pages.value.filter((f) => f.state === UploadState.Fail));
 }
 
 async function updateFile(file: File) {
   if (!editingFile.value) return;
 
-  const index = pages.value.findIndex(p => p.id === editingFile.value!.id);
+  const index = pages.value.findIndex((p) => p.id === editingFile.value!.id);
   if (index === -1) return;
 
   const updatedPages = await processFiles([file], "Replaced file", false);
   pages.value.splice(index, 1, ...updatedPages);
   removePage(editingFile.value, false);
   editingFile.value = null;
-  emit("newFiles", updatedPages.filter(p => p.state === UploadState.Pending));
-};
+  emit(
+    "newFiles",
+    updatedPages.filter((p) => p.state === UploadState.Pending),
+  );
+}
 
 function quickSort() {
   pages.value = sortByFileName([...pages.value]);
-};
+}
 
 async function resetPages() {
   busyCount.value++;
-  const validPages = pages.value.filter(p => ![UploadState.PendingRemoval, UploadState.Removed].includes(p.state!));
-  await processFiles(validPages.map(p => p.file));
+  const validPages = pages.value.filter(
+    (p) =>
+      ![UploadState.PendingRemoval, UploadState.Removed].includes(p.state!),
+  );
+  await processFiles(validPages.map((p) => p.file));
   busyCount.value--;
 }
 
@@ -224,7 +267,7 @@ function findDifferingNumber(from: string, to: string) {
 
   const numberRegex = /\d+(\.\d+)?[a-z]?/g;
   const fromMatches: { match: string; offset: number }[] = [];
-  
+
   let match: RegExpExecArray | null;
   let offset = 0;
 
@@ -238,7 +281,11 @@ function findDifferingNumber(from: string, to: string) {
   while ((match = numberRegex.exec(to))) {
     const adjustedIndex = (match.index || 0) - offset;
 
-    if (fromMatches.some(fm => fm.offset === adjustedIndex && fm.match !== match![0])) {
+    if (
+      fromMatches.some(
+        (fm) => fm.offset === adjustedIndex && fm.match !== match![0],
+      )
+    ) {
       if (differingMatch) return null;
       differingMatch = match;
     }
@@ -251,11 +298,11 @@ function findDifferingNumber(from: string, to: string) {
   return {
     before: to.substring(0, differingMatch.index || 0),
     after: to.substring((differingMatch.index || 0) + differingMatch[0].length),
-    pad: differingMatch[0][0] === "0" ? differingMatch[0].length : 0
+    pad: differingMatch[0][0] === "0" ? differingMatch[0].length : 0,
   };
-};
+}
 
-function createFilenameFormatter(filenames: string[]): ((num: number) => string) {
+function createFilenameFormatter(filenames: string[]): (num: number) => string {
   if (filenames.length < 2) return (n: number) => n.toString().padStart(3, "0");
 
   let basePattern = null;
@@ -265,7 +312,10 @@ function createFilenameFormatter(filenames: string[]): ((num: number) => string)
     if (diff) {
       if (!basePattern) basePattern = diff;
       else {
-        if (basePattern.before !== diff.before || basePattern.after !== diff.after) {
+        if (
+          basePattern.before !== diff.before ||
+          basePattern.after !== diff.after
+        ) {
           // Inconsistent pattern -> fallback to default
           return (n: number) => n.toString().padStart(3, "0");
         }
@@ -278,15 +328,21 @@ function createFilenameFormatter(filenames: string[]): ((num: number) => string)
 
   const { before, after, pad } = basePattern;
   return (n: number) => `${before}${n.toString().padStart(pad, "0")}${after}`;
-};
+}
 
-function canvasToBlob(canvas: HTMLCanvasElement, mimeType = "image/png"): Promise<Blob> {
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  mimeType = "image/png",
+): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    canvas.toBlob(blob => (blob ? resolve(blob) : reject(blob)), mimeType);
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(blob)), mimeType);
   });
 }
 
-function computeSliceHeights(inputHeight: number, targetHeight: number): number[] {
+function computeSliceHeights(
+  inputHeight: number,
+  targetHeight: number,
+): number[] {
   if (inputHeight <= targetHeight) return [inputHeight];
 
   const slices = Math.floor(inputHeight / targetHeight);
@@ -297,25 +353,33 @@ function computeSliceHeights(inputHeight: number, targetHeight: number): number[
   for (let i = 0; i < remainder; i++) heights[i] += 1;
 
   return heights;
-};
+}
 
 async function resliceImage(
   page: { image: HTMLImageElement; filename: string },
-  sliceHeights: number[]
+  sliceHeights: number[],
 ): Promise<File[]> {
-  console.log(`(${page.filename}) - Reslicing image with slice heights: ${sliceHeights}`);
+  console.log(
+    `(${page.filename}) - Reslicing image with slice heights: ${sliceHeights}`,
+  );
 
   const slices: File[] = [];
   let currentY = 0;
 
   const pushSlice = async (canvas: HTMLCanvasElement) => {
     const blob = await canvasToBlob(canvas);
-    slices.push(new File([blob], `${page.filename}-${slices.length + 1}.png`, { type: "image/png" }));
+    slices.push(
+      new File([blob], `${page.filename}-${slices.length + 1}.png`, {
+        type: "image/png",
+      }),
+    );
   };
 
   for (let i = 0; i < sliceHeights.length; i++) {
     const height = sliceHeights[i]!;
-    console.log(`(${page.filename}) - Drawing slice ${i + 1} with y0=${currentY} height=${height}`);
+    console.log(
+      `(${page.filename}) - Drawing slice ${i + 1} with y0=${currentY} height=${height}`,
+    );
 
     const canvas = document.createElement("canvas");
     canvas.width = page.image.width;
@@ -332,12 +396,14 @@ async function resliceImage(
   URL.revokeObjectURL(page.image.src);
 
   return slices;
-};
+}
 
 async function reslicePages(
-  pages: { image: HTMLImageElement; filename: string }[]
+  pages: { image: HTMLImageElement; filename: string }[],
 ): Promise<File[]> {
-  console.log(`Reslicing ${pages.length} pages: ${pages.map(p => p.filename)}`);
+  console.log(
+    `Reslicing ${pages.length} pages: ${pages.map((p) => p.filename)}`,
+  );
 
   const allSlices: File[] = [];
 
@@ -348,52 +414,87 @@ async function reslicePages(
   }
 
   return allSlices;
-};
+}
 
-const isPendingPage = (f: UploadPage): f is UploadPage & { state: UploadState; preview: string } =>
+const isPendingPage = (
+  f: UploadPage,
+): f is UploadPage & { state: UploadState; preview: string } =>
   typeof f.state === "number" &&
-  [UploadState.Pending, UploadState.Uploading, UploadState.Success].includes(f.state) &&
-  typeof f.preview === "string" && f.preview.length > 0;
+  [UploadState.Pending, UploadState.Uploading, UploadState.Success].includes(
+    f.state,
+  ) &&
+  typeof f.preview === "string" &&
+  f.preview.length > 0;
 
 async function resliceLargeImages() {
   isProcessing.value = true;
   const pendingPages = pages.value.filter(isPendingPage);
-  const images = await Promise.all(pendingPages.map(f => loadImage(f.preview)));
-  const filenames = createFilenameFormatter(pendingPages.map(f => f.file.name));
-  const sliced = await reslicePages(images.map((img, i) => ({ image: img, filename: filenames(i + 1) })));
+  const images = await Promise.all(
+    pendingPages.map((f) => loadImage(f.preview)),
+  );
+  const filenames = createFilenameFormatter(
+    pendingPages.map((f) => f.file.name),
+  );
+  const sliced = await reslicePages(
+    images.map((img, i) => ({ image: img, filename: filenames(i + 1) })),
+  );
   removePages(pendingPages);
   await addFiles(sliced);
   isProcessing.value = false;
-};
+}
 </script>
 <template>
   <div>
     <MangaUploadPages
       v-model="pages"
       :disabled="disabled"
+      :accept="[...IMAGE_TYPES, ...ACCEPTED_EXTS.map((e) => '.' + e)]"
       @add-files="addFiles"
       @remove-file="removePage"
-      @edit-click="file => editingFile = file"
+      @edit-click="(file) => (editingFile = file)"
       @edit-file="updateFile"
-      :accept="[...IMAGE_TYPES, ...ACCEPTED_EXTS.map(e => '.' + e)]"
     />
 
     <div v-if="!disabled && pages.length > 0" class="flex my-2 flex-wrap">
       <UPopover v-if="shouldReslice" text="reslice tooltip">
-        <UButton @click="resliceLargeImages" size="xl" :loading="isProcessing" :disabled="isProcessing">
+        <UButton
+          size="xl"
+          :loading="isProcessing"
+          :disabled="isProcessing"
+          @click="resliceLargeImages"
+        >
           Reslice all pages
         </UButton>
       </UPopover>
 
-      <UButton @click="quickSort" variant="ghost" color="neutral" size="xl" :disabled="isProcessing">
+      <UButton
+        variant="ghost"
+        color="neutral"
+        size="xl"
+        :disabled="isProcessing"
+        @click="quickSort"
+      >
         Quick sort
       </UButton>
 
-      <UButton @click="() => removeAll(false)" variant="ghost" color="neutral" size="xl" :disabled="isProcessing">
+      <UButton
+        variant="ghost"
+        color="neutral"
+        size="xl"
+        :disabled="isProcessing"
+        @click="() => removeAll(false)"
+      >
         Remove all
       </UButton>
 
-      <UButton v-if="pages.some(p => p.state === UploadState.Fail)" @click="removeFailed" variant="ghost" color="neutral" size="xl" :disabled="isProcessing">
+      <UButton
+        v-if="pages.some((p) => p.state === UploadState.Fail)"
+        variant="ghost"
+        color="neutral"
+        size="xl"
+        :disabled="isProcessing"
+        @click="removeFailed"
+      >
         Remove all failed pages
       </UButton>
     </div>

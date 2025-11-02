@@ -1,18 +1,20 @@
 <script setup lang="ts">
+const props = withDefaults(
+  defineProps<{
+    lang: string;
+    size?: number;
+    displayScripts?: boolean;
+  }>(),
+  {
+    size: 24,
+    displayScripts: false,
+  },
+);
 
-const props = withDefaults(defineProps<{
-  lang: string
-  size?: number
-  displayScripts?: boolean
-}>(), {
-  size: 24,
-  displayScripts: false,
-})
+const languages = LANGUAGES_BY_CODE;
 
-const languages = LANGUAGES_BY_CODE
-
-const halfSize = computed(() => Math.floor(props.size / 2))
-const flag = computed(() => languages.get(props.lang) || languages.get('NULL'))
+const halfSize = computed(() => Math.floor(props.size / 2));
+const flag = computed(() => languages.get(props.lang) || languages.get("NULL"));
 </script>
 <template>
   <Wrap
@@ -21,13 +23,13 @@ const flag = computed(() => languages.get(props.lang) || languages.get('NULL'))
     :wrap="displayScripts"
     :style="[
       { display: 'inline-block !important' },
-      { minWidth: size + 'px', minHeight: size + 'px' }
+      { minWidth: size + 'px', minHeight: size + 'px' },
     ]"
     v-bind="$attrs"
   >
     <img
-      v-bind="$attrs"
       v-if="flag"
+      v-bind="$attrs"
       :class="!displayScripts && 'inline-block select-none'"
       :title="flag.name.inEnglish"
       :src="`/img/flags/${flag.display.flag}.svg`"
@@ -43,7 +45,7 @@ const flag = computed(() => languages.get(props.lang) || languages.get('NULL'))
       :alt="`${flag.name.inEnglish} script icon`"
       :width="halfSize"
       :height="halfSize"
-      style="margin-top: -12px; margin-left: auto; margin-right: -2px;"
+      style="margin-top: -12px; margin-left: auto; margin-right: -2px"
     />
   </Wrap>
 </template>

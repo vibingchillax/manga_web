@@ -1,7 +1,7 @@
-import { z } from 'zod'
-import { formatGroup } from '~~/server/utils/formatResponse'
-import { GroupRole, UserRole } from '~~/shared/prisma/enums'
-import { ScanlationGroupSchema } from '../index.post'
+import { z } from "zod";
+import { formatGroup } from "~~/server/utils/formatResponse";
+import { GroupRole, UserRole } from "~~/shared/prisma/enums";
+import { ScanlationGroupSchema } from "../index.post";
 
 const ScanlationGroupUpdateSchema = ScanlationGroupSchema.extend({
   leader: zUuid.optional(),
@@ -9,76 +9,97 @@ const ScanlationGroupUpdateSchema = ScanlationGroupSchema.extend({
   focusedLanguages: z.array(zLang).optional(),
   inactive: z.boolean().optional(),
   locked: z.boolean().optional(),
-})
+});
 
 export default defineEventHandler(async (event) => {
-  const user = await getAuthenticatedUser(event)
+  const user = await getAuthenticatedUser(event);
 
-  if (!user) throw createError({
-    statusCode: 401,
-    statusMessage: 'Not logged in'
-  })
+  if (!user)
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Not logged in",
+    });
 
-  const params = await getValidatedRouterParams(event, z.object({
-    id: zUuid
-  }).parse)
+  const params = await getValidatedRouterParams(
+    event,
+    z.object({
+      id: zUuid,
+    }).parse,
+  );
 
-  const data = await readValidatedBody(event, ScanlationGroupUpdateSchema.parse)
+  const data = await readValidatedBody(
+    event,
+    ScanlationGroupUpdateSchema.parse,
+  );
 
   const currentGroup = await prisma.scanlationGroup.findUnique({
     where: { id: params.id },
-    include: { members: true }
-  })
-  if (!currentGroup) throw createError({ statusCode: 404, statusMessage: 'Group not found' })
+    include: { members: true },
+  });
+  if (!currentGroup)
+    throw createError({ statusCode: 404, statusMessage: "Group not found" });
 
-  if (!(user.roles.includes(UserRole.admin)
-    || user.id === currentGroup.members?.find(m => m.role === GroupRole.leader)?.userId)) {
+  if (
+    !(
+      user.roles.includes(UserRole.admin) ||
+      user.id ===
+        currentGroup.members?.find((m) => m.role === GroupRole.leader)?.userId
+    )
+  ) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Forbidden'
-    })
+      statusMessage: "Forbidden",
+    });
   }
 
-  const { members, leader, ...scalarUpdate } = data
+  const { members, leader, ...scalarUpdate } = data;
   await prisma.scanlationGroup.update({
     where: { id: params.id },
     data: {
       ...scalarUpdate,
-      focusedLanguages: scalarUpdate.focusedLanguages ? { set: scalarUpdate.focusedLanguages } : undefined,
+      focusedLanguages: scalarUpdate.focusedLanguages
+        ? { set: scalarUpdate.focusedLanguages }
+        : undefined,
       version: {
-        increment: 1
-      }
-    }
-  })
+        increment: 1,
+      },
+    },
+  });
 
   if (leader) {
     await prisma.scanlationGroupMember.updateMany({
-      where: { groupId: params.id, role: 'leader' },
-      data: { role: 'member' }
-    })
+      where: { groupId: params.id, role: "leader" },
+      data: { role: "member" },
+    });
     await prisma.scanlationGroupMember.upsert({
       where: { userId_groupId: { groupId: params.id, userId: leader } },
-      update: { role: 'leader' },
-      create: { groupId: params.id, userId: leader, role: 'leader' }
-    })
+      update: { role: "leader" },
+      create: { groupId: params.id, userId: leader, role: "leader" },
+    });
   }
 
   if (members) {
-    const currentMemberIds = currentGroup.members.map(m => m.userId)
-    const toAdd = members.filter(u => !currentMemberIds.includes(u))
-    const toRemove = currentMemberIds.filter(u => !members.includes(u) && u !== leader)
+    const currentMemberIds = currentGroup.members.map((m) => m.userId);
+    const toAdd = members.filter((u) => !currentMemberIds.includes(u));
+    const toRemove = currentMemberIds.filter(
+      (u) => !members.includes(u) && u !== leader,
+    );
 
     if (toAdd.length) {
       await prisma.scanlationGroupMember.createMany({
-        data: toAdd.map(userId => ({ groupId: params.id, userId, role: 'member' })),
-        skipDuplicates: true
-      })
+        data: toAdd.map((userId) => ({
+          groupId: params.id,
+          userId,
+          role: "member",
+        })),
+        skipDuplicates: true,
+      });
     }
 
     if (toRemove.length) {
       await prisma.scanlationGroupMember.deleteMany({
-        where: { groupId: params.id, userId: { in: toRemove } }
-      })
+        where: { groupId: params.id, userId: { in: toRemove } },
+      });
     }
   }
 
@@ -91,24 +112,24 @@ export default defineEventHandler(async (event) => {
             select: {
               id: true,
               username: true,
-              roles: true
-            }
+              roles: true,
+            },
           },
-          role: true
-        }
-      }
-    }
-  })
+          role: true,
+        },
+      },
+    },
+  });
 
   if (!result) {
     throw createError({
       statusCode: 409,
-      statusMessage: "Updated successfully, but record not found"
-    })
+      statusMessage: "Updated successfully, but record not found",
+    });
   }
 
   return {
     result: "ok",
-    data: formatGroup(result)
-  }
-})
+    data: formatGroup(result),
+  };
+});

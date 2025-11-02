@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import LanguageFilter from './LanguageFilter.vue';
-import ContentFilter from './ContentFilter.vue';
-import MOTD from './MOTD.vue';
-import IPFS from './IPFS.vue';
+import LanguageFilter from "./LanguageFilter.vue";
+import ContentFilter from "./ContentFilter.vue";
+import MOTD from "./MOTD.vue";
+import IPFS from "./IPFS.vue";
 </script>
 <template>
   <div class="flex">
-    <div class="button-menu"></div>
-    <div class="separator"></div>
+    <div class="button-menu" />
+    <div class="separator" />
     <div class="min-w-0">
       <div class="flex flex-col gap-2">
         <LanguageFilter />
@@ -23,7 +23,7 @@ import IPFS from './IPFS.vue';
   border-bottom: 1px solid;
   border-bottom-color: currentcolor;
   border-color: rgb(var(--mw-accent-20));
-  margin-top: calc(var(--navbar-height)*-1 - 16px);
+  margin-top: calc(var(--navbar-height) * -1 - 16px);
   padding-bottom: 1rem;
   padding-top: calc(var(--navbar-height) + 16px);
 }

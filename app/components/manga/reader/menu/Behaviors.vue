@@ -1,25 +1,26 @@
 <script setup lang="ts">
-import type { TabsItem } from '@nuxt/ui';
+import type { TabsItem } from "@nuxt/ui";
 
-const settings = useReaderMenu()
+const settings = useReaderMenu();
 
-const { doAutoAdvance } = storeToRefs(settings)
+const { doAutoAdvance } = storeToRefs(settings);
 
 const autoAdvanceItems: TabsItem[] = [
   {
-    label: 'Disabled',
-    value: 'disabled'
+    label: "Disabled",
+    value: "disabled",
   },
   {
-    label: 'Enabled',
-    value: 'enabled'
-  }
-]
+    label: "Enabled",
+    value: "enabled",
+  },
+];
 
 const autoAdvance = computed({
-  get: () => doAutoAdvance.value ? 'enabled' : 'disabled',
-  set: (val: 'enabled' | 'disabled') => settings.setAutoAdvance(val === 'enabled')
-})
+  get: () => (doAutoAdvance.value ? "enabled" : "disabled"),
+  set: (val: "enabled" | "disabled") =>
+    settings.setAutoAdvance(val === "enabled"),
+});
 </script>
 <template>
   Automatically advance chapter on last page

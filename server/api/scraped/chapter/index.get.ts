@@ -1,13 +1,16 @@
-import { z } from 'zod'
-import { formatScrapedChapter } from '~~/server/utils/formatResponse';
+import { z } from "zod";
+import { formatScrapedChapter } from "~~/server/utils/formatResponse";
 
 export default defineEventHandler(async (event) => {
-  const query = await getValidatedQuery(event, z.object({
-    'ids[]': zArrayable(zUuid).optional(),
-    'includes[]': zArrayable(z.string()).optional()
-  }).parse)
+  const query = await getValidatedQuery(
+    event,
+    z.object({
+      "ids[]": zArrayable(zUuid).optional(),
+      "includes[]": zArrayable(z.string()).optional(),
+    }).parse,
+  );
 
-  const ids = query['ids[]'] as string[] | undefined
+  const ids = query["ids[]"] as string[] | undefined;
 
   const chapters = await prisma.scrapedChapter.findMany({
     where: { id: { in: ids } },
@@ -17,7 +20,7 @@ export default defineEventHandler(async (event) => {
   if (chapters.length === 0) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Chapter(s) not found'
+      statusMessage: "Chapter(s) not found",
     });
   }
 

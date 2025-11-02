@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import type { MangaReaderPages } from '#components';
-import { HeaderStyleEnum, ProgressSideEnum, ReadStyleEnum, TurnPagesEnum } from '~/stores/useReaderMenu';
+import type { MangaReaderPages } from "#components";
+import {
+  HeaderStyleEnum,
+  ProgressSideEnum,
+  ReadStyleEnum,
+  TurnPagesEnum,
+} from "~/stores/useReaderMenu";
 
 const root = ref<HTMLElement | null>(null);
 const readerChapter = ref<HTMLElement | null>(null);
@@ -13,11 +18,11 @@ const reader = useReaderStore();
 const settings = useReaderMenu();
 const pageManager = useReaderPageManager();
 
-const { $breakpoints } = useNuxtApp()
-const { isFullscreen, enter, exit } = useFullscreen()
+const { $breakpoints } = useNuxtApp();
+const { isFullscreen, enter, exit } = useFullscreen();
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
 const {
   currentChapter,
@@ -28,7 +33,7 @@ const {
   manga,
   showContentWarning,
   chapterState,
-  immersionBreak
+  immersionBreak,
 } = storeToRefs(reader);
 
 const {
@@ -41,14 +46,21 @@ const {
   readStyle,
   turnPages,
   turnPagesByScrolling,
-  offsetDoubles
+  offsetDoubles,
 } = storeToRefs(settings);
 
-const is404 = computed(() => !!chapterLoadError && chapterLoadError.value?.status === 404 && useReaderPageManager().pageState === 'error404');
+const is404 = computed(
+  () =>
+    !!chapterLoadError &&
+    chapterLoadError.value?.status === 404 &&
+    useReaderPageManager().pageState === "error404",
+);
 const pageTitle = computed(() => {
-  if (is404.value || chapterLoadError) return '';
-  if (chapterState.value !== 'loaded') return `Loading...`;
-  const chapterLabel = chapterMeta.value.chapterNo ? `Ch. ${chapterMeta.value.chapterNo}` : 'Oneshot';
+  if (is404.value || chapterLoadError) return "";
+  if (chapterState.value !== "loaded") return `Loading...`;
+  const chapterLabel = chapterMeta.value.chapterNo
+    ? `Ch. ${chapterMeta.value.chapterNo}`
+    : "Oneshot";
   return `${currentPageNumber} | ${chapterLabel} - ${chapterMeta.value.mangaTitle}`;
 });
 
@@ -82,8 +94,8 @@ function handleClick(e: MouseEvent, isDouble = false) {
 
   if ((!inLeftZone && !inRightZone) || noPageTurn) {
     if (
-      immersive.value
-      || !$breakpoints.sm.value
+      immersive.value ||
+      !$breakpoints.sm.value
       // $isMobileApp
     ) {
       reader.toggleImmersionBreak();
@@ -97,7 +109,8 @@ function handleClick(e: MouseEvent, isDouble = false) {
     //   settings.setImmersionBreak(false);
     // }
 
-    if (turnPages.value === TurnPagesEnum.Directional) { //forward only?
+    if (turnPages.value === TurnPagesEnum.Directional) {
+      //forward only?
       // Only go forward (webtoon style)
       // if (reader.isWebtoon) scrollByAmount(1);
       // else pageManager.incrementPageGroup(1, router, true);
@@ -123,58 +136,85 @@ function handleClick(e: MouseEvent, isDouble = false) {
 //   window.scrollBy({ top: direction * step, behavior: "smooth" });
 // }
 
-
 defineShortcuts({
-  arrowleft: () => { //todo, use keybinds
-    reader.incrementPageGroup(-1, router, readStyle.value === ReadStyleEnum.LTR)
+  arrowleft: () => {
+    //todo, use keybinds
+    reader.incrementPageGroup(
+      -1,
+      router,
+      readStyle.value === ReadStyleEnum.LTR,
+    );
   },
   arrowright: () => {
-    reader.incrementPageGroup(1, router, readStyle.value === ReadStyleEnum.LTR)
+    reader.incrementPageGroup(1, router, readStyle.value === ReadStyleEnum.LTR);
   },
   m: () => {
-    menuOpen.value = !menuOpen.value
+    menuOpen.value = !menuOpen.value;
   },
-})
+});
 
 watch([currentChapter, currentPageNumber], () => {
   document.title = pageTitle.value;
 });
 
 watch(immersive, (val) => {
-  val ? enter() : exit()
-})
+  val ? enter() : exit();
+});
 
 watch(isFullscreen, (val) => {
-  if (!val) reader.setImmersive(false)
-})
+  if (!val) reader.setImmersive(false);
+});
 </script>
 <template>
-  <div ref="root" class="mw--reader-wrap" :class="{
-    'header-shown': headerStyle === HeaderStyleEnum.Shown && !immersive,
-    'immersion-break': immersionBreak
-  }">
-    <div v-if="showContentWarning && contentWarningVisible" class="mw--reader-warning">
+  <div
+    ref="root"
+    class="mw--reader-wrap"
+    :class="{
+      'header-shown': headerStyle === HeaderStyleEnum.Shown && !immersive,
+      'immersion-break': immersionBreak,
+    }"
+  >
+    <div
+      v-if="showContentWarning && contentWarningVisible"
+      class="mw--reader-warning"
+    >
       <h2>Content Warning</h2>
-      <p>{{ manga?.attributes.title.en }} - Chapter contains filtered out content</p>
+      <p>
+        {{ manga?.attributes.title.en }} - Chapter contains filtered out content
+      </p>
       <button @click="router.back()">Back</button>
       <button @click="contentWarningVisible = false">OK</button>
     </div>
 
-    <div v-else-if="is404" class="mw--reader-error">
-      Chapter not found
-    </div>
-    <div v-else class="mw--reader-chapter" ref="readerChapter" @scroll="" :class="{
-      'left-progress': progressSide === ProgressSideEnum.Left && $breakpoints.sm.value,
-      'right-progress': progressSide === ProgressSideEnum.Right && $breakpoints.sm.value,
-      immersive,
-      // mobile: isMobileApp,
-      // 'mobile-ls': isMobileApp && viewStyle === ViewStyleEnum.LongStrip,
-      'mobile-ls': viewStyle === ViewStyleEnum.LongStrip,
-      'header-not-floating': $breakpoints.md.value && menuPinned && headerStyle === HeaderStyleEnum.Shown
-    }">
+    <div v-else-if="is404" class="mw--reader-error">Chapter not found</div>
+    <div
+      v-else
+      ref="readerChapter"
+      class="mw--reader-chapter"
+      :class="{
+        'left-progress':
+          progressSide === ProgressSideEnum.Left && $breakpoints.sm.value,
+        'right-progress':
+          progressSide === ProgressSideEnum.Right && $breakpoints.sm.value,
+        immersive,
+        // mobile: isMobileApp,
+        // 'mobile-ls': isMobileApp && viewStyle === ViewStyleEnum.LongStrip,
+        'mobile-ls': viewStyle === ViewStyleEnum.LongStrip,
+        'header-not-floating':
+          $breakpoints.md.value &&
+          menuPinned &&
+          headerStyle === HeaderStyleEnum.Shown,
+      }"
+      @scroll=""
+    >
       <MangaReaderHeader />
-      <MangaReaderPages ref="pageContainer" :class="{ immersive }" :imm-target="readerChapter!"
-        @click="handleClick" @dblclick="(e: any) => handleClick(e, true)" />
+      <MangaReaderPages
+        ref="pageContainer"
+        :class="{ immersive }"
+        :imm-target="readerChapter!"
+        @click="handleClick"
+        @dblclick="(e: any) => handleClick(e, true)"
+      />
       <MangaReaderProgressBar />
       <MangaReaderLongStripNextChapter />
     </div>
@@ -192,11 +232,11 @@ watch(isFullscreen, (val) => {
   overflow-x: clip;
   padding: 0 !important;
   width: 100%;
-  --header-padding: 0px
+  --header-padding: 0px;
 }
 
 .mw--reader-wrap.header-shown:not(.immersive) {
-  --header-padding: 56px
+  --header-padding: 56px;
 }
 
 .mw--reader-warning {
@@ -210,36 +250,36 @@ watch(isFullscreen, (val) => {
   padding: 1.5rem;
   position: fixed;
   right: 0;
-  top: 0
+  top: 0;
 }
 
 .mw--reader-chapter {
   display: grid;
   grid-template-rows: min-content auto min-content min-content;
-  height: 100%
+  height: 100%;
 }
 
 .mw--reader-chapter.header-not-floating {
-  padding-top: var(--navbar-height)
+  padding-top: var(--navbar-height);
 }
 
 .mw--reader-chapter {
-  grid-template-areas: "header" "pages" "progress" "next"
+  grid-template-areas: "header" "pages" "progress" "next";
 }
 
 .mw--reader-chapter.left-progress {
   grid-template-areas: "header header" "progress pages" "next next";
   grid-template-columns: 0 auto;
-  grid-template-rows: min-content auto min-content
+  grid-template-rows: min-content auto min-content;
 }
 
 .mw--reader-chapter.right-progress {
   grid-template-areas: "header header" "pages progress" "next next";
   grid-template-columns: auto 0;
-  grid-template-rows: min-content auto min-content
+  grid-template-rows: min-content auto min-content;
 }
 
 .mw--reader-chapter.immersive {
-  overflow-y: auto
+  overflow-y: auto;
 }
 </style>

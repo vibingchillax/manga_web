@@ -1,17 +1,17 @@
 interface UserPreferences {
-  excludedTags: string[]
-  filteredLanguages: string[]
-  originLanguages: string[]
-  showSafe: boolean
-  showSuggestive: boolean
-  showErotic: boolean
-  showHentai: boolean
-  proxyUrl: string
-  gatewayUrl: string
-  gatewayUrls: string[]
+  excludedTags: string[];
+  filteredLanguages: string[];
+  originLanguages: string[];
+  showSafe: boolean;
+  showSuggestive: boolean;
+  showErotic: boolean;
+  showHentai: boolean;
+  proxyUrl: string;
+  gatewayUrl: string;
+  gatewayUrls: string[];
 }
 
-export const usePreferencesStore = defineStore('userPreferences', {
+export const usePreferencesStore = defineStore("userPreferences", {
   state: (): UserPreferences => ({
     excludedTags: [],
     filteredLanguages: [],
@@ -22,19 +22,20 @@ export const usePreferencesStore = defineStore('userPreferences', {
     showHentai: false,
     proxyUrl: useAppConfig().proxyUrl,
     gatewayUrl: useAppConfig().kuboGatewayUrl,
-    gatewayUrls: [useAppConfig().kuboGatewayUrl, 'https://ipfs.io/ipfs']
+    gatewayUrls: [useAppConfig().kuboGatewayUrl, "https://ipfs.io/ipfs"],
   }),
   persist: {
-    storage: localStorage
+    storage: localStorage,
   },
   getters: {
     contentRating(): ("safe" | "suggestive" | "erotica" | "pornographic")[] {
-      const ratings: ("safe" | "suggestive" | "erotica" | "pornographic")[] = []
-      if (this.showSafe) ratings.push('safe')
-      if (this.showSuggestive) ratings.push('suggestive')
-      if (this.showErotic) ratings.push('erotica')
-      if (this.showHentai) ratings.push('pornographic')
+      const ratings: ("safe" | "suggestive" | "erotica" | "pornographic")[] =
+        [];
+      if (this.showSafe) ratings.push("safe");
+      if (this.showSuggestive) ratings.push("suggestive");
+      if (this.showErotic) ratings.push("erotica");
+      if (this.showHentai) ratings.push("pornographic");
       return ratings;
-    }
-  }
-})
+    },
+  },
+});

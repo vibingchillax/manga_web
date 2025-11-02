@@ -1,17 +1,23 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export default defineEventHandler(async (event) => {
-  const params = await getValidatedRouterParams(event, z.object({
-    id: zUuid
-  }).parse)
+  const params = await getValidatedRouterParams(
+    event,
+    z.object({
+      id: zUuid,
+    }).parse,
+  );
 
-  const query = await getValidatedQuery(event, z.object({
-    'translatedLanguage[]': zArrayable(zLang).optional(),
-    'groups[]': zArrayable(zUuid).optional()
-  }).parse)
+  const query = await getValidatedQuery(
+    event,
+    z.object({
+      "translatedLanguage[]": zArrayable(zLang).optional(),
+      "groups[]": zArrayable(zUuid).optional(),
+    }).parse,
+  );
 
-  const translatedLanguage = query['translatedLanguage[]'] as string[]
-  const groups = query['groups[]'] as string[]
+  const translatedLanguage = query["translatedLanguage[]"] as string[];
+  const groups = query["groups[]"] as string[];
 
   const chapters = await prisma.uploadedChapter.findMany({
     where: {
@@ -21,10 +27,10 @@ export default defineEventHandler(async (event) => {
         : {}),
       ...(groups?.length
         ? {
-          groups: {
-            some: { groupId: { in: groups } },
-          },
-        }
+            groups: {
+              some: { groupId: { in: groups } },
+            },
+          }
         : {}),
     },
     include: {
@@ -32,25 +38,20 @@ export default defineEventHandler(async (event) => {
         select: { groupId: true },
       },
     },
-    orderBy: [
-      { volume: 'asc' },
-      { chapter: 'asc' },
-      { createdAt: 'asc' },
-    ],
-  })
+    orderBy: [{ volume: "asc" }, { chapter: "asc" }, { createdAt: "asc" }],
+  });
 
-
-  const volumes: Record<string, any> = {}
+  const volumes: Record<string, any> = {};
 
   for (const ch of chapters) {
-    const volume = ch.volume ?? 'none';
-    const chapterKey = ch.chapter ?? 'none';
+    const volume = ch.volume ?? "none";
+    const chapterKey = ch.chapter ?? "none";
 
     if (!volumes[volume]) {
       volumes[volume] = {
         volume,
         count: 0,
-        chapters: {}
+        chapters: {},
       };
     }
 
@@ -59,7 +60,7 @@ export default defineEventHandler(async (event) => {
         chapter: chapterKey,
         id: ch.id,
         others: [],
-        count: 0
+        count: 0,
       };
     } else {
       volumes[volume].chapters[chapterKey].others.push(ch.id);
@@ -71,6 +72,6 @@ export default defineEventHandler(async (event) => {
 
   return {
     result: "ok",
-    volumes: volumes
+    volumes: volumes,
   };
-})
+});

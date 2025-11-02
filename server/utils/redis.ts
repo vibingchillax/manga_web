@@ -1,9 +1,9 @@
-import Redis from 'ioredis'
+import Redis from "ioredis";
 
 export const redis = new Redis({
-  host: process.env.NODE_ENV === 'production' ? 'redis' : 'localhost',
+  host: process.env.NODE_ENV === "production" ? "redis" : "localhost",
   port: 6379,
-})
+});
 
 redis.on("connect", () => {
   console.log("Connected to Redis");

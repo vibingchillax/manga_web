@@ -1,31 +1,44 @@
 <script setup lang="ts">
-import { useResizeObserver } from '@vueuse/core'
+import { useResizeObserver } from "@vueuse/core";
 
-withDefaults(defineProps<{
-  rows?: number
-}>(), { rows: 3 })
+withDefaults(
+  defineProps<{
+    rows?: number;
+  }>(),
+  { rows: 3 },
+);
 
-const rowRef = useTemplateRef('rowRef')
-const hasOverflow = ref(false)
-const expanded = ref(false)
+const rowRef = useTemplateRef("rowRef");
+const hasOverflow = ref(false);
+const expanded = ref(false);
 
 const checkOverflow = () => {
-  if (!rowRef.value) return
-  const el = rowRef.value
-  hasOverflow.value = el.scrollHeight > el.clientHeight + 1
-}
+  if (!rowRef.value) return;
+  const el = rowRef.value;
+  hasOverflow.value = el.scrollHeight > el.clientHeight + 1;
+};
 
-useResizeObserver(rowRef, checkOverflow)
+useResizeObserver(rowRef, checkOverflow);
 
 onMounted(() => {
-  checkOverflow()
-})
+  checkOverflow();
+});
 </script>
 <template>
-  <div ref="rowRef" :class="['flex flex-wrap gap-1 tags-row', { 'overflow-y-hidden': hasOverflow && !expanded }]"
-    :style="{ maxHeight: expanded ? 'unset' : `calc(${rows} * 1em + ${(rows - 1) * 0.25}rem)` }"
-    @click="expanded = true">
-    <slot></slot>
+  <div
+    ref="rowRef"
+    :class="[
+      'flex flex-wrap gap-1 tags-row',
+      { 'overflow-y-hidden': hasOverflow && !expanded },
+    ]"
+    :style="{
+      maxHeight: expanded
+        ? 'unset'
+        : `calc(${rows} * 1em + ${(rows - 1) * 0.25}rem)`,
+    }"
+    @click="expanded = true"
+  >
+    <slot />
   </div>
 </template>
 <style lang="css" scoped>
@@ -40,10 +53,10 @@ onMounted(() => {
   color: var(--ui-primary);
   content: "MORE";
   display: block;
-  font-size: .75rem;
+  font-size: 0.75rem;
   font-weight: 700;
   line-height: 1rem;
   position: absolute;
-  right: .125rem
+  right: 0.125rem;
 }
 </style>

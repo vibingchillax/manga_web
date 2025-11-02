@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import type { Manga } from '~~/shared/types';
+import type { Manga } from "~~/shared/types";
 const props = defineProps<{
-  manga: Manga
-}>()
-const synopsis = props.manga.attributes?.description?.en || ''; //TODO user preferences
+  manga: Manga;
+}>();
+const synopsis = props.manga.attributes?.description?.en || ""; //TODO user preferences
 </script>
 <template>
-  <div class="" style="word-break: break-word;">
-    <div style="max-height: 234px; height: auto;" class="overflow-hidden transition-[max-height,height]">
+  <div class="" style="word-break: break-word">
+    <div
+      style="max-height: 234px; height: auto"
+      class="overflow-hidden transition-[max-height,height]"
+    >
       <div>
         <div class="py-2 text-sm">
           <!-- <div class="md-md-container">

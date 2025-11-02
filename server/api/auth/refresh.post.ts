@@ -1,31 +1,34 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 export default defineEventHandler(async (event) => {
-  const refreshToken = getCookie(event, 'refresh_token');
+  const refreshToken = getCookie(event, "refresh_token");
   if (!refreshToken) {
-    throw createError({ statusCode: 401, statusMessage: 'No refresh token' });
+    throw createError({ statusCode: 401, statusMessage: "No refresh token" });
   }
 
   const tokenRecord = await prisma.refreshToken.findUnique({
-    where: { token: refreshToken }
+    where: { token: refreshToken },
   });
 
   if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
-    throw createError({ statusCode: 401, statusMessage: 'Invalid refresh token' });
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Invalid refresh token",
+    });
   }
 
   const newAccessToken = jwt.sign(
     { userId: tokenRecord.userId },
     useRuntimeConfig().jwtSecret,
-    { expiresIn: '1h' }
+    { expiresIn: "1h" },
   );
 
-  setCookie(event, 'access_token', newAccessToken, {
+  setCookie(event, "access_token", newAccessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
     maxAge: 60 * 60,
-    path: '/',
+    path: "/",
   });
 
   return { result: "ok" };

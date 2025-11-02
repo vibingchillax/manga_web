@@ -1,63 +1,58 @@
 <script setup lang="ts">
-import type { User } from '~~/shared/types';
-const props = defineProps<{ user: User, noLink?: boolean }>()
+import type { User } from "~~/shared/types";
+const props = defineProps<{ user: User; noLink?: boolean }>();
 
-const {
-  username,
-  roles,
-  pageLink
-} = useUser(toRef(props, 'user'))
+const { username, roles, pageLink } = useUser(toRef(props, "user"));
 </script>
 <template>
-  <NuxtLink class="user-card" :to="noLink ?
-    undefined : pageLink">
+  <NuxtLink class="user-card" :to="noLink ? undefined : pageLink">
     <div class="user-head">
-      <slot name="prepend"></slot>
+      <slot name="prepend" />
       <!-- <NuxtImg class="user-avatar" alt="Avatar" :src="undefined"
         style="width: 32px; height: 32px;" /> -->
-      <UIcon name="i-lucide-user" style="width: 32px; height: 32px;" />
+      <UIcon name="i-lucide-user" style="width: 32px; height: 32px" />
       <div class="line-clamp-1 break-all" :title="username">{{ username }}</div>
       <div class="ml-auto pl-1">
-        <UserRoleTag :roleList="roles" />
+        <UserRoleTag :role-list="roles" />
       </div>
     </div>
-    <slot name="append"></slot>
+    <slot name="append" />
   </NuxtLink>
 </template>
 <style lang="css" scoped>
 .user-card {
   background: rgb(var(--mw-accent));
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  transition: background .1s ease-out
+  transition: background 0.1s ease-out;
 }
 
-@media (any-hover:hover) {
+@media (any-hover: hover) {
   .user-card:hover {
-    background: rgb(var(--mw-accent-10)) /* hover */
+    background: rgb(var(--mw-accent-10)); /* hover */
   }
 }
 
 .user-card:active {
-  background: rgb(var(--mw-accent-10)) /* active */
+  background: rgb(var(--mw-accent-10)); /* active */
 }
 
 .user-head {
   align-items: center;
-  border-top-left-radius: .25rem;
-  border-top-right-radius: .25rem;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
   display: flex;
   font-weight: 500;
-  padding: .5rem
+  padding: 0.5rem;
 }
 
 .user-avatar {
   border-radius: 9999px;
   border-width: 1px;
-  margin-right: .5rem;
+  margin-right: 0.5rem;
   --tw-border-opacity: 1;
-  border-color: rgb(255 255 255/var(--tw-border-opacity, 1))
+  border-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
 }
 </style>

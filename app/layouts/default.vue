@@ -1,16 +1,16 @@
 <template>
   <div class="flex flex-grow">
     <Sidebar />
-    <div class="flex flex-col flex-grow" style="min-width: 0px;">
+    <div class="flex flex-col flex-grow" style="min-width: 0px">
       <Navbar />
       <div class="content flex-grow">
-        <slot></slot>
+        <slot />
       </div>
     </div>
   </div>
 </template>
 <style lang="css" scoped>
-.content>* {
+.content > * {
   margin-bottom: 2rem;
   margin-bottom: calc(var(--bottom-nav-area) + var(--bottom-margin));
   margin-top: 0;

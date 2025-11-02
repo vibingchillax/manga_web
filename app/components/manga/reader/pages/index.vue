@@ -1,238 +1,342 @@
 <script setup lang="ts">
-import { HeaderStyleEnum, ProgressSideEnum, ReadStyleEnum, ViewStyleEnum } from '~/stores/useReaderMenu'
-import ManagedImage from './ManagedImage.vue'
+import {
+  HeaderStyleEnum,
+  ProgressSideEnum,
+  ReadStyleEnum,
+  ViewStyleEnum,
+} from "~/stores/useReaderMenu";
+import ManagedImage from "./ManagedImage.vue";
 
-const props = defineProps<{ immTarget?: HTMLElement }>()
+const props = defineProps<{ immTarget?: HTMLElement }>();
 
-const reader = useReaderStore()
-const pageManager = useReaderPageManager()
-const settings = useReaderMenu()
+const reader = useReaderStore();
+const pageManager = useReaderPageManager();
+const settings = useReaderMenu();
 
-const { $breakpoints } = useNuxtApp()
+const { $breakpoints } = useNuxtApp();
 
-const { setIsClickFromPage, setCurrentPageGroup, setScrollbarOffset, incrementPageGroup,
-  setCurrentProgress, showImagePage, setImmersionBreak, setAtTop
-} = reader
+const {
+  setIsClickFromPage,
+  setCurrentPageGroup,
+  setScrollbarOffset,
+  incrementPageGroup,
+  setCurrentProgress,
+  showImagePage,
+  setImmersionBreak,
+  setAtTop,
+} = reader;
 
-const { scrolling, immersive, isClickFromPage, currentPageGroup, currentProgress, greyscale,
-  immersionBreak
-} = storeToRefs(reader)
+const {
+  scrolling,
+  immersive,
+  isClickFromPage,
+  currentPageGroup,
+  currentProgress,
+  greyscale,
+  immersionBreak,
+} = storeToRefs(reader);
 
-const { viewStyle, readStyle, headerStyle, shouldAutoScroll, doAutoAdvance, limitHeight,
-  limitWidth, growPages, dimPages, dimWithDark, pageDim, longStripMargin, maxWidthPixels,
-  backgroundColor, progressSide } = storeToRefs(settings)
+const {
+  viewStyle,
+  readStyle,
+  headerStyle,
+  shouldAutoScroll,
+  doAutoAdvance,
+  limitHeight,
+  limitWidth,
+  growPages,
+  dimPages,
+  dimWithDark,
+  pageDim,
+  longStripMargin,
+  maxWidthPixels,
+  backgroundColor,
+  progressSide,
+} = storeToRefs(settings);
 
-const { pageGroups, pageItems } = storeToRefs(pageManager)
+const { pageGroups, pageItems } = storeToRefs(pageManager);
 
-const rootEl = ref<HTMLElement | null>(null)
-const pagesEl = ref<HTMLElement | null>(null)
-const pageRefs = ref<InstanceType<typeof ManagedImage>[][]>([])
-const scrollBlock = ref(false)
-const zoomTarget = ref<HTMLElement | null>(null)
+const rootEl = ref<HTMLElement | null>(null);
+const pagesEl = ref<HTMLElement | null>(null);
+const pageRefs = ref<InstanceType<typeof ManagedImage>[][]>([]);
+const scrollBlock = ref(false);
+const zoomTarget = ref<HTMLElement | null>(null);
 const pageHeight = ref(0);
-const lastScrollY = ref<number | null>(null)
+const lastScrollY = ref<number | null>(null);
 
 const updateViewportHeight = () => {
-  pageHeight.value = window.innerHeight
-}
+  pageHeight.value = window.innerHeight;
+};
 
 const resetScroll = () => {
-  lastScrollY.value = null
-}
+  lastScrollY.value = null;
+};
 
 const calcCurrentGroup = () => {
-  const container = pagesEl.value
-  if (!container) return 0
+  const container = pagesEl.value;
+  if (!container) return 0;
 
-  const viewportCenter = window.scrollY + window.innerHeight / 2
+  const viewportCenter = window.scrollY + window.innerHeight / 2;
 
   for (let i = 0; i < pageGroups.value.length; i++) {
-    const el = visiblePageInGroup(i)
-    if (!el) continue
-    const rect = el.$el.getBoundingClientRect()
-    const pageTop = rect.top + window.scrollY
-    const pageBottom = pageTop + rect.height
-    if (viewportCenter >= pageTop && viewportCenter < pageBottom) return i
+    const el = visiblePageInGroup(i);
+    if (!el) continue;
+    const rect = el.$el.getBoundingClientRect();
+    const pageTop = rect.top + window.scrollY;
+    const pageBottom = pageTop + rect.height;
+    if (viewportCenter >= pageTop && viewportCenter < pageBottom) return i;
   }
 
-  return pageGroups.value.length - 1
-}
+  return pageGroups.value.length - 1;
+};
 
 const visiblePageInGroup = (idx: number) => {
-  const group = pageRefs.value[idx]
-  if (!group || !group.length) return
+  const group = pageRefs.value[idx];
+  if (!group || !group.length) return;
   return group.reduce((biggest, cmp) => {
-    const h = cmp?.$el.getBoundingClientRect().height ?? 0
-    const bh = biggest?.$el.getBoundingClientRect().height ?? 0
-    return h > bh ? cmp : biggest
-  })
-}
+    const h = cmp?.$el.getBoundingClientRect().height ?? 0;
+    const bh = biggest?.$el.getBoundingClientRect().height ?? 0;
+    return h > bh ? cmp : biggest;
+  });
+};
 
 function handleScroll(e?: Event) {
-  if (scrolling.value) return
-  const container = pagesEl.value
-  if (!container) return
+  if (scrolling.value) return;
+  const container = pagesEl.value;
+  if (!container) return;
 
-  const rect = container.getBoundingClientRect()
+  const rect = container.getBoundingClientRect();
 
   if (container.scrollWidth > container.clientWidth) {
-    setScrollbarOffset(Math.min(Math.round(rect.bottom - (container.offsetHeight - container.clientHeight) - window.innerHeight), 0))
+    setScrollbarOffset(
+      Math.min(
+        Math.round(
+          rect.bottom -
+            (container.offsetHeight - container.clientHeight) -
+            window.innerHeight,
+        ),
+        0,
+      ),
+    );
   } else {
-    setScrollbarOffset(0)
+    setScrollbarOffset(0);
   }
 
   if (viewStyle.value === ViewStyleEnum.LongStrip) {
-    const scrollTop = Math.max(-(rect.top - Math.min(window.scrollY - rect.top, 0)), 0)
-    const totalHeight = Math.max(rect.height - window.innerHeight, 1)
-    setCurrentProgress(Math.max(0, Math.min(1, scrollTop / totalHeight)))
+    const scrollTop = Math.max(
+      -(rect.top - Math.min(window.scrollY - rect.top, 0)),
+      0,
+    );
+    const totalHeight = Math.max(rect.height - window.innerHeight, 1);
+    setCurrentProgress(Math.max(0, Math.min(1, scrollTop / totalHeight)));
 
-    const pageIndex = calcCurrentGroup()
+    const pageIndex = calcCurrentGroup();
     if (pageIndex !== currentPageGroup.value) {
-      scrollBlock.value = true
-      setCurrentPageGroup(Math.max(0, pageIndex))
+      scrollBlock.value = true;
+      setCurrentPageGroup(Math.max(0, pageIndex));
     }
     if (pageIndex === -1) {
-      scrollBlock.value = false
+      scrollBlock.value = false;
     }
   }
 }
 
 const handleWideStripScroll = () => {
-  if (viewStyle.value !== ViewStyleEnum.WideStrip) return
-  const el = pagesEl.value
-  if (!el) return
+  if (viewStyle.value !== ViewStyleEnum.WideStrip) return;
+  const el = pagesEl.value;
+  if (!el) return;
 
-  let ratio = el.scrollLeft / (el.scrollWidth - el.clientWidth)
-  ratio = Math.max(0, Math.min(1, Math.abs(ratio)))
-  setCurrentProgress(ratio)
+  let ratio = el.scrollLeft / (el.scrollWidth - el.clientWidth);
+  ratio = Math.max(0, Math.min(1, Math.abs(ratio)));
+  setCurrentProgress(ratio);
 
-  const pos = Math.round(el.clientWidth * ratio)
-  let idx = -1
+  const pos = Math.round(el.clientWidth * ratio);
+  let idx = -1;
   for (let i = 0; i < pageGroups.value.length; i++) {
-    const pagesEl = pageRefs.value[i]
-    if (!pagesEl || !pagesEl.length) return
-    const pageEl = pagesEl[0]?.$el
-    const left = Math.round(pageEl.getBoundingClientRect().left)
-    const range = [left, left + pageEl.clientWidth]
-    if (range[1] > pos && pos > range[0]) idx = i
+    const pagesEl = pageRefs.value[i];
+    if (!pagesEl || !pagesEl.length) return;
+    const pageEl = pagesEl[0]?.$el;
+    const left = Math.round(pageEl.getBoundingClientRect().left);
+    const range = [left, left + pageEl.clientWidth];
+    if (range[1] > pos && pos > range[0]) idx = i;
   }
   if (idx !== -1 && idx !== currentPageGroup.value) {
-    scrollBlock.value = true
-    setCurrentPageGroup(idx)
+    scrollBlock.value = true;
+    setCurrentPageGroup(idx);
   }
-}
+};
 
 const finalizePageChange = (target: number, fromClick: boolean) => {
-  const wasScrolling = scrollBlock.value
-  scrollBlock.value = false
+  const wasScrolling = scrollBlock.value;
+  scrollBlock.value = false;
 
   if (shouldAutoScroll.value && !wasScrolling) {
-    if (fromClick && viewStyle.value === ViewStyleEnum.LongStrip && calcCurrentGroup() === -1) {
-      scrollToGroup(0)
-      return
+    if (
+      fromClick &&
+      viewStyle.value === ViewStyleEnum.LongStrip &&
+      calcCurrentGroup() === -1
+    ) {
+      scrollToGroup(0);
+      return;
     }
-    scrollToGroup(target)
-    scrollBlock.value = false
+    scrollToGroup(target);
+    scrollBlock.value = false;
   }
-  setCurrentProgress(currentPageGroup.value / pageGroups.value.length)
-}
+  setCurrentProgress(currentPageGroup.value / pageGroups.value.length);
+};
 
 const scrollToGroup = async (idx: number) => {
-  await nextTick()
-  const el = visiblePageInGroup(idx)
-  el?.$el?.scrollIntoView()
-}
+  await nextTick();
+  const el = visiblePageInGroup(idx);
+  el?.$el?.scrollIntoView();
+};
 
 const scrollToTop = () => {
-  pagesEl?.value?.scrollIntoView({ behavior: "smooth" })
-}
+  pagesEl?.value?.scrollIntoView({ behavior: "smooth" });
+};
 
 const dynamicPageClasses = computed(() => {
-  let classes = ''
-  if (limitWidth.value || growPages.value) classes += 'w-full '
-  return classes.trim()
-})
+  let classes = "";
+  if (limitWidth.value || growPages.value) classes += "w-full ";
+  return classes.trim();
+});
 
 const dimPagesFilter = computed(() => {
   // if (dimPages) return dimWithDark ? (theme.dark ? `brightness(${1 - pageDim})` : undefined) : `brightness(${1 - pageDim})`
-  if (dimPages.value) return `brightness(${1 - pageDim.value})`
-})
+  if (dimPages.value) return `brightness(${1 - pageDim.value})`;
+});
 
 watch(currentPageGroup, (newVal, oldVal) => {
   // if (oldVal !== newVal && viewStyle.value !== Fe.WideStrip && viewStyle.value !== Fe.LongStrip) {
   //   resetZoom()
   // }
   // if (!isWebtoon.value) {
-  finalizePageChange(newVal, isClickFromPage.value)
-  if (isClickFromPage.value) setIsClickFromPage(false)
+  finalizePageChange(newVal, isClickFromPage.value);
+  if (isClickFromPage.value) setIsClickFromPage(false);
   // }
-})
+});
 
-watch(currentProgress, val => {
+watch(currentProgress, (val) => {
   if (scrolling.value && viewStyle.value === ViewStyleEnum.LongStrip) {
-    const rect = pagesEl.value!.getBoundingClientRect()
-    const start = rect.top + window.scrollY
-    const diff = rect.height - window.innerHeight - start
+    const rect = pagesEl.value!.getBoundingClientRect();
+    const start = rect.top + window.scrollY;
+    const diff = rect.height - window.innerHeight - start;
     if (immersive.value) {
-      props.immTarget?.scrollTo(0, val * props.immTarget.scrollHeight)
+      props.immTarget?.scrollTo(0, val * props.immTarget.scrollHeight);
     } else {
-      window.scrollTo(0, start + val * diff)
+      window.scrollTo(0, start + val * diff);
     }
   }
-})
+});
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll, { passive: true })
-})
+  window.addEventListener("scroll", handleScroll, { passive: true });
+});
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 <template>
-  <div class="min-w-0 relative pages-wrap mw--reader-pages" :class="{ ls: viewStyle === ViewStyleEnum.LongStrip }"
-    :style="{ minHeight: pageHeight ? pageHeight + 'px' : undefined }" ref="rootEl">
+  <div
+    ref="rootEl"
+    class="min-w-0 relative pages-wrap mw--reader-pages"
+    :class="{ ls: viewStyle === ViewStyleEnum.LongStrip }"
+    :style="{ minHeight: pageHeight ? pageHeight + 'px' : undefined }"
+  >
     <MangaReaderImmersiveHeader />
-    <div class="overflow-x-auto flex items-center h-full select-none" :class="{ bw: greyscale }" :style="{
-      background: backgroundColor,
-      direction: readStyle === ReadStyleEnum.RTL && viewStyle === ViewStyleEnum.WideStrip ? 'rtl' : undefined
-    }" ref="pagesEl" @scroll="handleWideStripScroll">
-      <div ref="zoomTarget" class="mx-auto h-full" v-if="pageGroups.length && pageGroups[currentPageGroup]" :class="{
-        'mw--page': viewStyle !== ViewStyleEnum.LongStrip && viewStyle !== ViewStyleEnum.WideStrip,
-        'header-shown': headerStyle === HeaderStyleEnum.Shown,
-        flex: viewStyle !== ViewStyleEnum.LongStrip,
-        'grid grid-cols-2': viewStyle === ViewStyleEnum.DoublePage && pageGroups[currentPageGroup]!.length === 2 && pageGroups[currentPageGroup]!.some(p => !p.loaded),
-        rtl: readStyle === ReadStyleEnum.RTL && viewStyle === ViewStyleEnum.WideStrip,
-        [dynamicPageClasses]: true
-      }" :style="{
-        maxWidth: limitWidth && viewStyle !== ViewStyleEnum.WideStrip ? maxWidthPixels : undefined,
-        filter: dimPagesFilter,
-        columnGap: viewStyle === ViewStyleEnum.WideStrip ? longStripMargin + 'px' : undefined,
-        // transform: transformStyle
-      }">
-
+    <div
+      ref="pagesEl"
+      class="overflow-x-auto flex items-center h-full select-none"
+      :class="{ bw: greyscale }"
+      :style="{
+        background: backgroundColor,
+        direction:
+          readStyle === ReadStyleEnum.RTL &&
+          viewStyle === ViewStyleEnum.WideStrip
+            ? 'rtl'
+            : undefined,
+      }"
+      @scroll="handleWideStripScroll"
+    >
+      <div
+        v-if="pageGroups.length && pageGroups[currentPageGroup]"
+        ref="zoomTarget"
+        class="mx-auto h-full"
+        :class="{
+          'mw--page':
+            viewStyle !== ViewStyleEnum.LongStrip &&
+            viewStyle !== ViewStyleEnum.WideStrip,
+          'header-shown': headerStyle === HeaderStyleEnum.Shown,
+          flex: viewStyle !== ViewStyleEnum.LongStrip,
+          'grid grid-cols-2':
+            viewStyle === ViewStyleEnum.DoublePage &&
+            pageGroups[currentPageGroup]!.length === 2 &&
+            pageGroups[currentPageGroup]!.some((p) => !p.loaded),
+          rtl:
+            readStyle === ReadStyleEnum.RTL &&
+            viewStyle === ViewStyleEnum.WideStrip,
+          [dynamicPageClasses]: true,
+        }"
+        :style="{
+          maxWidth:
+            limitWidth && viewStyle !== ViewStyleEnum.WideStrip
+              ? maxWidthPixels
+              : undefined,
+          filter: dimPagesFilter,
+          columnGap:
+            viewStyle === ViewStyleEnum.WideStrip
+              ? longStripMargin + 'px'
+              : undefined,
+          // transform: transformStyle
+        }"
+      >
         <template v-if="pageGroups.length === 0">
-          <div class="m-4 flex-grow">
-            This chapter has no pages
-          </div>
+          <div class="m-4 flex-grow">This chapter has no pages</div>
         </template>
 
         <template v-else>
           <template v-for="(group, groupIndex) in pageGroups" :key="groupIndex">
-            <ManagedImage v-for="(page, pageIndex) in group" :key="page.pageNum" :managedImage="page"
-              :show="reader.showImagePage(groupIndex)"
-              :class="group.length > 1 ? (pageIndex === 0 ? 'ml-auto' : 'mr-auto') : 'mx-auto'" :style="{
-                maxWidth: limitWidth && viewStyle === ViewStyleEnum.WideStrip ? maxWidthPixels : undefined,
-                objectPosition: group.length > 1 ? (pageIndex === 0 ? 'right' : 'left') : undefined
-              }" :ref="el => {
-                if (el) {
-                  if (pageRefs[groupIndex]) {
-                    pageRefs[groupIndex].push(el as InstanceType<typeof ManagedImage>)
-                  } else {
-                    pageRefs[groupIndex] = [el as InstanceType<typeof ManagedImage>]
+            <ManagedImage
+              v-for="(page, pageIndex) in group"
+              :key="page.pageNum"
+              :ref="
+                (el) => {
+                  if (el) {
+                    if (pageRefs[groupIndex]) {
+                      pageRefs[groupIndex].push(
+                        el as InstanceType<typeof ManagedImage>,
+                      );
+                    } else {
+                      pageRefs[groupIndex] = [
+                        el as InstanceType<typeof ManagedImage>,
+                      ];
+                    }
                   }
                 }
-              }" />
+              "
+              :managed-image="page"
+              :show="reader.showImagePage(groupIndex)"
+              :class="
+                group.length > 1
+                  ? pageIndex === 0
+                    ? 'ml-auto'
+                    : 'mr-auto'
+                  : 'mx-auto'
+              "
+              :style="{
+                maxWidth:
+                  limitWidth && viewStyle === ViewStyleEnum.WideStrip
+                    ? maxWidthPixels
+                    : undefined,
+                objectPosition:
+                  group.length > 1
+                    ? pageIndex === 0
+                      ? 'right'
+                      : 'left'
+                    : undefined,
+              }"
+            />
           </template>
         </template>
       </div>
@@ -243,8 +347,14 @@ onBeforeUnmount(() => {
     </template>
     <MangaReaderImmersive v-if="immersive && $breakpoints.sm.value" />
     <Transition>
-      <div v-if="immersionBreak && !scrolling && viewStyle === ViewStyleEnum.LongStrip" class="scroll-to-top"
-        :class="{ pad: progressSide === ProgressSideEnum.Bottom }" @click.stop.prevent="scrollToTop">
+      <div
+        v-if="
+          immersionBreak && !scrolling && viewStyle === ViewStyleEnum.LongStrip
+        "
+        class="scroll-to-top"
+        :class="{ pad: progressSide === ProgressSideEnum.Bottom }"
+        @click.stop.prevent="scrollToTop"
+      >
         <UIcon name="i-lucide-chevron-up" />
       </div>
     </Transition>
@@ -257,20 +367,20 @@ onBeforeUnmount(() => {
 }
 
 .pages-wrap {
-  min-height: calc(100vh - var(--header-padding))
+  min-height: calc(100vh - var(--header-padding));
 }
 
 .pages-wrap.ls {
-  min-height: calc(100vh - var(--header-padding) - 3rem)
+  min-height: calc(100vh - var(--header-padding) - 3rem);
 }
 
-@supports (min-height:100dvh) {
+@supports (min-height: 100dvh) {
   .pages-wrap {
-    min-height: calc(100dvh - var(--header-padding))
+    min-height: calc(100dvh - var(--header-padding));
   }
 
   .pages-wrap.ls {
-    min-height: calc(100dvh - var(--header-padding) - 3rem)
+    min-height: calc(100dvh - var(--header-padding) - 3rem);
   }
 }
 
@@ -280,13 +390,13 @@ onBeforeUnmount(() => {
 
 .zoom-reset {
   align-items: center;
-  border-radius: .375rem;
+  border-radius: 0.375rem;
   bottom: 3rem;
   display: flex;
   height: 2.5rem;
   justify-content: space-evenly;
   width: 8rem;
-  z-index: 30
+  z-index: 30;
 }
 
 .scroll-to-top,
@@ -294,7 +404,7 @@ onBeforeUnmount(() => {
   background-color: rgb(var(--mw-accent));
   left: 50%;
   position: fixed;
-  transform: translate(-50%)
+  transform: translate(-50%);
 }
 
 .scroll-to-top {
@@ -303,27 +413,34 @@ onBeforeUnmount(() => {
   cursor: pointer;
   display: flex;
   justify-content: center;
-  padding: .5rem;
-  transition: background-color .1s ease-in-out, opacity 75ms ease-in-out;
+  padding: 0.5rem;
+  transition:
+    background-color 0.1s ease-in-out,
+    opacity 75ms ease-in-out;
   z-index: 10;
-  --tw-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1);
-  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+  --tw-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --tw-shadow-colored:
+    0 10px 15px -3px var(--tw-shadow-color),
+    0 4px 6px -4px var(--tw-shadow-color);
+  box-shadow:
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+    var(--tw-shadow);
 }
 
 .scroll-to-top:hover {
-  background-color: rgb(var(--mw-accent-10)) /* hover */
+  background-color: rgb(var(--mw-accent-10)); /* hover */
 }
 
 .scroll-to-top:active {
-  background-color: rgb(var(--mw-accent-10)) /* active */
+  background-color: rgb(var(--mw-accent-10)); /* active */
 }
 
 .scroll-to-top {
-  bottom: var(--bottom-margin)
+  bottom: var(--bottom-margin);
 }
 
 .scroll-to-top.pad {
-  bottom: calc(max(var(--bottom-nav-area), 3rem) + var(--bottom-margin))
+  bottom: calc(max(var(--bottom-nav-area), 3rem) + var(--bottom-margin));
 }
 </style>

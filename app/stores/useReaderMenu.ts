@@ -14,26 +14,83 @@ const defaultKeys = {
 const defaultScrollLock = { width: true, height: true, none: true };
 const defaultLongStripMargin = 4;
 
-export enum ViewStyleEnum { SinglePage, DoublePage, LongStrip, WideStrip }
-export enum ReadStyleEnum { LTR, RTL }
-export enum HeaderStyleEnum { Hidden, Shown }
-export enum ProgressModeEnum { None, LightBar, Normal }
-export enum ProgressSideEnum { Bottom, Left, Right }
-export enum CursorHintsEnum { None, Overlay, Cursor }
-export enum TurnPagesEnum { Directional, None }
-export enum TurnPagesByScrollingEnum { Disabled, Enabled }
-export enum HistoryModeEnum { Both, ChaptersOnly, PagesOnly }
+export enum ViewStyleEnum {
+  SinglePage,
+  DoublePage,
+  LongStrip,
+  WideStrip,
+}
+export enum ReadStyleEnum {
+  LTR,
+  RTL,
+}
+export enum HeaderStyleEnum {
+  Hidden,
+  Shown,
+}
+export enum ProgressModeEnum {
+  None,
+  LightBar,
+  Normal,
+}
+export enum ProgressSideEnum {
+  Bottom,
+  Left,
+  Right,
+}
+export enum CursorHintsEnum {
+  None,
+  Overlay,
+  Cursor,
+}
+export enum TurnPagesEnum {
+  Directional,
+  None,
+}
+export enum TurnPagesByScrollingEnum {
+  Disabled,
+  Enabled,
+}
+export enum HistoryModeEnum {
+  Both,
+  ChaptersOnly,
+  PagesOnly,
+}
 
 export const viewStyles = [
-  { label: "Single Page", value: ViewStyleEnum.SinglePage, icon: "i-lucide-sticky-note" },
-  { label: "Double Page", value: ViewStyleEnum.DoublePage, icon: "i-lucide-book-open" },
-  { label: "Long Strip", value: ViewStyleEnum.LongStrip, icon: "i-lucide-stretch-horizontal" },
-  { label: "Wide Strip", value: ViewStyleEnum.WideStrip, icon: "i-lucide-stretch-vertical" },
+  {
+    label: "Single Page",
+    value: ViewStyleEnum.SinglePage,
+    icon: "i-lucide-sticky-note",
+  },
+  {
+    label: "Double Page",
+    value: ViewStyleEnum.DoublePage,
+    icon: "i-lucide-book-open",
+  },
+  {
+    label: "Long Strip",
+    value: ViewStyleEnum.LongStrip,
+    icon: "i-lucide-stretch-horizontal",
+  },
+  {
+    label: "Wide Strip",
+    value: ViewStyleEnum.WideStrip,
+    icon: "i-lucide-stretch-vertical",
+  },
 ];
 
 export const readStyles = [
-  { label: "Left To Right", value: ReadStyleEnum.LTR, icon: "i-lucide-circle-arrow-right" },
-  { label: "Right To Left", value: ReadStyleEnum.RTL, icon: "i-lucide-circle-arrow-left" },
+  {
+    label: "Left To Right",
+    value: ReadStyleEnum.LTR,
+    icon: "i-lucide-circle-arrow-right",
+  },
+  {
+    label: "Right To Left",
+    value: ReadStyleEnum.RTL,
+    icon: "i-lucide-circle-arrow-left",
+  },
 ];
 
 export const sizeModes = [
@@ -48,26 +105,62 @@ export const sizeModes = [
 ];
 
 export const headerStyles = [
-  { label: "Header Hidden", value: HeaderStyleEnum.Hidden, icon: "i-lucide-square" },
-  { label: "Header Shown", value: HeaderStyleEnum.Shown, icon: "i-lucide-panel-top" },
+  {
+    label: "Header Hidden",
+    value: HeaderStyleEnum.Hidden,
+    icon: "i-lucide-square",
+  },
+  {
+    label: "Header Shown",
+    value: HeaderStyleEnum.Shown,
+    icon: "i-lucide-panel-top",
+  },
 ];
 
 export const progressModes = [
-  { label: "Progress Hidden", value: ProgressModeEnum.None, icon: "i-lucide-minus" },
-  { label: "Progress Lightbar", value: ProgressModeEnum.LightBar, icon: "progressLightbar" },
-  { label: "Normal Progress", value: ProgressModeEnum.Normal, icon: "i-lucide-align-vertical-space-around" },
+  {
+    label: "Progress Hidden",
+    value: ProgressModeEnum.None,
+    icon: "i-lucide-minus",
+  },
+  {
+    label: "Progress Lightbar",
+    value: ProgressModeEnum.LightBar,
+    icon: "progressLightbar",
+  },
+  {
+    label: "Normal Progress",
+    value: ProgressModeEnum.Normal,
+    icon: "i-lucide-align-vertical-space-around",
+  },
 ];
 
 export const progressSides = [
-  { label: "Bottom", value: ProgressSideEnum.Bottom, icon: "i-lucide-chevron-down" },
-  { label: "Left", value: ProgressSideEnum.Left, icon: "i-lucide-chevron-left" },
-  { label: "Right", value: ProgressSideEnum.Right, icon: "i-lucide-chevron-right" },
+  {
+    label: "Bottom",
+    value: ProgressSideEnum.Bottom,
+    icon: "i-lucide-chevron-down",
+  },
+  {
+    label: "Left",
+    value: ProgressSideEnum.Left,
+    icon: "i-lucide-chevron-left",
+  },
+  {
+    label: "Right",
+    value: ProgressSideEnum.Right,
+    icon: "i-lucide-chevron-right",
+  },
 ];
 
 export const cursorHints = [
   { label: "None", value: CursorHintsEnum.None, icon: "i-lucide-ban" },
   { label: "Overlay", value: CursorHintsEnum.Overlay, icon: "overlay" },
-  { label: "Cursor", value: CursorHintsEnum.Cursor, icon: "i-lucide-mouse-pointer" },
+  {
+    label: "Cursor",
+    value: CursorHintsEnum.Cursor,
+    icon: "i-lucide-mouse-pointer",
+  },
 ];
 
 const settings = {
@@ -78,7 +171,7 @@ const settings = {
   progressMode: progressModes,
   progressSide: progressSides,
   cursorHint: cursorHints,
-}
+};
 // --- State Interface ---
 export interface ReaderMenuState {
   readStyle: ReadStyleEnum;
@@ -160,10 +253,19 @@ export const useReaderMenu = defineStore("readerMenu", {
     },
     setStyle({
       style,
-      value
+      value,
     }: {
-      style: string
-      value: ViewStyleEnum | ReadStyleEnum | HeaderStyleEnum | ProgressModeEnum | ProgressSideEnum | CursorHintsEnum | TurnPagesEnum | TurnPagesByScrollingEnum | HistoryModeEnum
+      style: string;
+      value:
+        | ViewStyleEnum
+        | ReadStyleEnum
+        | HeaderStyleEnum
+        | ProgressModeEnum
+        | ProgressSideEnum
+        | CursorHintsEnum
+        | TurnPagesEnum
+        | TurnPagesByScrollingEnum
+        | HistoryModeEnum;
     }) {
       const key = style === "viewStyle" ? "_viewStyle" : style;
       (this as any)[key] = value; //temp
@@ -172,21 +274,51 @@ export const useReaderMenu = defineStore("readerMenu", {
       this._limitWidth && (this._limitHeight = !this._limitHeight);
       this._limitWidth = !this._limitWidth;
     },
-    setLimitWidth(val: boolean) { this._limitWidth = val; },
-    setLimitHeight(val: boolean) { this._limitHeight = val; },
-    setGrowPages(val: boolean) { this._growPages = val; },
-    setLock({ style, value }: { style: keyof typeof defaultScrollLock; value: boolean }) {
+    setLimitWidth(val: boolean) {
+      this._limitWidth = val;
+    },
+    setLimitHeight(val: boolean) {
+      this._limitHeight = val;
+    },
+    setGrowPages(val: boolean) {
+      this._growPages = val;
+    },
+    setLock({
+      style,
+      value,
+    }: {
+      style: keyof typeof defaultScrollLock;
+      value: boolean;
+    }) {
       this._scrollLock[style] = value;
     },
-    resetLock() { this._scrollLock = defaultScrollLock; },
-    setMaxWidth(val: number) { this.maxWidth = val; },
-    setMaxHeight(val: number) { this.maxHeight = val; },
-    setLimitMaxWidth(val: boolean) { this.limitMaxWidth = val; },
-    setLimitMaxHeight(val: boolean) { this.limitMaxHeight = val; },
-    setAutoAdvance(val: boolean) { this.doAutoAdvance = val; },
-    setHistoryMode(val: HistoryModeEnum) { this.historyMode = val; },
-    setLockOffset(val: number) { this.lockOffset = val; },
-    setLongStripMargin(val: number) { this._longStripMargin = Math.max(0, val); },
+    resetLock() {
+      this._scrollLock = defaultScrollLock;
+    },
+    setMaxWidth(val: number) {
+      this.maxWidth = val;
+    },
+    setMaxHeight(val: number) {
+      this.maxHeight = val;
+    },
+    setLimitMaxWidth(val: boolean) {
+      this.limitMaxWidth = val;
+    },
+    setLimitMaxHeight(val: boolean) {
+      this.limitMaxHeight = val;
+    },
+    setAutoAdvance(val: boolean) {
+      this.doAutoAdvance = val;
+    },
+    setHistoryMode(val: HistoryModeEnum) {
+      this.historyMode = val;
+    },
+    setLockOffset(val: number) {
+      this.lockOffset = val;
+    },
+    setLongStripMargin(val: number) {
+      this._longStripMargin = Math.max(0, val);
+    },
     setKeybindings(bindings: Partial<typeof defaultKeys>) {
       this.keys = { ...this.keys, ...bindings };
     },
@@ -196,40 +328,72 @@ export const useReaderMenu = defineStore("readerMenu", {
       this.offsetDoubles = clone;
     },
     setHasImmersiveBefore() {
-      this.hasImmersiveBefore = true
+      this.hasImmersiveBefore = true;
     },
     setBackgroundColor(color: string) {
       this.backgroundColor = color;
     },
-    setMenuPinned(val: boolean) { this.menuPinned = val; },
-    setTurnPages(val: TurnPagesEnum) { this.turnPages = val; },
-    setTurnPagesByScrolling(val: TurnPagesByScrollingEnum) { this.turnPagesByScrolling = val; },
-    setCursorHints(val: CursorHintsEnum) { this.cursorHints = val; },
-    setImmersiveTap(val: number) { this.immersiveTap = val; },
-    setMenuOpen(val: boolean) { this.menuOpen = val; },
-    toggleMenuOpen() { this.menuOpen = !this.menuOpen; },
-    setShowMenuButton(val: boolean) { this._showMenuButton = val; },
-    setShowPageNumber(val: boolean) { this.showPageNumber = val; },
-    setDimPages(val: boolean) { this.dimPages = val; },
-    setDimWithDark(val: boolean) { this.dimWithDark = val; },
-    setPageDim(val: number) { this.pageDim = val; },
-    setProgressMode(mode: ProgressModeEnum) { this._progressMode = mode; },
+    setMenuPinned(val: boolean) {
+      this.menuPinned = val;
+    },
+    setTurnPages(val: TurnPagesEnum) {
+      this.turnPages = val;
+    },
+    setTurnPagesByScrolling(val: TurnPagesByScrollingEnum) {
+      this.turnPagesByScrolling = val;
+    },
+    setCursorHints(val: CursorHintsEnum) {
+      this.cursorHints = val;
+    },
+    setImmersiveTap(val: number) {
+      this.immersiveTap = val;
+    },
+    setMenuOpen(val: boolean) {
+      this.menuOpen = val;
+    },
+    toggleMenuOpen() {
+      this.menuOpen = !this.menuOpen;
+    },
+    setShowMenuButton(val: boolean) {
+      this._showMenuButton = val;
+    },
+    setShowPageNumber(val: boolean) {
+      this.showPageNumber = val;
+    },
+    setDimPages(val: boolean) {
+      this.dimPages = val;
+    },
+    setDimWithDark(val: boolean) {
+      this.dimWithDark = val;
+    },
+    setPageDim(val: number) {
+      this.pageDim = val;
+    },
+    setProgressMode(mode: ProgressModeEnum) {
+      this._progressMode = mode;
+    },
     switchProgressMode() {
       switch (this.progressMode) {
         case ProgressModeEnum.LightBar:
-          this._progressMode = ProgressModeEnum.Normal
-          break
+          this._progressMode = ProgressModeEnum.Normal;
+          break;
         case ProgressModeEnum.Normal:
-          this._progressMode = ProgressModeEnum.None
-          break
+          this._progressMode = ProgressModeEnum.None;
+          break;
         default:
-          this._progressMode = ProgressModeEnum.LightBar
-          break
+          this._progressMode = ProgressModeEnum.LightBar;
+          break;
       }
     },
-    setProgressSide(side: ProgressSideEnum) { this._progressSide = side; },
-    setProgressHeight(height: number) { this.progressHeight = height; },
-    setViewStyle(val: ViewStyleEnum) { this._viewStyle = val; },
+    setProgressSide(side: ProgressSideEnum) {
+      this._progressSide = side;
+    },
+    setProgressHeight(height: number) {
+      this.progressHeight = height;
+    },
+    setViewStyle(val: ViewStyleEnum) {
+      this._viewStyle = val;
+    },
   },
 
   getters: {
@@ -240,37 +404,53 @@ export const useReaderMenu = defineStore("readerMenu", {
     progressMode: (state) => state._progressMode,
     progressModeLabel: (state) => progressModes[state._progressMode],
     progressSideLabel: (state) => progressSides[state._progressSide],
-    sizeModeLabel: (state) => settings.sizeMode[+state._limitWidth]?.[+state._limitHeight],
+    sizeModeLabel: (state) =>
+      settings.sizeMode[+state._limitWidth]?.[+state._limitHeight],
     viewStyle: (state) => state._viewStyle,
     limitWidth: (state) => state._limitWidth,
     limitHeight: (state) => state._limitHeight,
     longStripMargin: (state) => state._longStripMargin,
     scrollLock: (state) => state._scrollLock,
     shouldAutoScroll(state): boolean {
-      return this.scrollLock.width && this.limitWidth || this.scrollLock.height && this.limitHeight || this.scrollLock.none && !(this.limitHeight || this.limitWidth) || this.viewStyle === ViewStyleEnum.LongStrip || this.viewStyle === ViewStyleEnum.WideStrip
+      return (
+        (this.scrollLock.width && this.limitWidth) ||
+        (this.scrollLock.height && this.limitHeight) ||
+        (this.scrollLock.none && !(this.limitHeight || this.limitWidth)) ||
+        this.viewStyle === ViewStyleEnum.LongStrip ||
+        this.viewStyle === ViewStyleEnum.WideStrip
+      );
     },
-    growPages: (state) => state._growPages && (state._limitWidth || state._limitHeight),
+    growPages: (state) =>
+      state._growPages && (state._limitWidth || state._limitHeight),
     maxWidthPixels(state) {
-      if (state.limitMaxWidth) return `${state.maxWidth}px`
+      if (state.limitMaxWidth) return `${state.maxWidth}px`;
     },
     maxHeightPixels(state) {
-      if (state.limitMaxHeight) return `${state.maxHeight}px`
+      if (state.limitMaxHeight) return `${state.maxHeight}px`;
     },
     navbarHoverMode(state) {
-      return state.headerStyle === HeaderStyleEnum.Hidden && state.menuPinned
+      return state.headerStyle === HeaderStyleEnum.Hidden && state.menuPinned;
     },
     squeezeNavbar(state) {
-      return state.menuOpen && (state.headerStyle === HeaderStyleEnum.Shown || state.menuPinned)
+      return (
+        state.menuOpen &&
+        (state.headerStyle === HeaderStyleEnum.Shown || state.menuPinned)
+      );
     },
     showMenuButton(state) {
-      return state.menuPinned && !state.menuOpen && state.headerStyle === HeaderStyleEnum.Hidden && state._showMenuButton
+      return (
+        state.menuPinned &&
+        !state.menuOpen &&
+        state.headerStyle === HeaderStyleEnum.Hidden &&
+        state._showMenuButton
+      );
     },
     keyBindingToActions(state) {
-      return
-    }
+      return;
+    },
   },
 
   persist: {
-    storage: localStorage
+    storage: localStorage,
   },
 });

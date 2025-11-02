@@ -1,7 +1,7 @@
 interface Layout {
-  menuActive: boolean
-  navbarFloating: boolean
-  showMOTD: boolean
+  menuActive: boolean;
+  navbarFloating: boolean;
+  showMOTD: boolean;
 }
 
 export const useLayout = defineStore("layout", {
@@ -12,10 +12,10 @@ export const useLayout = defineStore("layout", {
   }),
   actions: {
     setMenu(bool: boolean) {
-      this.menuActive = bool
+      this.menuActive = bool;
     },
     setMOTD(bool: boolean) {
-      this.showMOTD = bool
-    }
-  }
-})
+      this.showMOTD = bool;
+    },
+  },
+});

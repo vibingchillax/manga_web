@@ -1,40 +1,49 @@
-import { ScanlationGroup } from "~~/shared/prisma/client"
-import { ChapterQueryResult } from "./[id]/index.get"
-import { UploadedChapterOrderByWithRelationInput, UploadedChapterWhereInput } from "~~/shared/prisma/models"
-import { Enumerable } from "~~/shared/prisma/internal/prismaNamespace"
+import type { ScanlationGroup } from "~~/shared/prisma/client";
+import type { ChapterQueryResult } from "./[id]/index.get";
+import type {
+  UploadedChapterOrderByWithRelationInput,
+  UploadedChapterWhereInput,
+} from "~~/shared/prisma/models";
+import type { Enumerable } from "~~/shared/prisma/internal/prismaNamespace";
 
 export default defineEventHandler(async (event) => {
-  const query = await getValidatedQuery(event, baseQuerySchema.extend({
-    title: zTitle.optional(),
-    'groups[]': zArrayable(zUuid).optional(),
-    uploader: zUuid.optional(),
-    manga: zUuid.optional(),
-    'volume[]': zArrayable(zVolume).optional(),
-    chapter: zChapter.optional(),
-    'translatedLanguage[]': zArrayable(zLang).optional(),
-    'originalLanguage[]': zArrayable(zLang).optional(),
-    'excludedOriginalLanguage[]': zArrayable(zLang).optional(),
-    'contentRating[]': zArrayable(zContentRating).optional(),
-    'excludedGroups[]': zArrayable(zUuid).optional(),
-    'excludedUploaders[]': zArrayable(zUuid).optional(),
-    createdAtSince: zDateString.optional(),
-    updatedAtSince: zDateString.optional(),
-    publishAtSince: zDateString.optional(),
-    'order[createdAt]': zOrderDirection.optional(),
-    'order[updatedAt]': zOrderDirection.optional(),
-    'order[publishAt]': zOrderDirection.optional(),
-    'order[readableAt]': zOrderDirection.optional(),
-    'order[volume]': zOrderDirection.optional(),
-    'order[chapter]': zOrderDirection.optional(),
+  const query = await getValidatedQuery(
+    event,
+    baseQuerySchema.extend({
+      title: zTitle.optional(),
+      "groups[]": zArrayable(zUuid).optional(),
+      uploader: zUuid.optional(),
+      manga: zUuid.optional(),
+      "volume[]": zArrayable(zVolume).optional(),
+      chapter: zChapter.optional(),
+      "translatedLanguage[]": zArrayable(zLang).optional(),
+      "originalLanguage[]": zArrayable(zLang).optional(),
+      "excludedOriginalLanguage[]": zArrayable(zLang).optional(),
+      "contentRating[]": zArrayable(zContentRating).optional(),
+      "excludedGroups[]": zArrayable(zUuid).optional(),
+      "excludedUploaders[]": zArrayable(zUuid).optional(),
+      createdAtSince: zDateString.optional(),
+      updatedAtSince: zDateString.optional(),
+      publishAtSince: zDateString.optional(),
+      "order[createdAt]": zOrderDirection.optional(),
+      "order[updatedAt]": zOrderDirection.optional(),
+      "order[publishAt]": zOrderDirection.optional(),
+      "order[readableAt]": zOrderDirection.optional(),
+      "order[volume]": zOrderDirection.optional(),
+      "order[chapter]": zOrderDirection.optional(),
+    }).parse,
+  );
 
-  }).parse)
-
-  const ids = query["ids[]"] as string[] | undefined
-  const volumes = query["volume[]"] as string[] | undefined
-  const translatedLanguages = query["translatedLanguage[]"] as string[] | undefined
-  const groups = query["groups[]"] as string[] | undefined
-  const excludedUploaders = query["excludedUploaders[]"] as string[] | undefined
-  const excludedGroups = query["excludedGroups[]"] as string[] | undefined
+  const ids = query["ids[]"] as string[] | undefined;
+  const volumes = query["volume[]"] as string[] | undefined;
+  const translatedLanguages = query["translatedLanguage[]"] as
+    | string[]
+    | undefined;
+  const groups = query["groups[]"] as string[] | undefined;
+  const excludedUploaders = query["excludedUploaders[]"] as
+    | string[]
+    | undefined;
+  const excludedGroups = query["excludedGroups[]"] as string[] | undefined;
 
   const filters: UploadedChapterWhereInput = {
     id: ids ? { in: ids } : undefined,
@@ -85,14 +94,16 @@ export default defineEventHandler(async (event) => {
 
   const orderBy: Enumerable<UploadedChapterOrderByWithRelationInput> = [];
 
-  ([
-    "createdAt",
-    "updatedAt",
-    "publishAt",
-    "readableAt",
-    "volume",
-    "chapter",
-  ] as const).forEach((field) => {
+  (
+    [
+      "createdAt",
+      "updatedAt",
+      "publishAt",
+      "readableAt",
+      "volume",
+      "chapter",
+    ] as const
+  ).forEach((field) => {
     const key = `order[${field}]` as const;
     const dir = query[key];
     if (dir) {
@@ -106,25 +117,30 @@ export default defineEventHandler(async (event) => {
       skip: query.offset ?? 0,
       where: filters,
       include: {
-        user: query['includes[]']?.includes("user") ? {
-          select: {
-            id: true,
-            username: true,
-            roles: true,
-          }
-        } : undefined,
-        groups: query['includes[]']?.includes("scanlation_group") ? {
-          include: {
-            group: true
-          }
-        } : undefined
+        user: query["includes[]"]?.includes("user")
+          ? {
+              select: {
+                id: true,
+                username: true,
+                roles: true,
+              },
+            }
+          : undefined,
+        groups: query["includes[]"]?.includes("scanlation_group")
+          ? {
+              include: {
+                group: true,
+              },
+            }
+          : undefined,
       },
-      orderBy: orderBy
+      orderBy: orderBy,
     }),
 
     await prisma.uploadedChapter.count({
-      where: filters
-    })])
+      where: filters,
+    }),
+  ]);
 
   const formattedChapters = chapters.map((chapter) => {
     const flattenedGroups: ScanlationGroup[] =
@@ -133,21 +149,21 @@ export default defineEventHandler(async (event) => {
     return formatUploadedChapter({
       ...chapter,
       user: chapter.user
-        ? {
-          id: chapter.user.id,
-          username: chapter.user.username,
-          roles: chapter.user.roles,
-        } satisfies SafeUser
+        ? ({
+            id: chapter.user.id,
+            username: chapter.user.username,
+            roles: chapter.user.roles,
+          } satisfies SafeUser)
         : undefined,
-      groups: flattenedGroups
+      groups: flattenedGroups,
     });
   });
 
   return {
-    result: 'ok',
+    result: "ok",
     data: formattedChapters,
     limit: query.limit ?? 10,
     offset: query.offset ?? 0,
-    count: total
+    count: total,
   };
-})
+});

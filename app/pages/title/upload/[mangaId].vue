@@ -1,35 +1,39 @@
 <script setup lang="ts">
-import type { UploadPage } from '~/components/manga/upload/Pages.vue'
-import SuccessModal from '~/components/manga/upload/SuccessModal.vue'
-import { UploadState } from '~~/shared/types'
+import type { UploadPage } from "~/components/manga/upload/Pages.vue";
+import SuccessModal from "~/components/manga/upload/SuccessModal.vue";
+import { UploadState } from "~~/shared/types";
 
-const route = useRoute()
-const router = useRouter()
-const toast = useToast()
-const overlay = useOverlay()
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
+const overlay = useOverlay();
 
-const { data: mangaResponse, pending, error } = await useMangadex('/manga/{id}', {
+const {
+  data: mangaResponse,
+  pending,
+  error,
+} = await useMangadex("/manga/{id}", {
   path: {
-    id: route.params.mangaId as string
+    id: route.params.mangaId as string,
   },
   query: {
-    "includes[]": ['cover_art', 'author', 'artist']
+    "includes[]": ["cover_art", "author", "artist"],
   },
-  key: `manga-${route.params.mangaId}`
-})
+  key: `manga-${route.params.mangaId}`,
+});
 
-const session = ref<string | null>(null)
-const manga = mangaResponse.value?.data
-const pages = ref<UploadPage[]>([])
-const selectedGroups = ref<string[]>([])
+const session = ref<string | null>(null);
+const manga = mangaResponse.value?.data;
+const pages = ref<UploadPage[]>([]);
+const selectedGroups = ref<string[]>([]);
 
-const oneshot = ref(false)
-const volNumber = ref("")
-const chNumber = ref("")
-const tlLang = ref("")
-const chName = ref("")
+const oneshot = ref(false);
+const volNumber = ref("");
+const chNumber = ref("");
+const tlLang = ref("");
+const chName = ref("");
 
-const formLocked = ref(false)
+const formLocked = ref(false);
 const uploadIssues = ref([]);
 const showUploadConfirm = ref(false);
 const canDismissConfirm = ref(true);
@@ -37,26 +41,31 @@ const uploadFailed = ref(false);
 const uploadFailedReason = ref("");
 const uploadTakingAWhile = ref(false);
 const pendingRemoval = ref(0);
-const removePromises = ref<Promise<void>[]>([])
-const uploadJobPromises = ref<Promise<void>[]>([])
+const removePromises = ref<Promise<void>[]>([]);
+const uploadJobPromises = ref<Promise<void>[]>([]);
 const showIdkGroupWarning = ref(false);
 
-const submitting = ref(false)
+const submitting = ref(false);
 
 const canSubmit = computed(() => {
-  const hasPages = pages.value.length > 0 && pages.value.some(p => p.state === UploadState.Success)
-  return Boolean(session.value && tlLang.value.length >= 2 && hasPages && !submitting.value)
-})
+  const hasPages =
+    pages.value.length > 0 &&
+    pages.value.some((p) => p.state === UploadState.Success);
+  return Boolean(
+    session.value && tlLang.value.length >= 2 && hasPages && !submitting.value,
+  );
+});
 
-const successModal = overlay.create(SuccessModal)
+const successModal = overlay.create(SuccessModal);
 
-const BATCH_SIZE = 3;   // Bo
-const CONCURRENCY = 3;  // qp
+const BATCH_SIZE = 3; // Bo
+const CONCURRENCY = 3; // qp
 
 async function runWithConcurrency<T, R>(
   concurrency: number,
   items: T[],
-  worker: (item: T) => Promise<R>): Promise<R[]> {
+  worker: (item: T) => Promise<R>,
+): Promise<R[]> {
   const queue = [...items];
   const allPromises: Promise<R>[] = [];
   const active: Promise<void>[] = [];
@@ -90,15 +99,19 @@ async function runWithConcurrency<T, R>(
 }
 
 function setFileState(fileId: string, state: UploadState, failReason?: string) {
-  pages.value = pages.value.map(f => f.id === fileId ? { ...f, state, failReason } : f)
+  pages.value = pages.value.map((f) =>
+    f.id === fileId ? { ...f, state, failReason } : f,
+  );
 }
 
 function setFileProgress(fileId: string, progress: number) {
-  pages.value = pages.value.map(f => f.id === fileId ? { ...f, progress } : f)
+  pages.value = pages.value.map((f) =>
+    f.id === fileId ? { ...f, progress } : f,
+  );
 }
 
 async function processUploads(files: UploadPage[]): Promise<void> {
-  if (!session.value) return
+  if (!session.value) return;
 
   const batches: any[][] = [];
   for (let i = 0; i < files.length; i += BATCH_SIZE) {
@@ -141,7 +154,7 @@ async function processUploads(files: UploadPage[]): Promise<void> {
           setFileProgress(file.id, Math.min(1, ratio * batch.length - index));
         });
       },
-      cancelBundle.controller.signal
+      cancelBundle.controller.signal,
     );
 
     const retryQueue: UploadPage[] = [];
@@ -161,7 +174,9 @@ async function processUploads(files: UploadPage[]): Promise<void> {
         return {
           ...file,
           state:
-            file.state === UploadState.PendingRemoval ? UploadState.PendingRemoval : UploadState.Success,
+            file.state === UploadState.PendingRemoval
+              ? UploadState.PendingRemoval
+              : UploadState.Success,
           progress: 1,
           sessionFile: result.sessionFile,
         };
@@ -207,10 +222,10 @@ async function processUploads(files: UploadPage[]): Promise<void> {
   if (resolvers[0]) {
     resolvers[0]();
   }
-};
+}
 
 async function removeFiles(pages: UploadPage[]): Promise<void> {
-  if (!session.value) return
+  if (!session.value) return;
   pendingRemoval.value += pages.length;
 
   for (const file of pages) {
@@ -223,9 +238,7 @@ async function removeFiles(pages: UploadPage[]): Promise<void> {
   }
 
   await Promise.all(
-    pages.map((file) =>
-      file.sessionFile ? Promise.resolve() : file.promise
-    )
+    pages.map((file) => (file.sessionFile ? Promise.resolve() : file.promise)),
   );
 
   const toRemove: string[] = pages
@@ -241,33 +254,37 @@ async function removeFiles(pages: UploadPage[]): Promise<void> {
     (async () => {
       await deletePages(session.value!, toRemove);
       pendingRemoval.value -= pages.length;
-    })()
+    })(),
   );
-};
+}
 
 async function existingSession() {
-  return await $fetch('/api/upload', {
-    method: "GET"
-  })
+  return await $fetch("/api/upload", {
+    method: "GET",
+  });
 }
 
 async function beginSession(manga: string, groups: string[]) {
-  return await $fetch('/api/upload/begin', {
+  return await $fetch("/api/upload/begin", {
     method: "POST",
     body: {
       manga: manga,
-      groups: groups
-    }
-  })
+      groups: groups,
+    },
+  });
 }
 
-async function uploadFiles(files: File[], onProgress: (progressEvent: any) => void, signal: AbortSignal) {
-  if (!session.value) throw new Error("No upload session")
+async function uploadFiles(
+  files: File[],
+  onProgress: (progressEvent: any) => void,
+  signal: AbortSignal,
+) {
+  if (!session.value) throw new Error("No upload session");
 
-  const sessionId = session.value
+  const sessionId = session.value;
 
   if (files.length === 0) {
-    throw new Error("No files to upload")
+    throw new Error("No files to upload");
   }
 
   const formData = new FormData();
@@ -279,9 +296,9 @@ async function uploadFiles(files: File[], onProgress: (progressEvent: any) => vo
   let shouldRetry = false;
   let response: {
     errors: {
-      filename: string
-      message: string
-    }[]
+      filename: string;
+      message: string;
+    }[];
     data: {
       id: string;
       attributes: {
@@ -291,24 +308,24 @@ async function uploadFiles(files: File[], onProgress: (progressEvent: any) => vo
         fileSize: number;
         mimeType: string;
         source: string;
-      }
-    }[]
+      };
+    }[];
     // @ts-ignore
   } = await $fetch(`/api/upload/${sessionId}`, {
     signal,
     body: formData,
-    method: "POST"
-  })
+    method: "POST",
+  });
 
   if (response.errors.length > 0) {
-    shouldRetry = true
+    shouldRetry = true;
     const defaultError = response.errors[0]?.message || "Unknown error";
     response = {
       ...response,
       errors: files.map((file, index) => ({
         filename: file.name,
-        message: defaultError
-      }))
+        message: defaultError,
+      })),
     };
   }
 
@@ -318,8 +335,11 @@ async function uploadFiles(files: File[], onProgress: (progressEvent: any) => vo
     if (response.data.length === files.length) {
       sessionFile = response.data[index];
     } else {
-      sessionFile = response.data.find(f =>
-        f.attributes.originalFileName === file.name && f.attributes.fileSize === file.size)
+      sessionFile = response.data.find(
+        (f) =>
+          f.attributes.originalFileName === file.name &&
+          f.attributes.fileSize === file.size,
+      );
     }
 
     if (!sessionFile) {
@@ -327,19 +347,19 @@ async function uploadFiles(files: File[], onProgress: (progressEvent: any) => vo
       if (response.errors.length === files.length) {
         errorDetail = response.errors[index]!.message;
       } else {
-        errorDetail = response.errors.find(err => err.message)!.message;
+        errorDetail = response.errors.find((err) => err.message)!.message;
       }
 
       return {
         success: false,
         error: errorDetail ?? "Unknown error",
-        shouldRetry
+        shouldRetry,
       };
     }
 
     return {
       success: true,
-      sessionFile
+      sessionFile,
     };
   });
 }
@@ -347,170 +367,179 @@ async function uploadFiles(files: File[], onProgress: (progressEvent: any) => vo
 async function deletePages(sessionId: string, ids: string[]) {
   return await $fetch(`/api/upload/${sessionId}/batch`, {
     method: "DELETE",
-    body: JSON.stringify(ids)
-  })
+    body: JSON.stringify(ids),
+  });
 }
 
 async function deleteSession(sessionId: string) {
   return await $fetch(`/api/upload/${sessionId}`, {
-    method: "DELETE"
-  })
+    method: "DELETE",
+  });
 }
 
 async function uploadChapter(addAnother = false) {
-  if (!session.value) return
-  submitting.value = true
-  formLocked.value = true
+  if (!session.value) return;
+  submitting.value = true;
+  formLocked.value = true;
   try {
     await $fetch(`/api/upload/${session.value}/commit`, {
       method: "POST",
       body: {
-        chapterDraft: oneshot.value ? {
-          volume: null,
-          chapter: null,
-          title: chName.value,
-          translatedLanguage: tlLang.value,
-          publishAt: new Date()
-        } : {
-          volume: volNumber.value,
-          chapter: chNumber.value,
-          title: chName.value,
-          translatedLanguage: tlLang.value,
-          publishAt: new Date()
-        },
-        pageOrder: pages.value.map(p => p.sessionFile?.id)
-      }
-    })
-    formLocked.value = false
+        chapterDraft: oneshot.value
+          ? {
+              volume: null,
+              chapter: null,
+              title: chName.value,
+              translatedLanguage: tlLang.value,
+              publishAt: new Date(),
+            }
+          : {
+              volume: volNumber.value,
+              chapter: chNumber.value,
+              title: chName.value,
+              translatedLanguage: tlLang.value,
+              publishAt: new Date(),
+            },
+        pageOrder: pages.value.map((p) => p.sessionFile?.id),
+      },
+    });
+    formLocked.value = false;
     if (addAnother) {
       toast.add({
-        title: 'Success',
-        description: 'Chapter uploaded successfully. You can add another chapter now.',
-        color: 'success'
-      })
-      resetForm()
+        title: "Success",
+        description:
+          "Chapter uploaded successfully. You can add another chapter now.",
+        color: "success",
+      });
+      resetForm();
     } else {
-      successModal.open({ manga: manga! })
+      successModal.open({ manga: manga! });
     }
-    resetUnsavedChangesWarning()
+    resetUnsavedChangesWarning();
   } catch (error) {
-    uploadFailed.value = true
-    uploadFailedReason.value = (error as Error).message
+    uploadFailed.value = true;
+    uploadFailedReason.value = (error as Error).message;
     toast.add({
-      title: 'Error',
+      title: "Error",
       description: `Failed to commit upload: ${error}`,
-      color: 'error'
-    })
+      color: "error",
+    });
   } finally {
-    formLocked.value = false
-    submitting.value = false
+    formLocked.value = false;
+    submitting.value = false;
   }
 }
 
 function confirmUnsavedChanges() {
-  window.onbeforeunload = () => 'You have unsaved changes! Are you sure you want to leave?'
+  window.onbeforeunload = () =>
+    "You have unsaved changes! Are you sure you want to leave?";
 }
 
 function resetUnsavedChangesWarning() {
-  window.onbeforeunload = null
+  window.onbeforeunload = null;
 }
 
 async function resetForm() {
-  oneshot.value = false
-  volNumber.value = ""
-  chNumber.value = ""
-  tlLang.value = ""
-  chName.value = ""
-  pages.value = []
+  oneshot.value = false;
+  volNumber.value = "";
+  chNumber.value = "";
+  tlLang.value = "";
+  chName.value = "";
+  pages.value = [];
   try {
-    const existing = await existingSession()
+    const existing = await existingSession();
     if (existing) {
-      await deleteSession(existing.id)
+      await deleteSession(existing.id);
     }
-  } catch {
-  }
+  } catch {}
 
   try {
-    const newSession = await beginSession(manga?.id!, selectedGroups.value)
-    session.value = newSession.id
+    const newSession = await beginSession(manga?.id!, selectedGroups.value);
+    session.value = newSession.id;
   } catch {
     toast.add({
-      title: 'Error',
-      description: 'Failed to start upload session',
-      color: 'error'
-    })
+      title: "Error",
+      description: "Failed to start upload session",
+      color: "error",
+    });
   }
 }
 
 onMounted(async () => {
   if (useAuth().loggedIn.value) {
     try {
-      const existing = await existingSession()
+      const existing = await existingSession();
       if (existing) {
-        await deleteSession(existing.id)
+        await deleteSession(existing.id);
       }
-    } catch {
-    }
+    } catch {}
 
     try {
-      const newSession = await beginSession(manga?.id!, selectedGroups.value)
-      session.value = newSession.id
+      const newSession = await beginSession(manga?.id!, selectedGroups.value);
+      session.value = newSession.id;
     } catch {
       toast.add({
-        title: 'Error',
-        description: 'Failed to start upload session',
-        color: 'error'
-      })
+        title: "Error",
+        description: "Failed to start upload session",
+        color: "error",
+      });
     }
   }
-})
+});
 
 onUnmounted(() => {
   if (session.value) {
-    deleteSession(session.value)
+    deleteSession(session.value);
   }
-})
+});
 
 watch(pages, () => {
-  confirmUnsavedChanges()
-})
+  confirmUnsavedChanges();
+});
 </script>
 <template>
   <Page title="Upload Chapter" :wide="false" require-auth>
-    <div v-if="pending">
-      Loading...
-    </div>
+    <div v-if="pending">Loading...</div>
     <div v-else-if="error">
       {{ error }}
     </div>
     <template v-else-if="manga">
       <MangaUploadDetails
-        :manga="manga"
-        :form-locked="formLocked"
         v-model:oneshot="oneshot"
         v-model:vol-number="volNumber"
         v-model:ch-number="chNumber"
         v-model:tl-lang="tlLang"
         v-model:ch-name="chName"
-        />
+        :manga="manga"
+        :form-locked="formLocked"
+      />
       <USeparator class="my-4 col-span-6" />
       <MangaUploadPagesWrapper
         v-if="session"
         v-model="pages"
-        @new-files="pages => processUploads(pages)"
-        @remove-pages="pages => removeFiles(pages)" />
+        @new-files="(pages) => processUploads(pages)"
+        @remove-pages="(pages) => removeFiles(pages)"
+      />
 
       <USeparator class="my-4 col-span-6" />
       <div class="mt-4">
-        <UButton size="xl" color="primary" :loading="submitting"
-          :disabled="!canSubmit"
-          @click="uploadChapter()">
-          Upload
-        </UButton>
-        <UButton size="xl" color="primary" variant="ghost"
+        <UButton
+          size="xl"
+          color="primary"
           :loading="submitting"
           :disabled="!canSubmit"
-          @click="uploadChapter(true)">
+          @click="uploadChapter()"
+        >
+          Upload
+        </UButton>
+        <UButton
+          size="xl"
+          color="primary"
+          variant="ghost"
+          :loading="submitting"
+          :disabled="!canSubmit"
+          @click="uploadChapter(true)"
+        >
           Upload and add another chapter
         </UButton>
       </div>

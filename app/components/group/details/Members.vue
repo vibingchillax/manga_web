@@ -1,12 +1,9 @@
 <script setup lang="ts">
 const props = defineProps<{
-  group: ScanlationGroup
-}>()
+  group: ScanlationGroup;
+}>();
 
-const {
-  members,
-  leader
-} = useScanlationGroup(toRef(props, 'group'))
+const { members, leader } = useScanlationGroup(toRef(props, "group"));
 </script>
 <template>
   <div>
@@ -20,7 +17,11 @@ const {
     <div v-else class="mb-6">
       <div class="font-bold mb-2">Group Members</div>
       <div class="grid gap-2">
-        <UserCard v-for="member in members" :key="member.id" :user="toUser(member)" />
+        <UserCard
+          v-for="member in members"
+          :key="member.id"
+          :user="toUser(member)"
+        />
       </div>
     </div>
   </div>

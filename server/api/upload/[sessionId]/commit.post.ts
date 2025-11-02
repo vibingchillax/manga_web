@@ -1,5 +1,5 @@
-import { randomUUID } from "crypto"
-import { z } from 'zod'
+import { randomUUID } from "crypto";
+import { z } from "zod";
 
 const commitSchema = z.object({
   chapterDraft: z.object({
@@ -7,50 +7,62 @@ const commitSchema = z.object({
     chapter: z.string().optional().nullable(),
     title: z.string().optional().nullable(),
     translatedLanguage: zLang,
-    publishAt: zDateString
+    publishAt: zDateString,
   }),
-  pageOrder: z.array(zUuid)
-})
+  pageOrder: z.array(zUuid),
+});
 
 export default defineEventHandler(async (event) => {
-  const user = await getAuthenticatedUser(event)
+  const user = await getAuthenticatedUser(event);
 
-  if (!user) throw createError({
-    statusCode: 401,
-    statusMessage: 'Not logged in'
-  })
+  if (!user)
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Not logged in",
+    });
 
-  const params = await getValidatedRouterParams(event, z.object({
-    sessionId: zUuid
-  }).parse)
+  const params = await getValidatedRouterParams(
+    event,
+    z.object({
+      sessionId: zUuid,
+    }).parse,
+  );
 
-  const body = await readValidatedBody(event, commitSchema.parse)
+  const body = await readValidatedBody(event, commitSchema.parse);
 
   const session = await prisma.uploadSession.findUnique({
     where: {
       id: params.sessionId,
-      userId: user.id
+      userId: user.id,
     },
     include: {
-      files: true
-    }
-  })
+      files: true,
+    },
+  });
 
-  if (!session) throw createError({
-    statusCode: 400,
-    statusMessage: 'No upload session with that id'
-  })
+  if (!session)
+    throw createError({
+      statusCode: 400,
+      statusMessage: "No upload session with that id",
+    });
 
-  if (!(session.files.length > 0)) throw createError({
-    statusCode: 400,
-    statusMessage: 'No files uploaded yet'
-  })
+  if (!(session.files.length > 0))
+    throw createError({
+      statusCode: 400,
+      statusMessage: "No files uploaded yet",
+    });
 
-  const orderedFiles = body.pageOrder.map(idOrName => {
-    const file = session.files.find(f => f.id === idOrName || f.originalFileName === idOrName)
-    if (!file) throw createError({ statusCode: 400, statusMessage: `File ${idOrName} not found in session` })
-    return file
-  })
+  const orderedFiles = body.pageOrder.map((idOrName) => {
+    const file = session.files.find(
+      (f) => f.id === idOrName || f.originalFileName === idOrName,
+    );
+    if (!file)
+      throw createError({
+        statusCode: 400,
+        statusMessage: `File ${idOrName} not found in session`,
+      });
+    return file;
+  });
 
   const chapter = await prisma.uploadedChapter.create({
     data: {
@@ -63,34 +75,35 @@ export default defineEventHandler(async (event) => {
       uploader: user.id,
       pages: {
         originalUrl: useAppConfig().kuboGatewayUrl,
-        data: orderedFiles.map(f => ({
+        data: orderedFiles.map((f) => ({
           cid: f.cid,
           fileSize: f.fileSize,
-          mimeType: f.mimeType
-        }))
+          mimeType: f.mimeType,
+        })),
       },
-      publishAt: body.chapterDraft.publishAt
-    }
-  })
+      publishAt: body.chapterDraft.publishAt,
+    },
+  });
 
   const deleted = await prisma.uploadSession.delete({
     where: {
       id: session.id,
-      userId: user.id
-    }
-  })
+      userId: user.id,
+    },
+  });
 
-  const targetDir = `/manga_web/${deleted.mangaId}/${chapter.id}_${chapter.translatedLanguage}_v${chapter.volume ?? 'v'}_c${chapter.chapter ?? 'c'}`
-  await kubo.files.mkdir(targetDir, { parents: true })
+  const targetDir = `/manga_web/${deleted.mangaId}/${chapter.id}_${chapter.translatedLanguage}_v${chapter.volume ?? "v"}_c${chapter.chapter ?? "c"}`;
+  await kubo.files.mkdir(targetDir, { parents: true });
 
   for (let i = 0; i < orderedFiles.length; i++) {
-    const file = orderedFiles[i]
-    const ext = file.originalFileName.split(".").pop() || "bin"
-    const targetPath = `${targetDir}/${i + 1}-${randomUUID()}.${ext}`
-    await kubo.files.cp(`/ipfs/${file.cid}`, targetPath)
+    const file = orderedFiles[i];
+    const ext = file.originalFileName.split(".").pop() || "bin";
+    const targetPath = `${targetDir}/${i + 1}-${randomUUID()}.${ext}`;
+    await kubo.files.cp(`/ipfs/${file.cid}`, targetPath);
   }
 
-  return { //formatUploadedChapter(chapter)
+  return {
+    //formatUploadedChapter(chapter)
     id: chapter.id,
     type: "chapter",
     attributes: {
@@ -109,8 +122,8 @@ export default defineEventHandler(async (event) => {
     relationships: [
       {
         id: chapter.mangaId,
-        type: "manga"
-      }
-    ]
-  }
-})
+        type: "manga",
+      },
+    ],
+  };
+});

@@ -1,32 +1,32 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   ssr: false,
   modules: [
-    '@nuxt/content',
-    '@nuxt/eslint',
-    '@nuxt/image',
-    '@nuxt/ui',
-    '@nuxt/test-utils',
-    '@nuxt/scripts',
-    'nuxt-swiper',
-    '@pinia/nuxt',
-    '@nuxt/icon',
-    'nuxt-open-fetch',
-    'pinia-plugin-persistedstate/nuxt',
-    '@nuxtjs/device',
-    '@vueuse/nuxt'
+    "@nuxt/content",
+    "@nuxt/eslint",
+    "@nuxt/image",
+    "@nuxt/ui",
+    "@nuxt/test-utils",
+    "@nuxt/scripts",
+    "nuxt-swiper",
+    "@pinia/nuxt",
+    "@nuxt/icon",
+    "nuxt-open-fetch",
+    "pinia-plugin-persistedstate/nuxt",
+    "@nuxtjs/device",
+    "@vueuse/nuxt",
   ],
-  css: ['~/assets/css/main.css'],
+  css: ["~/assets/css/main.css"],
   openFetch: {
     clients: {
       mangadex: {
-        baseURL: 'https://api.mangadex.org'
-      }
-    }
+        baseURL: "https://api.mangadex.org",
+      },
+    },
   },
   runtimeConfig: {
-    jwtSecret: process.env.JWT_SECRET
-  }
-})
+    jwtSecret: process.env.JWT_SECRET,
+  },
+});

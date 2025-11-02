@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { ProgressModeEnum, ProgressSideEnum, ReadStyleEnum } from '~/stores/useReaderMenu';
+import {
+  ProgressModeEnum,
+  ProgressSideEnum,
+  ReadStyleEnum,
+} from "~/stores/useReaderMenu";
 const props = defineProps<{ disabled?: boolean }>();
 
-const pageSlider = ref<HTMLElement | null>(null)
+const pageSlider = ref<HTMLElement | null>(null);
 const sliderBall = ref<HTMLElement | null>(null);
 const isDragging = ref(false);
 const sliderDirection = ref<ProgressSideEnum>(ProgressSideEnum.Bottom);
 const isAnimationDisabled = ref(false);
 
-const reader = useReaderStore()
-const pageManager = useReaderPageManager()
-const settings = useReaderMenu()
+const reader = useReaderStore();
+const pageManager = useReaderPageManager();
+const settings = useReaderMenu();
 
-const { $breakpoints } = useNuxtApp()
+const { $breakpoints } = useNuxtApp();
 
-const {
-  setCurrentPageGroup,
-  setCurrentProgress,
-  setScrolling,
-} = reader;
+const { setCurrentPageGroup, setCurrentProgress, setScrolling } = reader;
 
 const {
   chapterMeta,
@@ -29,82 +29,86 @@ const {
   scrollbarOffset,
 } = storeToRefs(reader);
 
-const {
-  pageState,
-  pageGroups,
-  pages,
-} = storeToRefs(pageManager)
+const { pageState, pageGroups, pages } = storeToRefs(pageManager);
 
 const {
   readStyle,
   showPageNumber,
   progressMode,
   progressSide,
-  progressHeight
-} = storeToRefs(settings)
+  progressHeight,
+} = storeToRefs(settings);
 
-const isLoading = computed(() => pageState.value !== 'loaded')
-const isRTL = computed(() => readStyle.value === ReadStyleEnum.RTL)
-const sliderHeight = computed(() => `${progressHeight.value}px`)
+const isLoading = computed(() => pageState.value !== "loaded");
+const isRTL = computed(() => readStyle.value === ReadStyleEnum.RTL);
+const sliderHeight = computed(() => `${progressHeight.value}px`);
 
 const totalPages = computed(() => pageGroups.value.length ?? 1);
-const currentProgressPercent = computed(() =>
-  currentPageGroup.value + 1
-);
+const currentProgressPercent = computed(() => currentPageGroup.value + 1);
 
 const sideClass = computed(() => {
-  if (!$breakpoints.sm.value) return ''
+  if (!$breakpoints.sm.value) return "";
   switch (progressSide.value) {
-    case ProgressSideEnum.Right: return 'side right'
-    case ProgressSideEnum.Left: return 'side left'
+    case ProgressSideEnum.Right:
+      return "side right";
+    case ProgressSideEnum.Left:
+      return "side left";
   }
-  return ''
-})
+  return "";
+});
 
-const sliderFraction = ref((currentProgressPercent.value - 1) / Math.max(1, totalPages.value - 1));
+const sliderFraction = ref(
+  (currentProgressPercent.value - 1) / Math.max(1, totalPages.value - 1),
+);
 watch([currentProgressPercent, totalPages], ([progress, total]) => {
   sliderFraction.value = (progress - 1) / Math.max(1, total - 1);
 });
 
 watch(progressSide, (newSide) => {
-  isAnimationDisabled.value = false
+  isAnimationDisabled.value = false;
   setTimeout(() => {
-    isAnimationDisabled.value = true
-    sliderDirection.value = newSide
-  })
-})
+    isAnimationDisabled.value = true;
+    sliderDirection.value = newSide;
+  });
+});
 
-const sliderBallSize = computed(() => `${100 / Math.max(1, totalPages.value)}%`);
+const sliderBallSize = computed(
+  () => `${100 / Math.max(1, totalPages.value)}%`,
+);
 
 const sliderPosition = computed(() => {
   const totalLength = `calc(100% - ${sliderBallSize.value})`;
   const halfBall = `calc(${sliderBallSize.value} / 2)`;
   let fraction = sliderFraction.value;
 
-  fraction = Math.round(fraction * Math.max(0, totalPages.value - 1)) / Math.max(1, totalPages.value - 1);
+  fraction =
+    Math.round(fraction * Math.max(0, totalPages.value - 1)) /
+    Math.max(1, totalPages.value - 1);
   return `calc(${fraction} * ${totalLength} + ${halfBall})`;
 });
 
 const getDividerState = (group: ManagedImage[]) => {
-  return group.some(p => p.fetching || (!p.loaded && !p.fetching && !p.blobUrl))
+  return group.some(
+    (p) => p.fetching || (!p.loaded && !p.fetching && !p.blobUrl),
+  )
     ? "loading"
-    : group.some(p => p.loaded && !p.blobUrl)
+    : group.some((p) => p.loaded && !p.blobUrl)
       ? "error"
-      : "loaded"
-}
+      : "loaded";
+};
 
-const isMouseEvent = (e: MouseEvent | TouchEvent) => !('touches' in e);
+const isMouseEvent = (e: MouseEvent | TouchEvent) => !("touches" in e);
 
 const startDrag = (event: MouseEvent | TouchEvent) => {
   isDragging.value = true;
   updateSlider(event);
 
   if (isMouseEvent(event)) {
-    window.addEventListener('mousemove', onDrag);
-    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener("mousemove", onDrag);
+    window.addEventListener("mouseup", stopDrag);
   } else {
-    window.addEventListener('touchmove', onDrag, { passive: true });
-    window.addEventListener('touchend', stopDrag);
+    window.addEventListener("touchmove", onDrag, { passive: true });
+    window.addEventListener("touchend", stopDrag);
   }
 };
 
@@ -113,10 +117,10 @@ const onDrag = (event: MouseEvent | TouchEvent) => updateSlider(event);
 const stopDrag = () => {
   isDragging.value = false;
 
-  window.removeEventListener('mousemove', onDrag);
-  window.removeEventListener('mouseup', stopDrag);
-  window.removeEventListener('touchmove', onDrag);
-  window.removeEventListener('touchend', stopDrag);
+  window.removeEventListener("mousemove", onDrag);
+  window.removeEventListener("mouseup", stopDrag);
+  window.removeEventListener("touchmove", onDrag);
+  window.removeEventListener("touchend", stopDrag);
 };
 
 const updateSlider = (event: MouseEvent | TouchEvent) => {
@@ -130,81 +134,126 @@ const updateSlider = (event: MouseEvent | TouchEvent) => {
     if (!touch) return;
     clientPos = touch.clientX - rect.left;
   }
-  const dividerWidth = rect.width / totalPages.value
-  const halfDivider = dividerWidth / 2
-  const effectiveWidth = rect.width - dividerWidth
+  const dividerWidth = rect.width / totalPages.value;
+  const halfDivider = dividerWidth / 2;
+  const effectiveWidth = rect.width - dividerWidth;
 
-  let relativePos = clientPos - halfDivider
-  let fraction = relativePos / effectiveWidth
+  const relativePos = clientPos - halfDivider;
+  let fraction = relativePos / effectiveWidth;
 
-  if (isRTL.value) fraction = 1 - fraction
-  sliderFraction.value = Math.max(0, Math.min(fraction, 1))
+  if (isRTL.value) fraction = 1 - fraction;
+  sliderFraction.value = Math.max(0, Math.min(fraction, 1));
 
   const newPage = Math.round(fraction * (totalPages.value - 1));
   if (newPage !== currentPageGroup.value) setCurrentPageGroup(newPage);
 };
 
-onMounted(() => window.addEventListener('blur', stopDrag));
-onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
+onMounted(() => window.addEventListener("blur", stopDrag));
+onBeforeUnmount(() => window.removeEventListener("blur", stopDrag));
 </script>
 
 <template>
-  <div class="reader-progress-wrap" :class="[
-    'mw--reader-progress',
-    {
-      'normal': progressMode === ProgressModeEnum.Normal,
-      [sideClass]: true,
-      'no-anim': isAnimationDisabled,
-      break: immersionBreak || isDragging,
-      mobile: !$breakpoints.sm.value,
-      'show-num': showPageNumber
-    },
-  ]" :style="{
-    bottom: `${scrollbarOffset ?? 0}px`,
-    '--progress-bar-size': sliderHeight,
-    '--slider-ball-left': sliderPosition,
-    '--slider-borderhuh': '1px',
-    '--divider-width': sliderBallSize
-  }">
+  <div
+    class="reader-progress-wrap"
+    :class="[
+      'mw--reader-progress',
+      {
+        normal: progressMode === ProgressModeEnum.Normal,
+        [sideClass]: true,
+        'no-anim': isAnimationDisabled,
+        break: immersionBreak || isDragging,
+        mobile: !$breakpoints.sm.value,
+        'show-num': showPageNumber,
+      },
+    ]"
+    :style="{
+      bottom: `${scrollbarOffset ?? 0}px`,
+      '--progress-bar-size': sliderHeight,
+      '--slider-ball-left': sliderPosition,
+      '--slider-borderhuh': '1px',
+      '--divider-width': sliderBallSize,
+    }"
+  >
     <div class="progress-wrap" :class="{ active: isDragging, rtl: isRTL }">
       <div class="page-number">
-        <span>{{isLoading ? '?' : pageGroups[currentPageGroup]!.map(p => p.pageNum).join('-')}}</span>
+        <span>{{
+          isLoading
+            ? "?"
+            : pageGroups[currentPageGroup]!.map((p) => p.pageNum).join("-")
+        }}</span>
       </div>
-      <div class="page-slider" :class="{
-        rtl: isRTL,
-        disabled: props.disabled || isLoading,
-        'mx-2': progressSide === ProgressSideEnum.Bottom || !$breakpoints.sm.value,
-        'my-2': progressSide !== ProgressSideEnum.Bottom && $breakpoints.sm.value,
-      }" ref="pageSlider" @mousedown.prevent.stop="startDrag" @touchstart.prevent.stop="startDrag">
-        <div id="slider-ball" ref="sliderBall" :class="{
+      <div
+        ref="pageSlider"
+        class="page-slider"
+        :class="{
           rtl: isRTL,
-          [sideClass]: true
-        }" @mousedown.prevent.stop="startDrag" @touchstart.prevent.stop="startDrag">
-          <div class="slider-ball-tooltip" :class="{
-            [sideClass]: true
-          }" style="display: none;">
-            {{isLoading ? '?' : pageGroups[currentPageGroup]!.map(p => p.pageNum).join('-')}}
-          </div>
-        </div>
-        <div v-if="totalPages > 1 && !isLoading" class="slider-dividers" :class="{
-          'rtl': isRTL,
-          [sideClass]: true
-        }">
-          <div v-for="(group, idx) in pageGroups" :key="idx" class="prog-divider" :class="{
-            [getDividerState(group)]: true,
-            read: currentPageGroup >= idx,
+          disabled: props.disabled || isLoading,
+          'mx-2':
+            progressSide === ProgressSideEnum.Bottom || !$breakpoints.sm.value,
+          'my-2':
+            progressSide !== ProgressSideEnum.Bottom && $breakpoints.sm.value,
+        }"
+        @mousedown.prevent.stop="startDrag"
+        @touchstart.prevent.stop="startDrag"
+      >
+        <div
+          id="slider-ball"
+          ref="sliderBall"
+          :class="{
             rtl: isRTL,
-            current: currentPageGroup === idx,
-            [sideClass]: true
-          }">
-            <div v-if="$breakpoints.sm.value" class="prog-divider-label" :class="{
-              current: currentPageGroup === idx
-            }">{{group.map(p => p.pageNum).join('-')}}</div>
+            [sideClass]: true,
+          }"
+          @mousedown.prevent.stop="startDrag"
+          @touchstart.prevent.stop="startDrag"
+        >
+          <div
+            class="slider-ball-tooltip"
+            :class="{
+              [sideClass]: true,
+            }"
+            style="display: none"
+          >
+            {{
+              isLoading
+                ? "?"
+                : pageGroups[currentPageGroup]!.map((p) => p.pageNum).join("-")
+            }}
           </div>
         </div>
-        <div class="slider-loading" v-if="isLoading"></div>
+        <div
+          v-if="totalPages > 1 && !isLoading"
+          class="slider-dividers"
+          :class="{
+            rtl: isRTL,
+            [sideClass]: true,
+          }"
+        >
+          <div
+            v-for="(group, idx) in pageGroups"
+            :key="idx"
+            class="prog-divider"
+            :class="{
+              [getDividerState(group)]: true,
+              read: currentPageGroup >= idx,
+              rtl: isRTL,
+              current: currentPageGroup === idx,
+              [sideClass]: true,
+            }"
+          >
+            <div
+              v-if="$breakpoints.sm.value"
+              class="prog-divider-label"
+              :class="{
+                current: currentPageGroup === idx,
+              }"
+            >
+              {{ group.map((p) => p.pageNum).join("-") }}
+            </div>
+          </div>
+        </div>
+        <div v-if="isLoading" class="slider-loading" />
       </div>
-      <div class="page-number">{{ isLoading ? '?' : pages.length }}</div>
+      <div class="page-number">{{ isLoading ? "?" : pages.length }}</div>
     </div>
   </div>
 </template>
@@ -219,7 +268,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   --progress-transition: 75ms ease-in-out;
   bottom: 0;
   height: var(--progress-height);
-  margin-top: calc(var(--progress-height)*-1);
+  margin-top: calc(var(--progress-height) * -1);
   overflow: hidden;
   padding-top: var(--padding);
   position: sticky;
@@ -227,21 +276,23 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
 
 .reader-progress-wrap.no-anim {
   --progress-transition: 0s;
-  --slider-transition: 0s
+  --slider-transition: 0s;
 }
 
-.reader-progress-wrap.normal>.progress-wrap {
+.reader-progress-wrap.normal > .progress-wrap {
   background-color: transparent;
   border-top: 1px solid transparent;
-  transform: translateY(calc(var(--raw-height)/2 - var(--slider-height)/2 - .25rem));
+  transform: translateY(
+    calc(var(--raw-height) / 2 - var(--slider-height) / 2 - 0.25rem)
+  );
 }
 
-.reader-progress-wrap.normal>.progress-wrap>.page-slider {
-  opacity: .7;
+.reader-progress-wrap.normal > .progress-wrap > .page-slider {
+  opacity: 0.7;
   pointer-events: none;
 }
 
-.reader-progress-wrap.normal>.progress-wrap>.page-number {
+.reader-progress-wrap.normal > .progress-wrap > .page-number {
   max-height: 0;
   max-width: 0;
   min-height: 0;
@@ -249,12 +300,16 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   transform: scale(0);
 }
 
-.reader-progress-wrap.normal.side.left>.progress-wrap {
-  transform: translate(calc(var(--raw-height)/-2 + var(--slider-height)/2 + .25rem))
+.reader-progress-wrap.normal.side.left > .progress-wrap {
+  transform: translate(
+    calc(var(--raw-height) / -2 + var(--slider-height) / 2 + 0.25rem)
+  );
 }
 
-.reader-progress-wrap.normal.side.right>.progress-wrap {
-  transform: translate(calc(var(--raw-height)/2 - var(--slider-height)/2 - .25rem))
+.reader-progress-wrap.normal.side.right > .progress-wrap {
+  transform: translate(
+    calc(var(--raw-height) / 2 - var(--slider-height) / 2 - 0.25rem)
+  );
 }
 
 .reader-progress-wrap.side {
@@ -265,71 +320,71 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   padding-top: 0;
   top: 0;
   width: var(--progress-height);
-  z-index: 1
+  z-index: 1;
 }
 
-.reader-progress-wrap.side>.progress-wrap {
+.reader-progress-wrap.side > .progress-wrap {
   border-top: none;
   flex-direction: column;
   height: 100%;
   max-height: 100%;
   padding: var(--side-margin) 0;
   transform: translate(0);
-  width: var(--raw-height, 3rem)
+  width: var(--raw-height, 3rem);
 }
 
-.reader-progress-wrap.side>.progress-wrap>.page-slider {
+.reader-progress-wrap.side > .progress-wrap > .page-slider {
   height: 100%;
   max-height: 100%;
-  width: var(--slider-height)
+  width: var(--slider-height);
 }
 
-.reader-progress-wrap.side>.progress-wrap>.page-slider>.slider-dividers {
-  flex-direction: column
+.reader-progress-wrap.side > .progress-wrap > .page-slider > .slider-dividers {
+  flex-direction: column;
 }
 
-.reader-progress-wrap.side.left>.progress-wrap {
+.reader-progress-wrap.side.left > .progress-wrap {
   border-right: 1px solid transparent;
-  transform: translate(-100%)
+  transform: translate(-100%);
 }
 
 .reader-progress-wrap.side.right {
-  transform: translate(-100%)
+  transform: translate(-100%);
 }
 
-.reader-progress-wrap.side.right>.progress-wrap {
+.reader-progress-wrap.side.right > .progress-wrap {
   border-left: 1px solid transparent;
   margin-left: auto;
-  transform: translate(100%)
+  transform: translate(100%);
 }
 
 .reader-progress-wrap.side {
-  overflow: visible
+  overflow: visible;
 }
 
 .reader-progress-wrap.web-mobile {
-  pointer-events: none
+  pointer-events: none;
 }
 
-.reader-progress-wrap.web-mobile>.progress-wrap {
-  pointer-events: all
+.reader-progress-wrap.web-mobile > .progress-wrap {
+  pointer-events: all;
 }
 
 .reader-progress-wrap.mobile {
   --raw-height: var(--bottom-nav-height);
   --slider-height: var(--divider-width);
   --slider-ball-diameter: var(--divider-width);
-  pointer-events: none
+  pointer-events: none;
 }
 
-.reader-progress-wrap.mobile>.progress-wrap {
+.reader-progress-wrap.mobile > .progress-wrap {
   background-color: transparent;
-  pointer-events: all
+  pointer-events: all;
 }
 
-.reader-progress-wrap.show-num>.pg-num {
+.reader-progress-wrap.show-num > .pg-num {
   opacity: 1;
-  transform: translate(-50%) translateY(0)
+  transform: translate(-50%) translateY(0);
 }
 
 .reader-progress-wrap.normal:not(.mobile):not(.break, :hover) {
@@ -343,45 +398,49 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   --slider-ball-diameter: 1rem;
 }
 
-.reader-progress-wrap.break.mobile>.progress-wrap,
-.reader-progress-wrap:not(.web-mobile):not(.mobile):hover.mobile>.progress-wrap {
-  background-color: rgb(var(--mw-background))
+.reader-progress-wrap.break.mobile > .progress-wrap,
+.reader-progress-wrap:not(.web-mobile):not(.mobile):hover.mobile
+  > .progress-wrap {
+  background-color: rgb(var(--mw-background));
 }
 
-.reader-progress-wrap.break>.progress-wrap,
-.reader-progress-wrap:not(.web-mobile):not(.mobile):hover>.progress-wrap {
-  background-color: rgb(var(--mw-background)/.8);
+.reader-progress-wrap.break > .progress-wrap,
+.reader-progress-wrap:not(.web-mobile):not(.mobile):hover > .progress-wrap {
+  background-color: rgb(var(--mw-background) / 0.8);
   border-color: rgb(var(--mw-accent));
-  transform: none !important
+  transform: none !important;
 }
 
-@media (min-width:40rem) {
-
-  .reader-progress-wrap.break>.progress-wrap,
-  .reader-progress-wrap:not(.web-mobile):not(.mobile):hover>.progress-wrap {
-    background-color: rgb(var(--mw-background))
+@media (min-width: 40rem) {
+  .reader-progress-wrap.break > .progress-wrap,
+  .reader-progress-wrap:not(.web-mobile):not(.mobile):hover > .progress-wrap {
+    background-color: rgb(var(--mw-background));
   }
 }
 
-.reader-progress-wrap.break>.progress-wrap>.page-slider,
-.reader-progress-wrap:not(.web-mobile):not(.mobile):hover>.progress-wrap>.page-slider {
+.reader-progress-wrap.break > .progress-wrap > .page-slider,
+.reader-progress-wrap:not(.web-mobile):not(.mobile):hover
+  > .progress-wrap
+  > .page-slider {
   opacity: 1;
-  pointer-events: all
+  pointer-events: all;
 }
 
-.reader-progress-wrap.break>.progress-wrap>.page-number,
-.reader-progress-wrap:not(.web-mobile):not(.mobile):hover>.progress-wrap>.page-number {
+.reader-progress-wrap.break > .progress-wrap > .page-number,
+.reader-progress-wrap:not(.web-mobile):not(.mobile):hover
+  > .progress-wrap
+  > .page-number {
   max-height: 1rem;
   max-width: 1rem;
   min-height: 1rem;
   min-width: 1rem;
-  transform: scale(1)
+  transform: scale(1);
 }
 
-.reader-progress-wrap.break>.pg-num,
-.reader-progress-wrap:not(.web-mobile):not(.mobile):hover>.pg-num {
+.reader-progress-wrap.break > .pg-num,
+.reader-progress-wrap:not(.web-mobile):not(.mobile):hover > .pg-num {
   opacity: 0;
-  transform: translate(-50%) translateY(calc(var(--progress-height)*-1))
+  transform: translate(-50%) translateY(calc(var(--progress-height) * -1));
 }
 
 .mw--reader-progress {
@@ -392,7 +451,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
 
 .progress-wrap {
   align-items: center;
-  background-color: rgb(var(--mw-background)/.8);
+  background-color: rgb(var(--mw-background) / 0.8);
   border-top: 1px solid var(--mw-accent);
   display: flex;
   height: var(--raw-height, 3rem);
@@ -411,24 +470,24 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
 }
 
 .progress-wrap.rtl {
-  flex-direction: row-reverse
+  flex-direction: row-reverse;
 }
 
 .progress-wrap.active {
-  transform: none
+  transform: none;
 }
 
 .progress-wrap.active .slider-ball-tooltip {
-  display: block
+  display: block;
 }
 
 .progress-wrap.thick {
-  --slider-height: 2rem
+  --slider-height: 2rem;
 }
 
 .page-number {
   display: flex;
-  font-size: .75rem;
+  font-size: 0.75rem;
   justify-content: center;
   line-height: 1rem;
   min-width: 0;
@@ -444,7 +503,10 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   height: var(--slider-height);
   min-width: 0;
   position: relative;
-  transition: height var(--progress-transition), width var(--progress-transition), opacity var(--progress-transition);
+  transition:
+    height var(--progress-transition),
+    width var(--progress-transition),
+    opacity var(--progress-transition);
 }
 
 #slider-ball {
@@ -453,7 +515,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   border-radius: 9999px;
   cursor: grab;
   display: flex;
-  font-size: .875rem;
+  font-size: 0.875rem;
   height: var(--slider-height);
   justify-content: center;
   left: var(--slider-ball-left);
@@ -463,11 +525,15 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   position: absolute;
   top: 0;
   transform: translate(-50%);
-  transition: min-width var(--progress-transition), min-height var(--progress-transition), width var(--progress-transition), height var(--progress-transition);
+  transition:
+    min-width var(--progress-transition),
+    min-height var(--progress-transition),
+    width var(--progress-transition),
+    height var(--progress-transition);
   width: var(--divider-width);
   z-index: 3;
   --tw-text-opacity: 1;
-  color: rgb(255 255 255/var(--tw-text-opacity, 1));
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
 #slider-ball.side {
@@ -475,27 +541,34 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   left: 0;
   top: var(--slider-ball-left);
   transform: translateY(-50%);
-  width: var(--slider-height)
+  width: var(--slider-height);
 }
 
 #slider-ball:active,
 #slider-ball:active:after {
-  cursor: grabbing
+  cursor: grabbing;
 }
 
 #slider-ball.continuous {
   height: var(--slider-ball-diameter);
-  max-width: var(--slider-ball-diameter)
+  max-width: var(--slider-ball-diameter);
 }
 
 #slider-ball:not(.side).rtl {
   left: unset;
   right: var(--slider-ball-left);
-  transform: translate(50%)
+  transform: translate(50%);
 }
 
 #slider-ball:not(.continuous) {
-  transition: left var(--slider-transition), right var(--slider-transition), top var(--slider-transition), min-width var(--progress-transition), min-height var(--progress-transition), height var(--progress-transition), width var(--progress-transition);
+  transition:
+    left var(--slider-transition),
+    right var(--slider-transition),
+    top var(--slider-transition),
+    min-width var(--progress-transition),
+    min-height var(--progress-transition),
+    height var(--progress-transition),
+    width var(--progress-transition);
 }
 
 #slider-ball::after {
@@ -506,7 +579,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   width: calc(100% + 1rem);
 }
 
-#slider-ball:hover>.slider-ball-tooltip {
+#slider-ball:hover > .slider-ball-tooltip {
   display: block !important;
 }
 
@@ -516,7 +589,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   font-size: 1.125rem;
   line-height: 1.75rem;
   line-height: 1;
-  padding: .25rem .5rem;
+  padding: 0.25rem 0.5rem;
   position: absolute;
   transform: translateY(-100%);
   vertical-align: middle;
@@ -524,20 +597,19 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
 }
 
 .slider-ball-tooltip.left {
-  transform: translate(100%)
+  transform: translate(100%);
 }
 
 .slider-ball-tooltip.right {
-  transform: translate(-100%)
+  transform: translate(-100%);
 }
-
 
 .slider-dividers::before {
   background-color: var(--ui-primary);
   bottom: 0;
   content: "";
   left: 0;
-  opacity: .7;
+  opacity: 0.7;
   position: absolute;
   top: 0;
   width: var(--slider-ball-left);
@@ -548,7 +620,6 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   .slider-dividers::before {
     border-radius: 9999px;
     z-index: unset;
-
   }
 }
 
@@ -556,40 +627,42 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   bottom: unset;
   height: var(--slider-ball-left);
   right: 0;
-  width: auto
+  width: auto;
 }
 
 .slider-dividers:not(.continuous)::before {
-  transition: width var(--slider-transition), height var(--slider-transition);
+  transition:
+    width var(--slider-transition),
+    height var(--slider-transition);
 }
 
-.slider-dividers:not(.rtl)>:first-child {
+.slider-dividers:not(.rtl) > :first-child {
   margin-left: 0;
-  padding-left: var(--slider-borderhuh)
+  padding-left: var(--slider-borderhuh);
 }
 
-.slider-dividers:not(.rtl)>:last-child {
+.slider-dividers:not(.rtl) > :last-child {
   margin-right: 0;
-  padding-right: var(--slider-borderhuh)
+  padding-right: var(--slider-borderhuh);
 }
 
 .slider-dividers:not(.side).rtl {
-  flex-direction: row-reverse
+  flex-direction: row-reverse;
 }
 
-.slider-dividers:not(.side).rtl>:first-child {
+.slider-dividers:not(.side).rtl > :first-child {
   margin-right: 0;
-  padding-right: var(--slider-borderhuh)
+  padding-right: var(--slider-borderhuh);
 }
 
-.slider-dividers:not(.side).rtl>:last-child {
+.slider-dividers:not(.side).rtl > :last-child {
   margin-left: 0;
-  padding-left: var(--slider-borderhuh)
+  padding-left: var(--slider-borderhuh);
 }
 
 .slider-dividers:not(.side).rtl:before {
   left: unset;
-  right: 0
+  right: 0;
 }
 
 .slider-dividers {
@@ -612,7 +685,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   background-color: transparent;
   display: flex;
   flex-grow: 1;
-  font-size: .75rem;
+  font-size: 0.75rem;
   height: 100%;
   justify-content: center;
   line-height: 1rem;
@@ -621,7 +694,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   white-space: nowrap;
 }
 
-@media (min-width:40rem) {
+@media (min-width: 40rem) {
   .prog-divider.read:after {
     background-color: var(--ui-primary);
     content: " ";
@@ -629,7 +702,7 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
     right: 0;
     bottom: 0;
     left: 0;
-    opacity: .7;
+    opacity: 0.7;
     position: absolute;
   }
 
@@ -638,12 +711,12 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
     height: auto;
     left: 0;
     top: 0;
-    width: 50%
+    width: 50%;
   }
 
   .prog-divider.read.current.rtl:after {
     left: unset;
-    right: 0
+    right: 0;
   }
 
   .prog-divider.read.current.side:after {
@@ -652,13 +725,13 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
     left: 0;
     right: 0;
     top: 0;
-    width: auto
+    width: auto;
   }
 
   .prog-divider:not(.side):not(.rtl):first-child,
   .prog-divider:not(.side):not(.rtl):first-child:after {
     border-bottom-left-radius: 9999px;
-    border-top-left-radius: 9999px
+    border-top-left-radius: 9999px;
   }
 
   .prog-divider:not(.side).rtl:first-child,
@@ -666,77 +739,77 @@ onBeforeUnmount(() => window.removeEventListener('blur', stopDrag));
   .prog-divider:not(.side):not(.rtl):last-child,
   .prog-divider:not(.side):not(.rtl):last-child:after {
     border-bottom-right-radius: 9999px;
-    border-top-right-radius: 9999px
+    border-top-right-radius: 9999px;
   }
 
   .prog-divider:not(.side).rtl:last-child,
   .prog-divider:not(.side).rtl:last-child:after {
     border-bottom-left-radius: 9999px;
-    border-top-left-radius: 9999px
+    border-top-left-radius: 9999px;
   }
 
   .prog-divider.side {
-    margin: var(--slider-borderhuh) 0
+    margin: var(--slider-borderhuh) 0;
   }
 
   .prog-divider.side:first-child,
   .prog-divider.side:first-child:after {
     border-top-left-radius: 9999px;
-    border-top-right-radius: 9999px
+    border-top-right-radius: 9999px;
   }
 
   .prog-divider.side:last-child,
   .prog-divider.side:last-child:after {
     border-bottom-left-radius: 9999px;
-    border-bottom-right-radius: 9999px
+    border-bottom-right-radius: 9999px;
   }
 }
 
 .prog-divider.loading {
-  background-color: rgb(var(--mw-accent))
+  background-color: rgb(var(--mw-accent));
 }
 
 .prog-divider.error {
   background-color: rgb(var(--mw-status-red));
-  z-index: 2
+  z-index: 2;
 }
 
 .prog-divider.loaded {
-  background-color: rgb(var(--mw-accent-20))
+  background-color: rgb(var(--mw-accent-20));
 }
 
 .prog-divider.continuous {
   margin: 0;
-  transition: background-color var(--slider-transition)
+  transition: background-color var(--slider-transition);
 }
 
-.prog-divider:hover>:not(.current).prog-divider-label {
-  display: block
+.prog-divider:hover > :not(.current).prog-divider-label {
+  display: block;
 }
 
 .prog-divider-label {
   background-color: rgb(var(--mw-accent));
   border-radius: 9999px;
-  bottom: calc(100% + .5rem);
+  bottom: calc(100% + 0.5rem);
   display: none;
   font-size: 1.125rem;
   line-height: 1.75rem;
   line-height: 1;
-  padding: .25rem .5rem;
+  padding: 0.25rem 0.5rem;
   position: absolute;
   vertical-align: middle;
-  white-space: nowrap
+  white-space: nowrap;
 }
 
 .prog-divider-label.left {
   bottom: unset;
-  left: calc(100% + .5rem);
-  right: unset
+  left: calc(100% + 0.5rem);
+  right: unset;
 }
 
 .prog-divider-label.right {
   bottom: unset;
   left: unset;
-  right: calc(100% + .5rem)
+  right: calc(100% + 0.5rem);
 }
 </style>

@@ -1,16 +1,15 @@
 <script setup lang="ts">
 defineProps<{
-  title?: string
-  icon: string
-  link?: string
-  ext?: string
-  rightIcon?: string
-  rightIconLink?: string
-}>()
+  title?: string;
+  icon: string;
+  link?: string;
+  ext?: string;
+  rightIcon?: string;
+  rightIconLink?: string;
+}>();
 
-const { $breakpoints } = useNuxtApp()
-const { setMenu } = useLayout()
-
+const { $breakpoints } = useNuxtApp();
+const { setMenu } = useLayout();
 </script>
 
 <template>
@@ -21,8 +20,13 @@ const { setMenu } = useLayout()
 
     <div class="mx-2 font-bold">{{ title }}</div>
 
-    <UButton v-if="rightIcon" :to="rightIconLink" class="ml-auto"
-      @click="!$breakpoints.lg.value && setMenu(false)" :icon="rightIcon" />
+    <UButton
+      v-if="rightIcon"
+      :to="rightIconLink"
+      class="ml-auto"
+      :icon="rightIcon"
+      @click="!$breakpoints.lg.value && setMenu(false)"
+    />
     <!-- <NuxtLink v-if="rightIcon" :to="rightIconLink" class="ml-auto">
       @click="!breakpoints.lg && setMenu(false)"
       <UIcon :name="rightIcon" color="currentColor" />
@@ -34,7 +38,7 @@ const { setMenu } = useLayout()
   align-items: center;
   border-radius: 4px;
   display: flex;
-  font-size: .875rem;
+  font-size: 0.875rem;
   height: 1.75rem;
 }
 </style>

@@ -1,48 +1,68 @@
 <script setup lang="ts">
-import { HeaderStyleEnum } from '~/stores/useReaderMenu';
-import Logo from './Logo.vue';
-import User from './User.vue';
-import MOTD from './MOTD.vue';
+import { HeaderStyleEnum } from "~/stores/useReaderMenu";
+import Logo from "./Logo.vue";
+import User from "./User.vue";
+import MOTD from "./MOTD.vue";
 
-const route = useRoute()
-const { y } = useScroll(window)
-const navbarOpacity = computed(() => Math.min(y.value / 56, 1))
-const isReader = computed(() => route.name?.toString().startsWith('chapter'))
-const { immersive } = storeToRefs(useReaderStore())
-const { headerStyle, menuPinned, menuOpen } = storeToRefs(useReaderMenu())
-const { menuActive, showMOTD } = storeToRefs(useLayout())
-const { $breakpoints } = useNuxtApp()
+const route = useRoute();
+const { y } = useScroll(window);
+const navbarOpacity = computed(() => Math.min(y.value / 56, 1));
+const isReader = computed(() => route.name?.toString().startsWith("chapter"));
+const { immersive } = storeToRefs(useReaderStore());
+const { headerStyle, menuPinned, menuOpen } = storeToRefs(useReaderMenu());
+const { menuActive, showMOTD } = storeToRefs(useLayout());
+const { $breakpoints } = useNuxtApp();
 </script>
 <template>
-  <div :class="['navbar-wrap flex flex-col',
-    {
-      transparent: true,
-      reader: isReader,
-      'header-hidden': headerStyle === HeaderStyleEnum.Hidden,
-      'shown-pinned': headerStyle === HeaderStyleEnum.Shown && menuPinned,
-      rmo: menuOpen,
-      ma: menuActive,
-    }, 'fixed top-0 right-0', {
-      'max-w-[calc(100%_-_var(--drawer-menu-width))] ml-auto': $breakpoints.lg.value && menuActive
-    }]">
+  <div
+    :class="[
+      'navbar-wrap flex flex-col',
+      {
+        transparent: true,
+        reader: isReader,
+        'header-hidden': headerStyle === HeaderStyleEnum.Hidden,
+        'shown-pinned': headerStyle === HeaderStyleEnum.Shown && menuPinned,
+        rmo: menuOpen,
+        ma: menuActive,
+      },
+      'fixed top-0 right-0',
+      {
+        'max-w-[calc(100%_-_var(--drawer-menu-width))] ml-auto':
+          $breakpoints.lg.value && menuActive,
+      },
+    ]"
+  >
     <div class="nav-bar-main flex justify-center">
       <div class="nav-bar flex flex-grow justify-end w-full items-center gap-2">
         <Logo v-if="!menuActive" />
-        <MOTD :message="useAppConfig().messageOfTheDay" v-if="showMOTD" />
+        <MOTD v-if="showMOTD" :message="useAppConfig().messageOfTheDay" />
         <SearchBar />
         <User />
       </div>
-      <div v-if="(isReader && headerStyle === HeaderStyleEnum.Shown && !immersive) || !isReader"
-        class="navbar-background" :style="{ opacity: navbarOpacity }"></div>
+      <div
+        v-if="
+          (isReader && headerStyle === HeaderStyleEnum.Shown && !immersive) ||
+          !isReader
+        "
+        class="navbar-background"
+        :style="{ opacity: navbarOpacity }"
+      />
     </div>
   </div>
-  <div v-if="(isReader && headerStyle === HeaderStyleEnum.Shown && !immersive) || !isReader"
-    class="h-[var(--navbar-height)]"></div>
+  <div
+    v-if="
+      (isReader && headerStyle === HeaderStyleEnum.Shown && !immersive) ||
+      !isReader
+    "
+    class="h-[var(--navbar-height)]"
+  />
 </template>
 <style lang="css" scoped>
 .navbar-wrap {
-  --nav-anim-attr: .15s ease-in-out;
-  transition: margin var(--nav-anim-attr), transform 75ms ease-out;
+  --nav-anim-attr: 0.15s ease-in-out;
+  transition:
+    margin var(--nav-anim-attr),
+    transform 75ms ease-out;
   width: 100%;
   z-index: 6;
 }
@@ -53,7 +73,9 @@ const { $breakpoints } = useNuxtApp()
 
 .navbar-wrap.reader {
   left: 0;
-  transition: padding-right var(--nav-anim-attr), left var(--nav-anim-attr);
+  transition:
+    padding-right var(--nav-anim-attr),
+    left var(--nav-anim-attr);
   width: unset;
 }
 
@@ -62,7 +84,7 @@ const { $breakpoints } = useNuxtApp()
 }
 
 .navbar-wrap.reader.shown-pinned {
-  margin-bottom: calc(var(--navbar-height)*-1);
+  margin-bottom: calc(var(--navbar-height) * -1);
 }
 
 .navbar-wrap.reader.rmo {

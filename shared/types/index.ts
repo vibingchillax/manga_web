@@ -1,13 +1,17 @@
 import type { components } from "#open-fetch-schemas/mangadex";
 import type { Flags } from "@manga_web/sources";
-import type { ContentRating, PublicationDemographic, UserRole } from "../prisma/client";
+import type {
+  ContentRating,
+  PublicationDemographic,
+  UserRole,
+} from "../prisma/client";
 
-export type Author = components["schemas"]["Author"]
-export type Cover = components["schemas"]["Cover"]
-export type Manga = components["schemas"]["Manga"]
-export type MangaList = components["schemas"]["MangaList"]
-export type Relationship = components["schemas"]["Relationship"]
-export type Tag = components["schemas"]["Tag"]
+export type Author = components["schemas"]["Author"];
+export type Cover = components["schemas"]["Cover"];
+export type Manga = components["schemas"]["Manga"];
+export type MangaList = components["schemas"]["MangaList"];
+export type Relationship = components["schemas"]["Relationship"];
+export type Tag = components["schemas"]["Tag"];
 
 export type MangaAggregateResponse = Record<
   string,
@@ -26,7 +30,12 @@ export type MangaAggregateResponse = Record<
   }
 >;
 
-export type SourceLabel = { label: string, id: string, url: string, flags: Flags[] };
+export type SourceLabel = {
+  label: string;
+  id: string;
+  url: string;
+  flags: Flags[];
+};
 
 export enum UploadState {
   Pending,
@@ -66,11 +75,9 @@ export type ScrapedManga = Resource<
     createdAt: string; //nuxt automatically serialize Date objs for us
     updatedAt: string;
   },
-  (
-    | { id: string; type: "author"; attributes: { name: string } }
-    | { id: string; type: "artist"; attributes: { name: string } }
-    | { id: string; type: "scraped_cover_art"; attributes: { url: string } }
-  )
+  | { id: string; type: "author"; attributes: { name: string } }
+  | { id: string; type: "artist"; attributes: { name: string } }
+  | { id: string; type: "scraped_cover_art"; attributes: { url: string } }
 >;
 
 export type ScrapedChapter = Resource<
@@ -89,24 +96,20 @@ export type ScrapedChapter = Resource<
     updatedAt: string;
     publishAt: string | null;
   },
-  (
-    | ScrapedManga
-    | { id: string; type: "scraped_manga" }
-    | ScrapedScanlationGroup
-  )
+  ScrapedManga | { id: string; type: "scraped_manga" } | ScrapedScanlationGroup
 >;
 
 export type ScrapedPage = {
-  originalUrl: string
-  cid: string | null
-}
+  originalUrl: string;
+  cid: string | null;
+};
 
 export type ScrapedScanlationGroup = Resource<
   "scraped_scanlation_group",
   {
-    name: string
+    name: string;
   }
->
+>;
 
 export type ScanlationGroup = Resource<
   "scanlation_group",
@@ -151,20 +154,17 @@ export type User = Resource<
 export type UploadedChapter = Resource<
   "chapter",
   {
-    title: string
-    volume: string
-    chapter: string
-    pages: any
-    translatedLanguage: string
-    uploader: string
-    version: number
-    createdAt: string
-    updatedAt: string
-    publishAt: string
-    readableAt: string
+    title: string;
+    volume: string;
+    chapter: string;
+    pages: any;
+    translatedLanguage: string;
+    uploader: string;
+    version: number;
+    createdAt: string;
+    updatedAt: string;
+    publishAt: string;
+    readableAt: string;
   },
-  (
-    User |
-    ScanlationGroup
-  )
+  User | ScanlationGroup
 >;

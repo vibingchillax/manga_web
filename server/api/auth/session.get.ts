@@ -1,9 +1,9 @@
-import { getAuthenticatedUser } from '../../utils/auth'
+import { getAuthenticatedUser } from "../../utils/auth";
 
 export default defineEventHandler(async (event) => {
-  const user = await getAuthenticatedUser(event)
+  const user = await getAuthenticatedUser(event);
 
-  if (!user) return null
+  if (!user) return null;
 
   return {
     id: user.id,
@@ -11,6 +11,6 @@ export default defineEventHandler(async (event) => {
     username: user.username,
     roles: user.roles,
     createdAt: user.createdAt,
-    updatedAt: user.updatedAt
-  }
-})
+    updatedAt: user.updatedAt,
+  };
+});

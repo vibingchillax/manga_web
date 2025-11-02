@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ChapterEntry from './details/content/ChapterEntry.vue';
+import ChapterEntry from "./details/content/ChapterEntry.vue";
 
 const props = defineProps<{
   manga: ScrapedManga;
@@ -35,7 +35,9 @@ onBeforeUnmount(() => {
   resizeObserver?.disconnect();
 });
 
-const isExpandable = computed(() => props.chapterList.length > visibleCount.value);
+const isExpandable = computed(
+  () => props.chapterList.length > visibleCount.value,
+);
 
 const visibleCount = computed(() => {
   // if (breakpoints.md) {
@@ -53,20 +55,18 @@ const toggleExpand = () => {
   showAll.value = !showAll.value;
 };
 
-const {
-  title,
-  detailsUrl,
-  coverUrl,
-} = useScrapedManga(toRef(props, 'manga'))
-
+const { title, detailsUrl, coverUrl } = useScrapedManga(toRef(props, "manga"));
 </script>
 <template>
-  <div class="chapter-feed__container" :class="{
-    // compact: feedStyle === 'Compact',
-    // details: feedStyle === 'Details',
-    expand: isExpandable
-    // && feedStyle !== 'Compact'
-  }">
+  <div
+    class="chapter-feed__container"
+    :class="{
+      // compact: feedStyle === 'Compact',
+      // details: feedStyle === 'Details',
+      expand: isExpandable,
+      // && feedStyle !== 'Compact'
+    }"
+  >
     <RouterLink :to="detailsUrl" class="chapter-feed__cover">
       <NuxtImg :src="coverUrl" class="chapter-feed__cover-image" />
     </RouterLink>
@@ -78,16 +78,31 @@ const {
     <div class="chapter-feed__chapters">
       <div class="chapter-feed__chapters-list">
         <div ref="firstThreeRef">
-          <ChapterEntry v-for="(chapter, index) in chapterList.slice(0, visibleCount)" :key="chapter.id"
-            :chapter="chapter" />
+          <ChapterEntry
+            v-for="(chapter, index) in chapterList.slice(0, visibleCount)"
+            :key="chapter.id"
+            :chapter="chapter"
+          />
           <!-- :manga="manga" :stats="chapterStats?.[chapter.id]" :stats-loading="statsLoading" -->
           <!-- prepend-chapter show-vol /> -->
         </div>
 
-        <div ref="allChaptersRef" class="animated"
-          :style="{ maxHeight: true ? (!isExpandable || showAll ? expandedHeight + 'px' : '0') : 'unset' }">
-          <ChapterEntry v-for="(chapter, index) in chapterList.slice(visibleCount)" :key="chapter.id"
-            :chapter="chapter" />
+        <div
+          ref="allChaptersRef"
+          class="animated"
+          :style="{
+            maxHeight: true
+              ? !isExpandable || showAll
+                ? expandedHeight + 'px'
+                : '0'
+              : 'unset',
+          }"
+        >
+          <ChapterEntry
+            v-for="(chapter, index) in chapterList.slice(visibleCount)"
+            :key="chapter.id"
+            :chapter="chapter"
+          />
           <!-- feedStyle !== 'Compact' -->
           <!-- :manga="manga" :stats="chapterStats?.[chapter.id]" :stats-loading="statsLoading" prepend-chapter show-vol  -->
         </div>
@@ -95,11 +110,15 @@ const {
     </div>
 
     <!-- Expand/Collapse button -->
-    <button v-if="isExpandable
-      // && feedStyle !== 'Compact'
-    " class="chapter-feed__chapters-expand" @click="toggleExpand">
-      {{ showAll ? 'Show less' :
-        'Show all' }}
+    <button
+      v-if="
+        isExpandable
+        // && feedStyle !== 'Compact'
+      "
+      class="chapter-feed__chapters-expand"
+      @click="toggleExpand"
+    >
+      {{ showAll ? "Show less" : "Show all" }}
     </button>
   </div>
 </template>
@@ -107,22 +126,22 @@ const {
 <style lang="css" scoped>
 .chapter-feed__container {
   background-color: rgb(var(--mw-accent));
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   display: grid;
-  gap: .25rem;
+  gap: 0.25rem;
   column-gap: 0.25rem;
   grid-template-areas:
     "title title"
     "art   list ";
   grid-template-columns: 48px minmax(0, 1fr);
-  padding: .25rem;
+  padding: 0.25rem;
 }
 
 @media (min-width: 40rem) {
   .chapter-feed__container {
-    -moz-column-gap: .5rem;
-    column-gap: .5rem;
-    padding: .5rem;
+    -moz-column-gap: 0.5rem;
+    column-gap: 0.5rem;
+    padding: 0.5rem;
   }
 }
 
@@ -159,7 +178,7 @@ const {
 }
 
 .chapter-feed__cover {
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   grid-area: art;
   height: 0;
   max-height: 0;
@@ -167,9 +186,13 @@ const {
   overflow: hidden;
   padding-bottom: 72px;
   position: relative;
-  --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px -1px rgba(0, 0, 0, .1);
-  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  --tw-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --tw-shadow-colored:
+    0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow:
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+    var(--tw-shadow);
 }
 
 @media (min-width: 40rem) {
@@ -180,8 +203,8 @@ const {
 
 .chapter-feed__title {
   align-self: center;
-  border-bottom: 1px solid hsla(0, 0%, 50%, .5);
-  font-size: .875rem;
+  border-bottom: 1px solid hsla(0, 0%, 50%, 0.5);
+  font-size: 0.875rem;
   font-weight: 700;
   grid-area: title;
   line-height: 1.25rem;
@@ -205,13 +228,13 @@ const {
 }
 
 .chapter-feed__chapters-list {
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   overflow: hidden;
 }
 
 .chapter-feed__chapters-expand {
   color: var(--ui-primary);
-  font-size: .875rem;
+  font-size: 0.875rem;
   grid-area: expand;
   line-height: 1.25rem;
   text-align: center;
