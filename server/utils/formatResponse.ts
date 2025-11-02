@@ -1,13 +1,15 @@
 import {
   Author,
   CoverArt,
+  Manga,
+  MangaRelation,
   ScanlationGroup,
   ScrapedChapter,
   ScrapedManga,
   UploadedChapter,
   User
 } from "~~/shared/prisma/client"
-import { GroupRole, UserRole } from "~~/shared/prisma/enums"
+import { GroupRole, MangaRelType, UserRole } from "~~/shared/prisma/enums"
 
 export type SafeUser = {
   id: string
@@ -19,15 +21,31 @@ export type SafeUser = {
   }[]
 }
 
-export function formatAuthor(author: Author) {
+const RELATION_TYPE_MAP = {
+  monochrome: "monochrome",
+  colored: "colored",
+  preserialization: "preserialization",
+  serialization: "serialization",
+  prequel: "prequel",
+  sequel: "sequel",
+  mainStory: "main_story",
+  sideStory: "side_story",
+  adaptedFrom: "adapted_from",
+  spinOff: "spin_off",
+  basedOn: "based_on",
+  doujinshi: "doujinshi",
+  sameFranchise: "same_franchise",
+  sharedUniverse: "shared_universe",
+  alternateStory: "alternate_story",
+  alternateVersion: "alternate_version",
+} as const
+
+export function formatAuthor(author: Author, type: "author" | "artist" = "author") {
   const { id, ...rest } = author
   return {
     id: author.id,
-    type: "author" as const,
-    attributes: {
-      ...rest
-    },
-    relationships: []
+    type: type,
+    attributes: rest,
   }
 }
 
@@ -36,9 +54,7 @@ export function formatCoverArt(cover: CoverArt & { user?: SafeUser | null }) {
   return {
     id: id,
     type: "cover_art" as const,
-    attributes: {
-      ...rest
-    },
+    attributes: rest,
     relationships: [
       {
         id: mangaId,
@@ -49,6 +65,51 @@ export function formatCoverArt(cover: CoverArt & { user?: SafeUser | null }) {
         type: "user" as const
       }
     ]
+  }
+}
+
+export function formatManga(manga: Manga
+  & {
+    authors?: Author[]
+    artists?: Author[]
+    covers?: CoverArt[]
+    relationsTo?: (MangaRelation & {
+      to?: Manga
+    })[]
+  },
+  latestUploadedChapter: string | null = null,
+  availableTranslatedLanguages: string[] = []
+) {
+  const { id, ...rest } = manga
+  return {
+    id: id,
+    type: "manga" as const,
+    attributes: {
+      ...rest,
+      availableTranslatedLanguages,
+      latestUploadedChapter
+    },
+    relationships: [
+      ...(manga.authors?.map((a) => formatAuthor(a, "author")) ?? []),
+      ...(manga.artists?.map((a) => formatAuthor(a, "artist")) ?? []),
+      ...(manga.covers?.map((a) => formatCoverArt(a)) ?? []),
+      ...(manga.relationsTo?.map((a) => a.to ? formatMangaRelation(a.to, a.type) : {
+        id: a.toId,
+        type: "manga" as const,
+        related: RELATION_TYPE_MAP[a.type]
+      }) ?? [])
+    ]
+  }
+}
+
+export function formatMangaRelation(manga: Manga, type: MangaRelType) {
+  const { id, ...rest } = manga
+  return {
+    id: id,
+    type: "manga" as const,
+    related: RELATION_TYPE_MAP[type],
+    attributes: rest,
+
   }
 }
 

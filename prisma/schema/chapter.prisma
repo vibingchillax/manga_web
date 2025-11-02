@@ -14,9 +14,11 @@ model UploadedChapter {
   readableAt         DateTime               @default(now())
   user               User?                  @relation(fields: [uploader], references: [id], onDelete: SetNull)
   groups             UploadedChapterGroup[]
+  Manga              Manga                  @relation(fields: [mangaId], references: [id])
 
-  @@index([mangaId])
+  @@index([mangaId, volume, chapter])
   @@index([uploader])
+  @@index([translatedLanguage])
 }
 
 model UploadedChapterGroup {

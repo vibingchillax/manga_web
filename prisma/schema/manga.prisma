@@ -1,0 +1,106 @@
+model Manga {
+  id                            String                 @id @db.Uuid
+  title                         Json
+  altTitles                     Json?
+  description                   Json?
+  isLocked                      Boolean                @default(false)
+  authors                       Author[]               @relation("MangaAuthors")
+  artists                       Author[]               @relation("MangaArtists")
+  links                         Json?
+  originalLanguage              String
+  lastVolume                    String?
+  lastChapter                   String?
+  publicationDemographic        PublicationDemographic
+  status                        MangaStatus            @default(ongoing)
+  year                          Int?
+  contentRating                 ContentRating
+  chapterNumberResetOnNewVolume Boolean                @default(true)
+  tags                          Tag[]                  @relation("MangaTags")
+  state                         MangaState             @default(draft)
+  covers                        CoverArt[]
+  primaryCoverId                String?                @unique @db.Uuid
+  primaryCover                  CoverArt?              @relation("PrimaryCover", fields: [primaryCoverId], references: [id])
+  version                       Int                    @default(1)
+  createdAt                     DateTime               @default(now()) @db.Timestamp(6)
+  updatedAt                     DateTime               @default(now()) @updatedAt @db.Timestamp(6)
+  chapters                      UploadedChapter[]
+  relationsFrom                 MangaRelation[]        @relation("MangaRelationsFrom")
+  relationsTo                   MangaRelation[]        @relation("MangaRelationsTo")
+
+  @@index([originalLanguage])
+  @@index([status])
+  @@index([state])
+  @@index([year])
+  @@index([contentRating])
+}
+
+model Tag {
+  id          String   @id @db.Uuid
+  name        Json
+  description Json?
+  group       TagGroup
+  version     Int      @default(1)
+  manga       Manga[]  @relation("MangaTags")
+}
+
+model MangaRelation {
+  id        String       @id @db.Uuid
+  from      Manga        @relation("MangaRelationsFrom", fields: [fromId], references: [id])
+  fromId    String       @db.Uuid
+  to        Manga        @relation("MangaRelationsTo", fields: [toId], references: [id])
+  toId      String       @db.Uuid
+  type      MangaRelType
+  createdAt DateTime     @default(now()) @db.Timestamp(6)
+}
+
+enum MangaState {
+  draft
+  published
+}
+
+enum PublicationDemographic {
+  shounen
+  shoujo
+  josei
+  seinen
+}
+
+enum MangaStatus {
+  completed
+  ongoing
+  cancelled
+  hiatus
+}
+
+enum ContentRating {
+  safe
+  suggestive
+  erotica
+  pornographic
+}
+
+enum TagGroup {
+  content
+  format
+  genre
+  theme
+}
+
+enum MangaRelType {
+  monochrome
+  colored
+  preserialization
+  serialization
+  prequel
+  sequel
+  mainStory
+  sideStory
+  adaptedFrom
+  spinOff
+  basedOn
+  doujinshi
+  sameFranchise
+  sharedUniverse
+  alternateStory
+  alternateVersion
+}

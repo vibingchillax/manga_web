@@ -10,4 +10,8 @@ model CoverArt {
   createdAt   DateTime @default(now()) @db.Timestamp(6)
   updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
   user        User?    @relation(fields: [uploader], references: [id], onDelete: SetNull)
+  manga       Manga    @relation(fields: [mangaId], references: [id])
+  primaryFor  Manga?   @relation("PrimaryCover")
+
+  @@index([mangaId])
 }
