@@ -1,4 +1,4 @@
-import type { ScanlationGroup } from "~~/shared/prisma/client";
+import type { ContentRating, ScanlationGroup } from "~~/shared/prisma/client";
 import type { ChapterQueryResult } from "./[id]/index.get";
 import type {
   UploadedChapterOrderByWithRelationInput,
@@ -39,44 +39,40 @@ export default defineEventHandler(async (event) => {
   const translatedLanguages = query["translatedLanguage[]"] as
     | string[]
     | undefined;
+  const originalLanguage = query["originalLanguage[]"] as string[] | undefined;
+  const contentRating = query["contentRating[]"] as ContentRating[] | undefined;
+  const excludedOriginalLanguage = query["excludedOriginalLanguage[]"] as
+    | string[]
+    | undefined;
   const groups = query["groups[]"] as string[] | undefined;
   const excludedUploaders = query["excludedUploaders[]"] as
     | string[]
     | undefined;
   const excludedGroups = query["excludedGroups[]"] as string[] | undefined;
 
-  const filters: UploadedChapterWhereInput = {
-    id: ids ? { in: ids } : undefined,
-    title: query.title
-      ? { contains: query.title, mode: "insensitive" }
-      : undefined,
-    uploader: query.uploader,
-    mangaId: query.manga,
-    volume: volumes ? { in: volumes } : undefined,
-    chapter: query.chapter,
-    translatedLanguage: translatedLanguages
-      ? { in: translatedLanguages }
-      : undefined,
-    // originalLanguage: query.["originalLanguage[]"]
-    //   ? { in: query."originalLanguage[]"] }
-    //   : undefined,
-    // contentRating: query.["contentRating[]"]
-    //   ? { in: query."contentRating[]"] }
-    //   : undefined,
-    createdAt: query.createdAtSince
-      ? { gte: new Date(query.createdAtSince) }
-      : undefined,
-    updatedAt: query.updatedAtSince
-      ? { gte: new Date(query.updatedAtSince) }
-      : undefined,
-    publishAt: query.publishAtSince
-      ? { gte: new Date(query.publishAtSince) }
-      : undefined,
-  };
-
-  // if (query.data?.["excludedOriginalLanguage[]"]?.length) {
-  //   filters.originalLanguage = { notIn: query.data["excludedOriginalLanguage[]"] };
-  // }
+  const filters: UploadedChapterWhereInput = {};
+  filters.Manga = {};
+  if (ids) filters.id = { in: ids };
+  if (query.title)
+    filters.title = { contains: query.title, mode: "insensitive" };
+  if (query.uploader) filters.uploader = query.uploader;
+  if (query.manga) filters.mangaId = query.manga;
+  if (volumes) filters.volume = { in: volumes };
+  if (query.chapter) filters.chapter = query.chapter;
+  if (translatedLanguages)
+    filters.translatedLanguage = { in: translatedLanguages };
+  if (query["originalLanguage[]"])
+    filters.Manga.originalLanguage = { in: originalLanguage };
+  if (query["contentRating[]"])
+    filters.Manga.contentRating = { in: contentRating };
+  if (query.createdAtSince)
+    filters.createdAt = { gte: new Date(query.createdAtSince) };
+  if (query.updatedAtSince)
+    filters.createdAt = { gte: new Date(query.updatedAtSince) };
+  if (query.publishAtSince)
+    filters.createdAt = { gte: new Date(query.publishAtSince) };
+  if (excludedOriginalLanguage)
+    filters.Manga.originalLanguage = { notIn: excludedOriginalLanguage };
 
   if (query["excludedUploaders[]"]?.length) {
     filters.uploader = { notIn: excludedUploaders };
