@@ -1,6 +1,7 @@
 import type {
   Author,
   CoverArt,
+  CustomList,
   Manga,
   MangaRelation,
   ScanlationGroup,
@@ -8,7 +9,6 @@ import type {
   ScrapedManga,
   UploadedChapter,
 } from "~~/shared/prisma/client";
-import { User } from "~~/shared/prisma/client";
 import type { MangaRelType, UserRole } from "~~/shared/prisma/enums";
 import { GroupRole } from "~~/shared/prisma/enums";
 
@@ -66,6 +66,31 @@ export function formatCoverArt(cover: CoverArt & { user?: SafeUser | null }) {
       },
       {
         id: uploader,
+        type: "user" as const,
+      },
+    ],
+  };
+}
+
+export function formatCustomList(
+  list: CustomList & {
+    manga?: {
+      id: string;
+    }[];
+  },
+) {
+  const { id, userId, manga, ...rest } = list;
+  return {
+    id: id,
+    type: "custom_list",
+    attributes: rest,
+    relationships: [
+      ...(manga?.map((m) => ({
+        id: m.id,
+        type: "manga" as const,
+      })) ?? []),
+      {
+        id: userId,
         type: "user" as const,
       },
     ],

@@ -98,9 +98,12 @@ export const zDateString = z.string().transform((val) => new Date(val));
 
 export const zOrderDirection = z.enum(["asc", "desc"]);
 
-export const baseQuerySchema = z.object({
+export const paginationSchema = z.object({
   limit: zLimit,
   offset: zOffset,
+});
+
+export const baseQuerySchema = paginationSchema.extend({
   "ids[]": zArrayable(zUuid).optional(),
   "includes[]": zArrayable(z.string()).optional(),
 });

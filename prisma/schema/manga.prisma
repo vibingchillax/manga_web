@@ -26,6 +26,7 @@ model Manga {
   chapters                      UploadedChapter[]
   relationsFrom                 MangaRelation[]        @relation("MangaRelationsFrom")
   relationsTo                   MangaRelation[]        @relation("MangaRelationsTo")
+  lists                         CustomList[]
 
   @@index([originalLanguage])
   @@index([status])

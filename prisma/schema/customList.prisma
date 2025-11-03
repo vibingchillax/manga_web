@@ -1,0 +1,14 @@
+model CustomList {
+  id         String         @id @db.Uuid
+  userId     String         @db.Uuid
+  name       String
+  visibility ListVisibility @default(public)
+  manga      Manga[]
+  version    Int            @default(1)
+  creator    User           @relation(fields: [userId], references: [id])
+}
+
+enum ListVisibility {
+  private
+  public
+}

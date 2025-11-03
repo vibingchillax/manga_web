@@ -12,6 +12,7 @@ model User {
   uploadSession    UploadSession?
   refreshTokens    RefreshToken[]
   groupMemberships ScanlationGroupMember[]
+  lists            CustomList[]
 }
 
 model RefreshToken {
