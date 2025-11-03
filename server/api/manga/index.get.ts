@@ -118,11 +118,7 @@ export default defineEventHandler(async (event) => {
       include: {
         authors: query["includes[]"]?.includes("author"),
         artists: query["includes[]"]?.includes("artist"),
-        covers: query["includes[]"]?.includes("cover_art")
-          ? {
-              where: { isMain: true },
-            }
-          : false,
+        primaryCover: query["includes[]"]?.includes("cover_art"),
         relationsTo: query["includes[]"]?.includes("manga")
           ? {
               include: {

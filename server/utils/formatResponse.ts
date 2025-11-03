@@ -101,7 +101,7 @@ export function formatManga(
   manga: Manga & {
     authors?: Author[];
     artists?: Author[];
-    covers?: CoverArt[];
+    primaryCover?: CoverArt | null;
     relationsTo?: (MangaRelation & {
       to?: Manga;
     })[];
@@ -109,7 +109,15 @@ export function formatManga(
   latestUploadedChapter: string | null = null,
   availableTranslatedLanguages: string[] = [],
 ) {
-  const { id, ...rest } = manga;
+  const {
+    id,
+    authors,
+    artists,
+    primaryCover,
+    primaryCoverId,
+    relationsTo,
+    ...rest
+  } = manga;
   return {
     id: id,
     type: "manga" as const,
@@ -119,10 +127,10 @@ export function formatManga(
       latestUploadedChapter,
     },
     relationships: [
-      ...(manga.authors?.map((a) => formatAuthor(a, "author")) ?? []),
-      ...(manga.artists?.map((a) => formatAuthor(a, "artist")) ?? []),
-      ...(manga.covers?.map((a) => formatCoverArt(a)) ?? []),
-      ...(manga.relationsTo?.map((a) =>
+      ...(authors?.map((a) => formatAuthor(a, "author")) ?? []),
+      ...(artists?.map((a) => formatAuthor(a, "artist")) ?? []),
+      ...(primaryCover ? [formatCoverArt(primaryCover)] : []),
+      ...(relationsTo?.map((a) =>
         a.to
           ? formatMangaRelation(a.to, a.type)
           : {
