@@ -27,6 +27,7 @@ model Manga {
   relationsFrom                 MangaRelation[]        @relation("MangaRelationsFrom")
   relationsTo                   MangaRelation[]        @relation("MangaRelationsTo")
   lists                         CustomList[]
+  ratings                       MangaRating[]
 
   @@index([originalLanguage])
   @@index([status])
@@ -52,6 +53,19 @@ model MangaRelation {
   toId      String       @db.Uuid
   type      MangaRelType
   createdAt DateTime     @default(now()) @db.Timestamp(6)
+}
+
+model MangaRating {
+  userId    String   @db.Uuid
+  mangaId   String   @db.Uuid
+  rating    Int
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  manga Manga @relation(fields: [mangaId], references: [id], onDelete: Cascade)
+
+  @@id([userId, mangaId])
 }
 
 enum MangaState {

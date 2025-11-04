@@ -13,6 +13,7 @@ model User {
   refreshTokens    RefreshToken[]
   groupMemberships ScanlationGroupMember[]
   lists            CustomList[]
+  mangaRating      MangaRating[]
 }
 
 model RefreshToken {
