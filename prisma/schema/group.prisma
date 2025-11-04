@@ -23,6 +23,7 @@ model ScanlationGroup {
   members          ScanlationGroupMember[]
   uploadSessions   UploadSessionGroup[]
   uploadedChapters UploadedChapterGroup[]
+  follows          GroupFollow[]
 
   @@index([name])
 }

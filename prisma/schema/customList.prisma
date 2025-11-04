@@ -6,6 +6,7 @@ model CustomList {
   manga      Manga[]
   version    Int            @default(1)
   creator    User           @relation(fields: [userId], references: [id])
+  follows    ListFollow[]
 }
 
 enum ListVisibility {

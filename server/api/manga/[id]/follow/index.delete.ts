@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Not logged in",
     });
 
-  await prisma.mangaFollows.delete({
+  await prisma.mangaFollow.delete({
     where: {
       userId_mangaId: {
         userId: user.id,

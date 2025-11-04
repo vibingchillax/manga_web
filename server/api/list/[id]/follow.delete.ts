@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   if (!user)
     throw createError({
       statusCode: 401,
-      statusMessage: "Not logged in",
+      statusMessage: "Not authenticated",
     });
 
   const params = await getValidatedRouterParams(
@@ -16,16 +16,18 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const result = await prisma.mangaFollow.findUnique({
-    where: {
-      userId_mangaId: {
-        userId: user.id,
-        mangaId: params.id,
+  try {
+    await prisma.listFollow.delete({
+      where: {
+        userId_listId: {
+          userId: user.id,
+          listId: params.id,
+        },
       },
-    },
-  });
+    });
+  } catch {}
 
   return {
-    status: result?.status ?? "none",
+    result: "ok",
   };
 });

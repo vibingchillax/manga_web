@@ -6,13 +6,15 @@ model User {
   roles            UserRole[]              @default([user])
   createdAt        DateTime                @default(now()) @db.Timestamp(6)
   updatedAt        DateTime                @default(now()) @updatedAt @db.Timestamp(6)
-  mangaFollows     MangaFollows[]
+  mangaFollows     MangaFollow[]
   uploadedChapters UploadedChapter[]
   uploadedCovers   CoverArt[]
   uploadSession    UploadSession?
   refreshTokens    RefreshToken[]
   groupMemberships ScanlationGroupMember[]
   lists            CustomList[]
+  groupFollows     GroupFollow[]
+  listFollows      ListFollow[]
   mangaRating      MangaRating[]
 }
 
@@ -28,7 +30,7 @@ model RefreshToken {
   @@index([expiresAt])
 }
 
-model MangaFollows {
+model MangaFollow {
   userId  String            @db.Uuid
   mangaId String            @db.Uuid
   status  MangaFollowStatus
@@ -38,6 +40,24 @@ model MangaFollows {
   @@index([userId])
   @@index([mangaId])
   @@index([status])
+}
+
+model GroupFollow {
+  userId  String          @db.Uuid
+  groupId String          @db.Uuid
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group   ScanlationGroup @relation(fields: [groupId], references: [id])
+
+  @@id([userId, groupId])
+}
+
+model ListFollow {
+  userId String     @db.Uuid
+  listId String     @db.Uuid
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  list   CustomList @relation(fields: [listId], references: [id])
+
+  @@id([userId, listId])
 }
 
 enum UserRole {

@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Not logged in",
     });
 
-  const follows = await prisma.mangaFollows.findMany({
+  const follows = await prisma.mangaFollow.findMany({
     where: {
       userId: user.id,
     },

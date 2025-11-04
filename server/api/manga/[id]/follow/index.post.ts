@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   const body = await readValidatedBody(event, schema.parse);
 
-  await prisma.mangaFollows.upsert({
+  await prisma.mangaFollow.upsert({
     where: {
       userId_mangaId: {
         userId: user.id,
