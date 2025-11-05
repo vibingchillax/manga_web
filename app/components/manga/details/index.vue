@@ -5,7 +5,7 @@ const props = defineProps<{
   manga: Manga;
 }>();
 const manga = props.manga;
-const { title, altTitles, cover, author } = useManga(manga);
+const { title, altTitles, cover, authorsList } = useManga(manga);
 
 const preferredAltTitle = computed(() => {
   const priority = ["en", "ja", "kr"]; // still not sure what is mangadex's alt title order
@@ -18,14 +18,6 @@ const preferredAltTitle = computed(() => {
   const first = altTitles.value?.find((title) => Object.values(title)[0]);
   return first ? Object.values(first)[0] : undefined;
 });
-
-const authors = computed(() => {
-  if (author.value.samePeople) {
-    return author.value.authors.map((a) => a.attributes?.name).join(", ");
-  } else {
-    return `${author.value.authors.map((a) => a.attributes?.name).join(", ")}, ${author.value.artists.map((a) => a.attributes?.name).join(", ")}`;
-  }
-});
 </script>
 
 <template>
@@ -34,7 +26,7 @@ const authors = computed(() => {
     :is-manga="true"
     :title="title"
     :alt-title="preferredAltTitle"
-    :sub-title="authors"
+    :sub-title="authorsList"
   >
     <template #icon>
       <MangaCover :manga="manga" no-title show-flag lightbox :use256="false" />

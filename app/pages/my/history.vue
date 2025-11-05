@@ -1,13 +1,14 @@
 <script setup lang="ts">
 const toast = useToast();
 const history = useReadingHistoryStore();
+const { _readingHistory } = storeToRefs(history);
 
 const active = ref<"dense" | "normal">("dense");
 
 const scrapedChapters = ref<ScrapedChapter[]>([]);
 
 watch(
-  () => history._readingHistory,
+  _readingHistory,
   async (newHistory) => {
     const chapterIds = newHistory.map((h) => h.chapterId);
 
@@ -56,7 +57,6 @@ function clearHistory() {
   });
 }
 </script>
-
 <template>
   <Page title="Reading History" wide>
     <div>

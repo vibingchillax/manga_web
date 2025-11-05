@@ -13,21 +13,19 @@ export const useManga = (manga: Manga | undefined) => {
     return `/title/${manga?.id}/${toKebabCase(title.value)}`;
   });
 
-  const author = computed(() => {
-    const authors =
-      manga?.relationships?.filter((r) => r.type === "author") ?? [];
-    const artists =
-      manga?.relationships?.filter((r) => r.type === "artist") ?? [];
+  const authors = computed(
+    () => manga?.relationships?.filter((r) => r.type === "author") ?? [],
+  );
+  const artists = computed(
+    () => manga?.relationships?.filter((r) => r.type === "artist") ?? [],
+  );
 
-    const samePeople =
-      authors.length === artists.length &&
-      authors.every((a, i) => a.id === artists[i]?.id);
-
-    return {
-      authors,
-      artists,
-      samePeople,
-    };
+  const authorsList = computed(() => {
+    const list = [...authors.value, ...artists.value];
+    return [...new Set(list.map((a) => a.attributes?.name))]
+      .filter(Boolean)
+      .sort()
+      .join(", ");
   });
 
   const cover = computed(() => {
@@ -96,6 +94,29 @@ export const useManga = (manga: Manga | undefined) => {
   });
 
   const tags = computed(() => manga?.attributes?.tags ?? []);
+
+  const groupedTags = computed(() => {
+    const content: Tag[] = [];
+    const format: Tag[] = [];
+    const genre: Tag[] = [];
+    const theme: Tag[] = [];
+
+    for (const tag of tags.value) {
+      const group = tag?.attributes?.group;
+      if (group === "content") content.push(tag);
+      else if (group === "format") format.push(tag);
+      else if (group === "genre") genre.push(tag);
+      else theme.push(tag);
+    }
+
+    return {
+      content,
+      format,
+      genre,
+      theme,
+    };
+  });
+
   const originalLanguage = computed(() => manga?.attributes?.originalLanguage);
 
   return {
@@ -103,7 +124,9 @@ export const useManga = (manga: Manga | undefined) => {
     altTitles,
     detailsUrl,
     description,
-    author,
+    authors,
+    artists,
+    authorsList,
     cover,
     publicationStatus,
     publicationYear,
@@ -111,6 +134,7 @@ export const useManga = (manga: Manga | undefined) => {
     contentRating,
     links,
     tags,
+    groupedTags,
     originalLanguage,
   };
 };

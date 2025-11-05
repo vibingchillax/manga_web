@@ -4,8 +4,15 @@ const props = defineProps<{
   manga: Manga;
 }>();
 const manga = props.manga;
-const { title, description, detailsUrl, author, cover, contentRating, tags } =
-  useManga(manga);
+const {
+  title,
+  description,
+  detailsUrl,
+  authorsList,
+  cover,
+  contentRating,
+  tags,
+} = useManga(manga);
 </script>
 
 <template>
@@ -68,13 +75,7 @@ const { title, description, detailsUrl, author, cover, contentRating, tags } =
           </div>
           <div class="truncate sm:mr-36 mr-4">
             <span class="font-medium italic">
-              <template v-if="author.samePeople">
-                {{ author.authors.map((a) => a.attributes?.name).join(", ") }}
-              </template>
-              <template v-else>
-                {{ author.authors.map((a) => a.attributes?.name).join(", ") }},
-                {{ author.artists.map((a) => a.attributes?.name).join(", ") }}
-              </template>
+              {{ authorsList }}
             </span>
           </div>
         </div>

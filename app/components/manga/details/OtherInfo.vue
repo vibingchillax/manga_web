@@ -6,8 +6,14 @@ const props = defineProps<{
 
 const manga = props.manga;
 
-const { altTitles, publicationDemographic, links, tags, author } =
-  useManga(manga);
+const {
+  altTitles,
+  publicationDemographic,
+  links,
+  groupedTags,
+  authors,
+  artists,
+} = useManga(manga);
 
 const altTitlesList = computed(() => {
   return (
@@ -17,20 +23,10 @@ const altTitlesList = computed(() => {
   );
 });
 
-const genres: Tag[] = [];
-const themes: Tag[] = [];
-const format: Tag[] = [];
-const content: Tag[] = [];
-
-for (const tag of tags.value) {
-  const group = tag.attributes?.group;
-  if (!group) continue;
-
-  if (group === "genre") genres.push(tag);
-  else if (group === "theme") themes.push(tag);
-  else if (group === "format") format.push(tag);
-  else if (group === "content") content.push(tag);
-}
+const genres = computed(() => groupedTags?.value.genre);
+const themes = computed(() => groupedTags?.value.theme);
+const format = computed(() => groupedTags?.value.format);
+const content = computed(() => groupedTags?.value.content);
 </script>
 <template>
   <div
@@ -42,7 +38,7 @@ for (const tag of tags.value) {
       <div class="font-bold mb-2">Author</div>
       <div class="flex gap-2 flex-wrap">
         <Tag
-          v-for="author in author.authors"
+          v-for="author in authors"
           :href="`/author/${author.id}/${toKebabCase(author.attributes?.name!)}`"
         >
           {{ author.attributes?.name }}
@@ -53,7 +49,7 @@ for (const tag of tags.value) {
       <div class="font-bold mb-2">Artist</div>
       <div class="flex gap-2 flex-wrap">
         <Tag
-          v-for="artist in author.artists"
+          v-for="artist in artists"
           :href="`/author/${artist.id}/${toKebabCase(artist.attributes?.name!)}`"
         >
           {{ artist.attributes?.name }}
