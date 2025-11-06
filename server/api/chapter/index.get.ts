@@ -108,7 +108,7 @@ export default defineEventHandler(async (event) => {
   });
 
   const [chapters, total]: [ChapterQueryResult[], number] = await Promise.all([
-    await prisma.uploadedChapter.findMany({
+    prisma.uploadedChapter.findMany({
       take: query.limit ?? 10,
       skip: query.offset ?? 0,
       where: filters,
@@ -133,7 +133,7 @@ export default defineEventHandler(async (event) => {
       orderBy: orderBy,
     }),
 
-    await prisma.uploadedChapter.count({
+    prisma.uploadedChapter.count({
       where: filters,
     }),
   ]);

@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     : undefined;
 
   const [authors, total] = await Promise.all([
-    await prisma.author.findMany({
+    prisma.author.findMany({
       take: query.limit ?? 10,
       skip: query.offset ?? 0,
       where: filters,
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       // }
     }),
 
-    await prisma.author.count({
+    prisma.author.count({
       where: filters,
     }),
   ]);

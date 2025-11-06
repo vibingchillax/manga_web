@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   const [result, total] = await Promise.all([
-    await prisma.tag.findMany(),
-    await prisma.tag.count(),
+    prisma.tag.findMany(),
+    prisma.tag.count(),
   ]);
 
   return {

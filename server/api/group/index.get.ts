@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
   };
 
   const [groups, total] = await Promise.all([
-    await prisma.scanlationGroup.findMany({
+    prisma.scanlationGroup.findMany({
       take: query.limit ?? 10,
       skip: query.offset ?? 0,
       where: filters,
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
       },
     }),
 
-    await prisma.scanlationGroup.count({
+    prisma.scanlationGroup.count({
       where: filters,
     }),
   ]);

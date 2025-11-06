@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
   });
 
   const [covers, total] = await Promise.all([
-    await prisma.coverArt.findMany({
+    prisma.coverArt.findMany({
       take: query.limit ?? 10,
       skip: query.offset ?? 0,
       where: filters,
@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
       orderBy: orderBy,
     }),
 
-    await prisma.coverArt.count({
+    prisma.coverArt.count({
       where: filters,
     }),
   ]);

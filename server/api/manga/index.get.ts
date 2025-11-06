@@ -111,7 +111,7 @@ export default defineEventHandler(async (event) => {
   if (andConditions.length > 0) filters.AND = andConditions;
 
   const [manga, total] = await Promise.all([
-    await prisma.manga.findMany({
+    prisma.manga.findMany({
       take: query.limit ?? 10,
       skip: query.offset ?? 0,
       where: filters,
@@ -138,7 +138,7 @@ export default defineEventHandler(async (event) => {
       },
     }),
 
-    await prisma.manga.count({
+    prisma.manga.count({
       where: filters,
     }),
   ]);
