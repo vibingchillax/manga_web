@@ -1,5 +1,6 @@
 import type {
   Author,
+  Comment,
   CoverArt,
   CustomList,
   Manga,
@@ -306,6 +307,55 @@ export function formatUser(user: SafeUser) {
         id: g.groupId,
         type: "scanlation_group" as const,
       })) || []),
+    ],
+  };
+}
+
+export function formatComment(
+  comment: Comment & {
+    user?: SafeUser;
+    votes?: { vote: number }[];
+    _count?: { replies: number };
+  },
+) {
+  const score = comment.votes?.reduce((sum, v) => sum + v.vote, 0) ?? 0;
+
+  return {
+    id: comment.id,
+    type: "comment" as const,
+
+    attributes: {
+      body: comment.deleted ? null : comment.body,
+      deleted: comment.deleted,
+      createdAt: comment.createdAt,
+      editedAt: comment.editedAt,
+      score,
+      replies: comment._count?.replies ?? 0,
+    },
+
+    relationships: [
+      ...(comment.user
+        ? [
+            {
+              id: comment.user.id,
+              type: "user" as const,
+              attributes: {
+                username: comment.user.username,
+                roles: comment.user.roles,
+              },
+            },
+          ]
+        : []),
+
+      ...(comment.parentId
+        ? [
+            {
+              id: comment.parentId,
+              type: "comment" as const,
+              related: "parent" as const,
+            },
+          ]
+        : []),
     ],
   };
 }

@@ -79,8 +79,8 @@ export const zExternalSite = z
     }
   });
 
-export const zLimit = z.coerce.number().min(0).max(100).optional();
-export const zOffset = z.coerce.number().min(0).optional();
+export const zLimit = z.coerce.number().min(0).max(100).default(10);
+export const zOffset = z.coerce.number().min(0).default(0);
 
 export const zArrayable = <T extends z.ZodTypeAny>(schema: T) =>
   z.union([schema, z.array(schema)]).transform((val) => {

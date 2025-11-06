@@ -25,8 +25,8 @@ export default defineEventHandler(async (event) => {
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
-      take: query.limit ?? 10,
-      skip: query.offset ?? 0,
+      take: query.limit,
+      skip: query.offset,
       where: filters,
       orderBy: query["order[username]"]
         ? { username: query["order[username]"] }
@@ -43,8 +43,8 @@ export default defineEventHandler(async (event) => {
   return {
     result: "ok",
     data: users.map(formatUser),
-    limit: query.limit ?? 10,
-    offset: query.offset ?? 0,
+    limit: query.limit,
+    offset: query.offset,
     count: total,
   };
 });

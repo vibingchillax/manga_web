@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
   );
 
   const groupFollows = await prisma.groupFollow.findMany({
-    take: query.limit ?? 10,
-    skip: query.offset ?? 0,
+    take: query.limit,
+    skip: query.offset,
     where: {
       userId: user.id,
     },

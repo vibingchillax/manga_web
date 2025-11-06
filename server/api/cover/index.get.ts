@@ -42,8 +42,8 @@ export default defineEventHandler(async (event) => {
 
   const [covers, total] = await Promise.all([
     prisma.coverArt.findMany({
-      take: query.limit ?? 10,
-      skip: query.offset ?? 0,
+      take: query.limit,
+      skip: query.offset,
       where: filters,
       include: {
         user: query["includes[]"]?.includes("user")
@@ -68,8 +68,8 @@ export default defineEventHandler(async (event) => {
   return {
     result: "ok",
     data: covers.map(formatCoverArt),
-    limit: query.limit ?? 10,
-    offset: query.offset ?? 0,
+    limit: query.limit,
+    offset: query.offset,
     count: total,
   };
 });

@@ -21,8 +21,8 @@ export default defineEventHandler(async (event) => {
 
   const [groups, total] = await Promise.all([
     prisma.scanlationGroup.findMany({
-      take: query.limit ?? 10,
-      skip: query.offset ?? 0,
+      take: query.limit,
+      skip: query.offset,
       where: filters,
       include: {
         members: {
@@ -48,8 +48,8 @@ export default defineEventHandler(async (event) => {
   return {
     result: "ok",
     data: groups.map(formatGroup),
-    limit: query.limit ?? 10,
-    offset: query.offset ?? 0,
+    limit: query.limit,
+    offset: query.offset,
     count: total,
   };
 });

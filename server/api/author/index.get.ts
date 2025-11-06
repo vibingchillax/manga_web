@@ -23,8 +23,8 @@ export default defineEventHandler(async (event) => {
 
   const [authors, total] = await Promise.all([
     prisma.author.findMany({
-      take: query.limit ?? 10,
-      skip: query.offset ?? 0,
+      take: query.limit,
+      skip: query.offset,
       where: filters,
       orderBy: orderBy,
       // include: {
@@ -40,8 +40,8 @@ export default defineEventHandler(async (event) => {
   return {
     result: "ok",
     data: authors.map((a) => formatAuthor),
-    limit: query.limit ?? 10,
-    offset: query.offset ?? 0,
+    limit: query.limit,
+    offset: query.offset,
     count: total,
   };
 });

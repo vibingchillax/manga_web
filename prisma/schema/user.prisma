@@ -16,6 +16,8 @@ model User {
   groupFollows     GroupFollow[]
   listFollows      ListFollow[]
   mangaRating      MangaRating[]
+  comments         Comment[]
+  commentVotes     CommentVote[]
 }
 
 model RefreshToken {

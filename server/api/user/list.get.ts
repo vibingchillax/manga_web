@@ -13,8 +13,8 @@ export default defineEventHandler(async (event) => {
 
   const [lists, total] = await Promise.all([
     prisma.customList.findMany({
-      take: query.limit ?? 10,
-      skip: query.offset ?? 0,
+      take: query.limit,
+      skip: query.offset,
       where: {
         userId: user.id,
       },
@@ -30,8 +30,8 @@ export default defineEventHandler(async (event) => {
   return {
     result: "ok",
     data: lists.map(formatCustomList),
-    limit: query.limit ?? 10,
-    offset: query.offset ?? 0,
+    limit: query.limit,
+    offset: query.offset,
     count: total,
   };
 });

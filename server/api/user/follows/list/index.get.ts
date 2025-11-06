@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
   );
 
   const listFollows = await prisma.listFollow.findMany({
-    take: query.limit ?? 10,
-    skip: query.offset ?? 0,
+    take: query.limit,
+    skip: query.offset,
     where: {
       userId: user.id,
     },

@@ -112,8 +112,8 @@ export default defineEventHandler(async (event) => {
 
   const [manga, total] = await Promise.all([
     prisma.manga.findMany({
-      take: query.limit ?? 10,
-      skip: query.offset ?? 0,
+      take: query.limit,
+      skip: query.offset,
       where: filters,
       include: {
         authors: query["includes[]"]?.includes("author"),
@@ -163,8 +163,8 @@ export default defineEventHandler(async (event) => {
     data: manga.map((m) =>
       formatManga(m, m.chapters?.[0].id ?? null, langMap.get(m.id) ?? []),
     ),
-    limit: query.limit ?? 10,
-    offset: query.offset ?? 0,
+    limit: query.limit,
+    offset: query.offset,
     count: total,
   };
 });
