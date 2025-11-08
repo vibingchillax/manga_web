@@ -29,4 +29,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     jwtSecret: process.env.JWT_SECRET,
   },
+  nitro: {
+    experimental: {
+      tasks: true,
+    },
+    scheduledTasks: {
+      "*/30 * * * * *": ["views:flush"],
+    },
+  },
 });

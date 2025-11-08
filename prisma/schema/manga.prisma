@@ -21,6 +21,7 @@ model Manga {
   primaryCoverId                String?                @unique @db.Uuid
   primaryCover                  CoverArt?              @relation("PrimaryCover", fields: [primaryCoverId], references: [id])
   version                       Int                    @default(1)
+  viewCount                     Int                    @default(0)
   createdAt                     DateTime               @default(now()) @db.Timestamp(6)
   updatedAt                     DateTime               @default(now()) @updatedAt @db.Timestamp(6)
   chapters                      UploadedChapter[]

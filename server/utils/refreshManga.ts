@@ -8,7 +8,7 @@ type MangaRequestBody = {
 };
 
 export async function refreshManga(mangaInput: MangaRequestBody) {
-  const scrapeNew = await sourcesInstance.runSourceForMangas({
+  const scrapeNew = await sourcesInstance.runSourceForManga({
     sourceId: mangaInput.sourceId,
     titleInput: mangaInput.title,
   });

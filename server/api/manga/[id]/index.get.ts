@@ -50,6 +50,15 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const user = await getAuthenticatedUser(event);
+  await incrementView(
+    "manga",
+    result.id,
+    user?.id,
+    event.context.clientIp,
+    event.context.userAgent,
+  );
+
   const languagesRows = await prisma.uploadedChapter.groupBy({
     by: ["translatedLanguage"],
     where: { mangaId: params.id },

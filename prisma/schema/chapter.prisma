@@ -12,6 +12,7 @@ model UploadedChapter {
   updatedAt          DateTime               @default(now()) @updatedAt @db.Timestamp(6)
   publishAt          DateTime               @default(now())
   readableAt         DateTime               @default(now())
+  viewCount          Int                    @default(0)
   user               User?                  @relation(fields: [uploader], references: [id], onDelete: SetNull)
   groups             UploadedChapterGroup[]
   Manga              Manga                  @relation(fields: [mangaId], references: [id])

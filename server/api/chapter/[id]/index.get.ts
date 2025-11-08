@@ -63,6 +63,16 @@ export default defineEventHandler(async (event) => {
 
   const chapter = result as ChapterQueryResult;
 
+  const user = await getAuthenticatedUser(event);
+
+  await incrementView(
+    "chapter",
+    chapter.id,
+    user?.id,
+    event.context.clientIp,
+    event.context.userAgent,
+  );
+
   const flattenedGroups: ScanlationGroup[] =
     chapter.groups?.map((g) => g.group!).filter(Boolean) ?? [];
 
