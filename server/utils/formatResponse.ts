@@ -43,19 +43,33 @@ const RELATION_TYPE_MAP = {
 } as const;
 
 export function formatAuthor(
-  author: Author,
+  author: Author & {
+    mangaAuthored?: Manga[];
+    mangaDrawn?: Manga[];
+  },
   type: "author" | "artist" = "author",
 ) {
-  const { id, ...rest } = author;
+  const { id, mangaAuthored, mangaDrawn, ...rest } = author;
+
+  const mangaMap = new Map<string, Manga>();
+  mangaAuthored?.forEach((m) => mangaMap.set(m.id, m));
+  mangaDrawn?.forEach((m) => mangaMap.set(m.id, mangaMap.get(m.id) || m));
+
   return {
-    id: author.id,
-    type: type,
+    id,
+    type,
     attributes: rest,
+    relationships: Array.from(mangaMap.values()).map((m) => formatManga),
   };
 }
 
-export function formatCoverArt(cover: CoverArt & { user?: SafeUser | null }) {
-  const { id, mangaId, uploader, user, ...rest } = cover;
+export function formatCoverArt(
+  cover: CoverArt & {
+    manga?: Manga;
+    user?: SafeUser | null;
+  },
+) {
+  const { id, manga, mangaId, uploader, user, ...rest } = cover;
   return {
     id: id,
     type: "cover_art" as const,
@@ -248,16 +262,25 @@ export function formatScrapedChapter(
 
 export function formatUploadedChapter(
   chapter: UploadedChapter & {
+    manga?: Manga;
     user?: SafeUser;
     groups?: ScanlationGroup[];
   },
 ) {
-  const { id, user, groups, mangaId, ...rest } = chapter;
+  const { id, user, groups, manga, mangaId, ...rest } = chapter;
   return {
     id: id,
     type: "chapter" as const,
     attributes: rest,
     relationships: [
+      ...(manga
+        ? [formatManga(manga)]
+        : [
+            {
+              id: mangaId,
+              type: "manga" as const,
+            },
+          ]),
       ...(user ? [formatUser(user)] : []),
       ...(groups
         ? groups.map((g) => {

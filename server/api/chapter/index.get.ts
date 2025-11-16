@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
   const excludedGroups = query["excludedGroups[]"] as string[] | undefined;
 
   const filters: UploadedChapterWhereInput = {};
-  filters.Manga = {};
+  filters.manga = {};
   if (ids) filters.id = { in: ids };
   if (query.title)
     filters.title = { contains: query.title, mode: "insensitive" };
@@ -62,9 +62,9 @@ export default defineEventHandler(async (event) => {
   if (translatedLanguages)
     filters.translatedLanguage = { in: translatedLanguages };
   if (query["originalLanguage[]"])
-    filters.Manga.originalLanguage = { in: originalLanguage };
+    filters.manga.originalLanguage = { in: originalLanguage };
   if (query["contentRating[]"])
-    filters.Manga.contentRating = { in: contentRating };
+    filters.manga.contentRating = { in: contentRating };
   if (query.createdAtSince)
     filters.createdAt = { gte: new Date(query.createdAtSince) };
   if (query.updatedAtSince)
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
   if (query.publishAtSince)
     filters.createdAt = { gte: new Date(query.publishAtSince) };
   if (excludedOriginalLanguage)
-    filters.Manga.originalLanguage = { notIn: excludedOriginalLanguage };
+    filters.manga.originalLanguage = { notIn: excludedOriginalLanguage };
 
   if (query["excludedUploaders[]"]?.length) {
     filters.uploader = { notIn: excludedUploaders };
@@ -113,6 +113,7 @@ export default defineEventHandler(async (event) => {
       skip: query.offset,
       where: filters,
       include: {
+        manga: query["includes[]"]?.includes("manga"),
         user: query["includes[]"]?.includes("user")
           ? {
               select: {

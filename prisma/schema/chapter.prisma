@@ -15,7 +15,7 @@ model UploadedChapter {
   viewCount          Int                    @default(0)
   user               User?                  @relation(fields: [uploader], references: [id], onDelete: SetNull)
   groups             UploadedChapterGroup[]
-  Manga              Manga                  @relation(fields: [mangaId], references: [id])
+  manga              Manga                  @relation(fields: [mangaId], references: [id])
 
   @@index([mangaId, volume, chapter])
   @@index([uploader])

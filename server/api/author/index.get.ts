@@ -27,9 +27,10 @@ export default defineEventHandler(async (event) => {
       skip: query.offset,
       where: filters,
       orderBy: orderBy,
-      // include: {
-      //   manga: true
-      // }
+      include: {
+        mangaAuthored: query["includes[]"]?.includes("manga"),
+        mangaDrawn: query["includes[]"]?.includes("manga"),
+      },
     }),
 
     prisma.author.count({
@@ -39,7 +40,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     result: "ok",
-    data: authors.map((a) => formatAuthor),
+    data: authors.map((a) => formatAuthor(a)),
     limit: query.limit,
     offset: query.offset,
     count: total,

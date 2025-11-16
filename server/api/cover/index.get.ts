@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
       skip: query.offset,
       where: filters,
       include: {
+        manga: query["includes[]"]?.includes("manga"),
         user: query["includes[]"]?.includes("user")
           ? {
               select: {
@@ -55,7 +56,6 @@ export default defineEventHandler(async (event) => {
               },
             }
           : undefined,
-        //manga
       },
       orderBy: orderBy,
     }),

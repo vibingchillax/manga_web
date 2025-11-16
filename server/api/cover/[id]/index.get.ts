@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
       id: params.id,
     },
     include: {
+      manga: query["includes[]"]?.includes("manga"),
       user: query["includes[]"]?.includes("user")
         ? {
             select: {
@@ -28,7 +29,6 @@ export default defineEventHandler(async (event) => {
             },
           }
         : undefined,
-      //manga
     },
   });
 

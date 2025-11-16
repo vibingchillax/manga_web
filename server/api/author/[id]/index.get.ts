@@ -18,9 +18,10 @@ export default defineEventHandler(async (event) => {
     where: {
       id: params.id,
     },
-    // include: {
-    //   manga: true
-    // }
+    include: {
+      mangaAuthored: query["includes[]"]?.includes("manga"),
+      mangaDrawn: query["includes[]"]?.includes("manga"),
+    },
   });
 
   if (!author)

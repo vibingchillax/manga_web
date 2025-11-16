@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { SafeUser } from "~~/server/utils/formatResponse";
 import { formatUploadedChapter } from "~~/server/utils/formatResponse";
 import type {
+  Manga,
   ScanlationGroup,
   UploadedChapter,
   UploadedChapterGroup,
@@ -9,6 +10,7 @@ import type {
 } from "~~/shared/prisma/client";
 
 export type ChapterQueryResult = UploadedChapter & {
+  manga?: Manga;
   user?: User | null;
   groups?: (UploadedChapterGroup & {
     group?: ScanlationGroup;
@@ -35,6 +37,7 @@ export default defineEventHandler(async (event) => {
       id: params.id,
     },
     include: {
+      manga: query["includes[]"]?.includes("manga"),
       user: query["includes[]"]?.includes("user")
         ? {
             select: {
