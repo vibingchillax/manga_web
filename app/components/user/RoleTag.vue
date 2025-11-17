@@ -1,19 +1,11 @@
-<script setup lang="ts">
-import type { UserRole } from "~~/shared/prisma/client";
-
-const props = defineProps<{
-  bgIndependent?: boolean;
-  role?: string;
-  roleList?: string[];
-}>();
-
+<script lang="ts">
 interface RoleStyle {
   text: string;
   color: string;
   background: string;
 }
 
-const roleMap: [UserRole, RoleStyle][] = [
+export const roleMap: [UserRole, RoleStyle][] = [
   [
     "admin",
     { text: "Admin", color: "rgb(255,255,255)", background: "#9b59b6" },
@@ -31,7 +23,15 @@ const roleMap: [UserRole, RoleStyle][] = [
     { text: "Banned", color: "rgb(255,255,255)", background: "rgb(0, 0, 0)" },
   ],
 ];
+</script>
+<script setup lang="ts">
+import type { UserRole } from "~~/shared/prisma/client";
 
+const props = defineProps<{
+  bgIndependent?: boolean;
+  role?: string;
+  roleList?: string[];
+}>();
 const roleStyle = computed<RoleStyle>(() => {
   if (props.role) {
     const found = roleMap.find((s) => s[0] === props.role);

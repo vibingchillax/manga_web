@@ -22,12 +22,20 @@ body {
   --mw-status-yellow: 218 117 0;
   --mw-status-red: 255 64 64;
   --mw-status-purple: 125 64 255;
+  --mw-status-blue: 0 201 245;
 }
 
 .dark {
   --mw-accent: 29 41 61;
+  --mw-accent-hover: 29 41 55;
+  --mw-accent-active: 29 41 50;
   --mw-accent-10: 53 62 80;
+  --mw-accent-10-hover: 53 62 72;
+  --mw-accent-10-active: 53 62 65;
   --mw-accent-20: 76 84 100;
+  --mw-accent-20-hover: 76 84 90;
+  --mw-accent-20-active: 76 84 80;
+  --mw-contrast-1: var(--ui-color-neutral-200);
 }
 
 :root {

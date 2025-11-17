@@ -17,6 +17,7 @@ export default defineNuxtConfig({
     "pinia-plugin-persistedstate/nuxt",
     "@nuxtjs/device",
     "@vueuse/nuxt",
+    "@nuxtjs/i18n",
   ],
   css: ["~/assets/css/main.css"],
   openFetch: {
@@ -36,5 +37,9 @@ export default defineNuxtConfig({
     scheduledTasks: {
       "*/30 * * * * *": ["views:flush"],
     },
+  },
+  i18n: {
+    defaultLocale: "en",
+    locales: [{ code: "en", name: "English", file: "en.json" }],
   },
 });

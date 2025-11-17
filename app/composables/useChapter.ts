@@ -1,3 +1,48 @@
+export const useUploadedChapter = (ch: Ref<UploadedChapter | undefined>) => {
+  const chapterId = computed(() => ch.value?.id);
+  const url = computed(() => `/chapter/${chapterId.value}`);
+
+  const title = computed(() => ch.value?.attributes.title?.trim() ?? "");
+  const volume = computed(() => ch.value?.attributes.volume ?? null);
+  const chapterNum = computed(() => ch.value?.attributes.chapter ?? null);
+  const translatedLanguage = computed(
+    () => ch.value?.attributes.translatedLanguage.toLowerCase() ?? null,
+  );
+  const pages = computed(() => ch.value?.attributes.pages ?? null);
+  const createdAt = computed(() => ch.value?.attributes.createdAt ?? null);
+  const updatedAt = computed(() => ch.value?.attributes.updatedAt ?? null);
+  const publishAt = computed(() => ch.value?.attributes.publishAt ?? null);
+  const readableAt = computed(() => ch.value?.attributes.readableAt ?? null);
+
+  const manga = computed(() =>
+    ch.value?.relationships?.find((m) => m.type === "manga"),
+  );
+  const groups = computed(() =>
+    ch.value?.relationships?.filter((m) => m.type === "scanlation_group"),
+  );
+
+  const uploader = computed(() =>
+    ch.value?.relationships?.find((r) => r.type === "user"),
+  );
+
+  return {
+    chapterId,
+    url,
+    title,
+    volume,
+    chapterNum,
+    translatedLanguage,
+    pages,
+    createdAt,
+    updatedAt,
+    publishAt,
+    readableAt,
+    manga,
+    groups,
+    uploader,
+  };
+};
+
 export const useScrapedChapter = (ch: Ref<ScrapedChapter | undefined>) => {
   const id = computed(() => ch.value?.id);
   const sourceId = computed(() => ch.value?.attributes.sourceId);
@@ -173,3 +218,21 @@ export const useScrapedChapterMeta = () => {
     chapterPageCount,
   };
 };
+
+export function formatChapterTitle(
+  volume?: string | null,
+  chapter?: string | null,
+  title?: string,
+) {
+  const separator = (volume || chapter) && (title || (!chapter && !title));
+
+  const parts = [
+    volume ? `Vol. ${volume}` : null, // $t("_components.chapter.tooltip.short_prefix_volume")
+    chapter ? `Ch. ${chapter}` : null, // $t("_components.chapter.tooltip.short_prefix_chapter")
+    separator ? "-" : null,
+    title ? title : null,
+    !title && !chapter ? "Oneshot" : null, // $t("generic.oneshot")
+  ];
+
+  return parts.filter(Boolean).join(" ");
+}

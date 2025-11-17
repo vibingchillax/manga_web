@@ -2,10 +2,14 @@ interface UserPreferences {
   excludedTags: string[];
   filteredLanguages: string[];
   originLanguages: string[];
+  paginationCount: number;
+  listMultiplier: number;
   showSafe: boolean;
   showSuggestive: boolean;
   showErotic: boolean;
   showHentai: boolean;
+  groupBlacklist: string[];
+  userBlacklist: string[];
   proxyUrl: string;
   gatewayUrl: string;
   gatewayUrls: string[];
@@ -16,10 +20,14 @@ export const usePreferencesStore = defineStore("userPreferences", {
     excludedTags: [],
     filteredLanguages: [],
     originLanguages: [],
+    paginationCount: 32,
+    listMultiplier: 3,
     showSafe: true,
     showSuggestive: true,
     showErotic: true,
     showHentai: false,
+    groupBlacklist: [],
+    userBlacklist: [],
     proxyUrl: useAppConfig().proxyUrl,
     gatewayUrl: useAppConfig().kuboGatewayUrl,
     gatewayUrls: [useAppConfig().kuboGatewayUrl, "https://ipfs.io/ipfs"],

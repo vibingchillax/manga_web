@@ -154,17 +154,22 @@ export type User = Resource<
 export type UploadedChapter = Resource<
   "chapter",
   {
-    title: string;
-    volume: string;
-    chapter: string;
+    title?: string | null;
+    volume?: string | null;
+    chapter?: string | null;
     pages: any;
     translatedLanguage: string;
-    uploader: string;
+    uploader?: string | null;
     version: number;
     createdAt: string;
     updatedAt: string;
     publishAt: string;
     readableAt: string;
   },
-  User | ScanlationGroup
+  User | ScanlationGroup | Manga
 >;
+
+export type ChapterStatistics = {
+  views: number;
+  comments: number;
+};

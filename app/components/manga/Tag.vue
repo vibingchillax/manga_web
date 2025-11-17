@@ -19,7 +19,7 @@ const contentClasses: Record<string, string> = {
 };
 </script>
 <template>
-  <MangaTagGeneric
+  <TagGeneric
     v-if="showSafe || value !== 'safe'"
     :class="contentClasses[value.toLowerCase()]"
     :large="large"
@@ -27,5 +27,5 @@ const contentClasses: Record<string, string> = {
     :to="to"
   >
     {{ value }}
-  </MangaTagGeneric>
+  </TagGeneric>
 </template>

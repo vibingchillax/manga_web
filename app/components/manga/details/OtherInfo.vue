@@ -29,11 +29,7 @@ const format = computed(() => groupedTags?.value.format);
 const content = computed(() => groupedTags?.value.content);
 </script>
 <template>
-  <div
-    :id="manga.id"
-    class="flex flex-wrap gap-x-4 gap-y-2"
-    style="flex-basis: 30%; max-width: 400px; min-width: 25%"
-  >
+  <div class="flex flex-wrap gap-x-4 gap-y-2 flex">
     <div class="mb-2">
       <div class="font-bold mb-2">Author</div>
       <div class="flex gap-2 flex-wrap">

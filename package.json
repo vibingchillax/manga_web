@@ -46,6 +46,7 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.68",
     "@nuxtjs/device": "^3.2.4",
+    "@nuxtjs/i18n": "^10.2.0",
     "@types/bcrypt": "^6.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/jszip": "^3.4.0",

@@ -2,6 +2,7 @@ interface Layout {
   menuActive: boolean;
   navbarFloating: boolean;
   showMOTD: boolean;
+  oneRowChapters: boolean;
 }
 
 export const useLayout = defineStore("layout", {
@@ -9,6 +10,7 @@ export const useLayout = defineStore("layout", {
     menuActive: true,
     navbarFloating: true,
     showMOTD: true,
+    oneRowChapters: false,
   }),
   actions: {
     setMenu(bool: boolean) {
