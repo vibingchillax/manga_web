@@ -29,6 +29,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     jwtSecret: process.env.JWT_SECRET,
+    esPassword: process.env.ELASTIC_PASSWORD,
   },
   nitro: {
     experimental: {

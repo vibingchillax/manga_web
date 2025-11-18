@@ -5,6 +5,7 @@ services:
     depends_on:
       - db
       - redis
+      - elasticsearch
     restart: unless-stopped
   db:
     image: postgres
@@ -55,7 +56,53 @@ services:
       - db
     env_file:
       - .env
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-wolfi:9.2.1
+    environment:
+      xpack.security.enabled: "true"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      bootstrap.memory_lock: "true"
+      xpack.ml.use_auto_machine_memory_percent: "true"
+      # - xpack.monitoring.collection.enabled=true
+      # - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200 || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+  kibana:
+    image: docker.elastic.co/kibana/kibana-wolfi:9.2.1
+    volumes:
+      - kibanadata:/usr/share/kibana/data
+    environment:
+      xpack.security.enabled: "true"
+      SERVERNAME: kibana
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD}
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
 volumes:
   db:
   ipfs_staging:
   ipfs_data:
+  esdata:
+  kibanadata:

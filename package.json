@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^9.2.0",
     "@manga_web/sources": "github:vibingchillax/sources",
     "@nuxt/content": "^3.6.3",
     "@nuxt/eslint": "^1.6.0",

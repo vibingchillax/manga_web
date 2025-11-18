@@ -16,3 +16,13 @@ services:
   pgadmin:
     ports:
       - "5050:80"
+
+  elasticsearch:
+    environment:
+      discovery.type: single-node
+    ports:
+      - "9200:9200"
+
+  kibana:
+    ports:
+      - "5601:5601"
