@@ -10,10 +10,3 @@ export const esClient = new Client({
     password: useRuntimeConfig().esPassword,
   },
 });
-
-async function testConnection() {
-  const health = await esClient.cluster.health({});
-  console.log("ES Cluster Health:", health);
-}
-
-testConnection();

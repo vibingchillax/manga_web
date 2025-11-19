@@ -17,12 +17,15 @@ services:
     ports:
       - "5050:80"
 
-  elasticsearch:
+  es01:
     environment:
+      xpack.security.enabled: "false"
       discovery.type: single-node
     ports:
       - "9200:9200"
 
   kibana:
+    environment:
+      xpack.security.enabled: "false"
     ports:
       - "5601:5601"

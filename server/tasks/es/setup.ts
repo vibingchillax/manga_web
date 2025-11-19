@@ -13,26 +13,33 @@ async function createAuthorIndex() {
     mappings: {
       properties: {
         id: { type: "keyword" },
-        type: { type: "keyword" },
+        type: { type: "keyword", index: false },
         attributes: {
           properties: {
-            name: { type: "text" },
-            imageUrl: { type: "text" },
-            biography: { type: "text" },
-            twitter: { type: "keyword" },
-            pixiv: { type: "keyword" },
-            melonBook: { type: "keyword" },
-            fanBox: { type: "keyword" },
-            booth: { type: "keyword" },
-            nicoVideo: { type: "keyword" },
-            skeb: { type: "keyword" },
-            fantia: { type: "keyword" },
-            tumblr: { type: "keyword" },
-            youtube: { type: "keyword" },
-            weibo: { type: "keyword" },
-            naver: { type: "keyword" },
-            namicomi: { type: "keyword" },
-            website: { type: "keyword" },
+            name: {
+              type: "text",
+              fields: {
+                keyword: {
+                  type: "keyword",
+                },
+              },
+            },
+            imageUrl: { type: "text", index: false },
+            biography: { type: "object", enabled: false },
+            twitter: { type: "keyword", index: false },
+            pixiv: { type: "keyword", index: false },
+            melonBook: { type: "keyword", index: false },
+            fanBox: { type: "keyword", index: false },
+            booth: { type: "keyword", index: false },
+            nicoVideo: { type: "keyword", index: false },
+            skeb: { type: "keyword", index: false },
+            fantia: { type: "keyword", index: false },
+            tumblr: { type: "keyword", index: false },
+            youtube: { type: "keyword", index: false },
+            weibo: { type: "keyword", index: false },
+            naver: { type: "keyword", index: false },
+            namicomi: { type: "keyword", index: false },
+            website: { type: "keyword", index: false },
             version: { type: "integer" },
             createdAt: { type: "date" },
             updatedAt: { type: "date" },
@@ -63,12 +70,33 @@ async function createChapterIndex() {
     mappings: {
       properties: {
         id: { type: "keyword" },
-        type: { type: "keyword" },
+        type: { type: "keyword", index: false },
         attributes: {
           properties: {
-            title: { type: "text" },
-            volume: { type: "text" },
-            chapter: { type: "text" },
+            title: {
+              type: "text",
+              fields: {
+                keyword: {
+                  type: "keyword",
+                },
+              },
+            },
+            volume: {
+              type: "text",
+              fields: {
+                keyword: {
+                  type: "keyword",
+                },
+              },
+            },
+            chapter: {
+              type: "text",
+              fields: {
+                keyword: {
+                  type: "keyword",
+                },
+              },
+            },
             translatedLanguage: { type: "keyword" },
             pages: { type: "object", enabled: false },
             version: { type: "integer" },
@@ -76,7 +104,6 @@ async function createChapterIndex() {
             updatedAt: { type: "date" },
             publishAt: { type: "date" },
             readableAt: { type: "date" },
-            viewCount: { type: "integer" },
           },
         },
         relationships: {
@@ -104,12 +131,12 @@ async function createCoverArtIndex() {
     mappings: {
       properties: {
         id: { type: "keyword" },
-        type: { type: "keyword" },
+        type: { type: "keyword", index: false },
         attributes: {
           properties: {
             volume: { type: "text" },
             file: { type: "object", enabled: false },
-            description: { type: "text" },
+            description: { type: "text", index: false },
             locale: { type: "keyword" },
             version: { type: "integer" },
             createdAt: { type: "date" },
@@ -141,7 +168,7 @@ async function createCustomListIndex() {
     mappings: {
       properties: {
         id: { type: "keyword" },
-        type: { type: "keyword" },
+        type: { type: "keyword", index: false },
         attributes: {
           properties: {
             name: { type: "text" },
@@ -176,7 +203,7 @@ async function createScanlationGroupIndex() {
     mappings: {
       properties: {
         id: { type: "keyword" },
-        type: { type: "keyword" },
+        type: { type: "keyword", index: false },
         attributes: {
           properties: {
             name: { type: "text", fields: { keyword: { type: "keyword" } } },
@@ -184,14 +211,14 @@ async function createScanlationGroupIndex() {
               type: "text",
               fields: { keyword: { type: "keyword" } },
             },
-            website: { type: "keyword" },
-            ircServer: { type: "keyword" },
-            ircChannel: { type: "keyword" },
-            discord: { type: "keyword" },
-            contactEmail: { type: "keyword" },
-            description: { type: "text" },
-            twitter: { type: "keyword" },
-            mangaUpdates: { type: "keyword" },
+            website: { type: "keyword", index: false },
+            ircServer: { type: "keyword", index: false },
+            ircChannel: { type: "keyword", index: false },
+            discord: { type: "keyword", index: false },
+            contactEmail: { type: "keyword", index: false },
+            description: { type: "text", index: false },
+            twitter: { type: "keyword", index: false },
+            mangaUpdates: { type: "keyword", index: false },
             inactive: { type: "boolean" },
             publishDelay: { type: "keyword" },
             focusedLanguages: { type: "keyword" },
@@ -242,7 +269,7 @@ async function createMangaIndex() {
       ],
       properties: {
         id: { type: "keyword" },
-        type: { type: "keyword" },
+        type: { type: "keyword", index: false },
         attributes: {
           properties: {
             title: { type: "object", dynamic: true },
@@ -252,17 +279,20 @@ async function createMangaIndex() {
             isLocked: { type: "boolean" },
             links: { type: "object", enabled: false },
             originalLanguage: { type: "keyword" },
-            lastVolume: { type: "text" },
-            lastChapter: { type: "text" },
+            lastVolume: { type: "keyword" },
+            lastChapter: { type: "keyword" },
             publicationDemographic: { type: "keyword" },
             status: { type: "keyword" },
             year: { type: "integer" },
             contentRating: { type: "keyword" },
+            chapterNumbersResetOnNewVolume: { type: "boolean" },
+            availableTranslatedLanguages: { type: "keyword" },
+            latestUploadedChapter: { type: "keyword" },
             tags: {
               type: "nested",
               properties: {
                 id: { type: "keyword" },
-                type: { type: "keyword" },
+                type: { type: "keyword", index: false },
                 attributes: {
                   properties: {
                     name: { type: "text" },
@@ -281,6 +311,7 @@ async function createMangaIndex() {
           properties: {
             id: { type: "keyword" },
             type: { type: "keyword" },
+            related: { type: "keyword" }
           },
         },
       },
@@ -301,7 +332,7 @@ async function createUserIndex() {
     mappings: {
       properties: {
         id: { type: "keyword" },
-        type: { type: "keyword" },
+        type: { type: "keyword", index: false },
         attributes: {
           properties: {
             username: {

@@ -5,7 +5,7 @@ services:
     depends_on:
       - db
       - redis
-      - elasticsearch
+      - es01
     restart: unless-stopped
   db:
     image: postgres
@@ -56,7 +56,7 @@ services:
       - db
     env_file:
       - .env
-  elasticsearch:
+  es01:
     image: docker.elastic.co/elasticsearch/elasticsearch-wolfi:9.2.1
     environment:
       xpack.security.enabled: "true"
@@ -84,11 +84,11 @@ services:
     environment:
       xpack.security.enabled: "true"
       SERVERNAME: kibana
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://es01:9200
       ELASTICSEARCH_USERNAME: kibana_system
       ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD}
     depends_on:
-      elasticsearch:
+      es01:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
