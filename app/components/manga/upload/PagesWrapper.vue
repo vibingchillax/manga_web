@@ -445,16 +445,17 @@ async function resliceLargeImages() {
 </script>
 <template>
   <div>
-    <MangaUploadPages
-      v-model="pages"
-      :disabled="disabled"
-      :accept="[...IMAGE_TYPES, ...ACCEPTED_EXTS.map((e) => '.' + e)]"
-      @add-files="addFiles"
-      @remove-file="removePage"
-      @edit-click="(file) => (editingFile = file)"
-      @edit-file="updateFile"
-    />
-
+    <LightboxGroup>
+      <MangaUploadPages
+        v-model="pages"
+        :disabled="disabled"
+        :accept="[...IMAGE_TYPES, ...ACCEPTED_EXTS.map((e) => '.' + e)]"
+        @add-files="addFiles"
+        @remove-file="removePage"
+        @edit-click="(file) => (editingFile = file)"
+        @edit-file="updateFile"
+      />
+    </LightboxGroup>
     <div v-if="!disabled && pages.length > 0" class="flex my-2 flex-wrap">
       <UPopover v-if="shouldReslice" text="reslice tooltip">
         <UButton

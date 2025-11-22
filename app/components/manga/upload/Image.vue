@@ -155,7 +155,7 @@ function handleClick(e: MouseEvent) {
       <div v-if="isDuplicate" class="duplicate">Duplicate</div>
     </template>
 
-    <!-- lightbox component! -->
+    <Lightbox v-if="preview" v-model:open="showPreview" :src="preview" />
   </component>
 </template>
 

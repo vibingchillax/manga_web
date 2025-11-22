@@ -110,22 +110,24 @@ const { pending, error } = useAsyncData(async () => {
           </template>
         </USelect>
       </div>
-      <div
-        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2"
-      >
-        <MangaCover
-          v-for="cover in covers"
-          :key="cover.file"
-          :manga="manga"
-          :cover-file="
-            `https://uploads.mangadex.org/covers/${manga.id}/` + cover.file
-          "
-          :label="cover.volume ? `Volume ${cover.volume}` : 'No volume'"
-          :no-title="false"
-          lightbox
-          :use256="false"
-        />
-      </div>
+      <LightboxGroup>
+        <div
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2"
+        >
+          <MangaCover
+            v-for="cover in covers"
+            :key="cover.file"
+            :manga="manga"
+            :cover-file="
+              `https://uploads.mangadex.org/covers/${manga.id}/` + cover.file
+            "
+            :label="cover.volume ? `Volume ${cover.volume}` : 'No volume'"
+            :no-title="false"
+            lightbox
+            :use256="false"
+          />
+        </div>
+      </LightboxGroup>
     </div>
   </div>
 </template>

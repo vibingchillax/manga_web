@@ -311,7 +311,7 @@ async function createMangaIndex() {
           properties: {
             id: { type: "keyword" },
             type: { type: "keyword" },
-            related: { type: "keyword" }
+            related: { type: "keyword" },
           },
         },
       },

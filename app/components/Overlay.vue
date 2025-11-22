@@ -12,31 +12,28 @@ const props = withDefaults(
   },
 );
 
+const emit = defineEmits(["click"]);
+
+function onClick(event: PointerEvent) {
+  emit("click", event);
+}
+
 const overlayStyle = computed(() => ({
   "--overlay-opacity": props.opacity,
   zIndex: props.zIndex,
 }));
 </script>
 <template>
-  <Teleport v-if="attach" :to="attach">
+  <Teleport :to="attach || 'body'" :disabled="!attach && attach !== undefined">
     <div
       ref="content"
       class="mw-overlay text-white p-8 flex flex-col items-center justify-center"
       :style="[{ zIndex }, overlayStyle]"
-      @click="$emit('click', $event)"
+      @click="onClick"
     >
       <slot />
     </div>
   </Teleport>
-  <div
-    v-else
-    ref="content"
-    class="mw-overlay text-white p-8 flex flex-col items-center justify-center"
-    :style="{ zIndex }"
-    @click="$emit('click', $event)"
-  >
-    <slot />
-  </div>
 </template>
 <style lang="css" scoped>
 .mw-overlay {

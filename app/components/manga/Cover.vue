@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NuxtLink } from "#components";
+import { Lightbox, NuxtLink } from "#components";
 
 const props = withDefaults(
   defineProps<{
@@ -131,6 +131,12 @@ function onClick(e: MouseEvent) {
     >
       {{ displayLabel }}
     </span>
+    <Lightbox
+      v-if="lightbox"
+      v-model:open="lightboxVisible"
+      :src="computedSrc"
+      :fullRes="fullResSrc"
+    />
   </component>
 </template>
 <style lang="css" scoped>
