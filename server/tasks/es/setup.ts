@@ -274,7 +274,6 @@ async function createMangaIndex() {
           properties: {
             title: { type: "object", dynamic: true },
             altTitles: { type: "nested", dynamic: true },
-            // description: { type: "object", dynamic: true }, //should we allow search with description?
             description: { type: "object", enabled: false },
             isLocked: { type: "boolean" },
             links: { type: "object", enabled: false },
@@ -340,6 +339,7 @@ async function createUserIndex() {
               fields: { keyword: { type: "keyword" } },
             },
             roles: { type: "keyword" },
+            version: { type: "integer" },
             createdAt: { type: "date" },
             updatedAt: { type: "date" },
           },
