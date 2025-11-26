@@ -1,10 +1,3 @@
-import { formatCoverArt } from "~~/server/utils/formatResponse";
-import type { Enumerable } from "~~/shared/prisma/internal/prismaNamespace";
-import type {
-  CoverArtOrderByWithRelationInput,
-  CoverArtWhereInput,
-} from "~~/shared/prisma/models";
-
 export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(
     event,
@@ -18,58 +11,59 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const ids = query["ids[]"] as string[] | undefined;
-  const mangaIds = query["manga[]"] as string[] | undefined;
-  const uploaders = query["uploaders[]"] as string[] | undefined;
-  const locales = query["locales[]"] as string[] | undefined;
+  const cacheKey = `cover:list:${JSON.stringify(query)}`;
 
-  const filters: CoverArtWhereInput = {
-    id: ids ? { in: ids } : undefined,
-    mangaId: mangaIds ? { in: mangaIds } : undefined,
-    uploader: uploaders ? { in: uploaders } : undefined,
-    locale: locales ? { in: locales } : undefined,
-  };
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
 
-  const orderBy: Enumerable<CoverArtOrderByWithRelationInput> = [];
+  const esQuery: any = { bool: { must: [] } };
+
+  if (query["ids[]"]?.length) {
+    esQuery.bool.must.push({ terms: { id: query["ids[]"] } });
+  }
+
+  if (query["manga[]"]?.length) {
+    esQuery.bool.must.push(nestedRelationship("manga", query["manga[]"]));
+  }
+
+  if (query["uploaders[]"]?.length) {
+    esQuery.bool.must.push(nestedRelationship("user", query["uploaders[]"]));
+  }
+
+  if (query["locales[]"]?.length) {
+    esQuery.bool.must.push({
+      terms: { "attributes.locale": query["locales[]"] },
+    });
+  }
+
+  const sort: any[] = [];
 
   (["createdAt", "updatedAt", "volume"] as const).forEach((field) => {
-    const key = `order[${field}]` as const;
-    const dir = query[key];
-    if (dir) {
-      orderBy.push({ [field]: dir });
-    }
+    const dir = query[`order[${field}]`];
+    const f = "attributes." + field;
+    if (dir) sort.push({ [f]: { order: dir } });
   });
 
-  const [covers, total] = await Promise.all([
-    prisma.coverArt.findMany({
-      take: query.limit,
-      skip: query.offset,
-      where: filters,
-      include: {
-        manga: query["includes[]"]?.includes("manga"),
-        user: query["includes[]"]?.includes("user")
-          ? {
-              select: {
-                id: true,
-                username: true,
-                roles: true,
-              },
-            }
-          : undefined,
-      },
-      orderBy: orderBy,
-    }),
+  const { hits, total } = await esSearch("cover_art", {
+    query: esQuery,
+    from: query.offset,
+    size: query.limit,
+    sort,
+  });
 
-    prisma.coverArt.count({
-      where: filters,
-    }),
-  ]);
+  const expanded = await Promise.all(
+    hits.map((hit) => expandRelationships(hit, query["includes[]"])),
+  );
 
-  return {
+  const response = {
     result: "ok",
-    data: covers.map(formatCoverArt),
+    data: expanded,
     limit: query.limit,
     offset: query.offset,
     count: total,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

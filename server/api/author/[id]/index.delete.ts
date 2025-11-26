@@ -29,6 +29,11 @@ export default defineEventHandler(async (event) => {
         id: params.id,
       },
     });
+
+    await esDelete("authors", params.id);
+
+    await deleteCache(`author:${params.id}:*`);
+    await deleteCache(`author:list:*`);
   } catch {}
 
   return {

@@ -5,6 +5,8 @@ model CustomList {
   visibility ListVisibility @default(public)
   manga      Manga[]
   version    Int            @default(1)
+  createdAt     DateTime @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime @default(now()) @updatedAt @db.Timestamp(6)
   creator    User           @relation(fields: [userId], references: [id])
   follows    ListFollow[]
 }

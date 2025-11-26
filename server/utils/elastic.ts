@@ -10,8 +10,8 @@ const REL_INDEX_MAP: Record<string, string> = {
   manga: "manga",
   user: "users",
   leader: "users",
-  member: "users"
-}
+  member: "users",
+};
 
 export const esClient = new Client({
   node:
@@ -72,35 +72,37 @@ export async function esDelete(index: string, id: string) {
       refresh: "wait_for",
     });
   } catch (err) {
-    console.error(`[ES] Failed to delete ${id} from ${index}`)
+    console.error(`[ES] Failed to delete ${id} from ${index}`);
   }
 }
 
-export async function expandRelationships(item: any, includes: any[] | undefined) {
+export async function expandRelationships(
+  item: any,
+  includes: any[] | undefined,
+) {
   if (!includes?.length) return item;
 
   const out = { ...item };
 
-  const expanded: any[] = []
+  const expanded: any[] = [];
 
   for (const rel of item.relationships ?? []) {
     if (!includes.includes(rel.type)) {
-      expanded.push(rel)
+      expanded.push(rel);
       continue;
     }
     const index = REL_INDEX_MAP[rel.type];
     if (!index) {
-      expanded.push(rel)
-      continue
-    };
+      expanded.push(rel);
+      continue;
+    }
 
     const obj: any = await esGetById(index, rel.id);
-    obj.type = rel.type
-    expanded.push(obj ?? rel)
-
+    obj.type = rel.type;
+    expanded.push(obj ?? rel);
   }
 
-  out.relationships = expanded
+  out.relationships = expanded;
 
   return out;
 }
@@ -112,11 +114,11 @@ export function nestedRelationship(type: string, ids: string[]) {
       query: {
         bool: {
           filter: [
-            { term: { "relationships.type": type }},
-            { terms: { "relationships.id": ids }},
-          ]
-        }
-      }
-    }
+            { term: { "relationships.type": type } },
+            { terms: { "relationships.id": ids } },
+          ],
+        },
+      },
+    },
   };
 }

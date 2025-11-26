@@ -29,6 +29,11 @@ export default defineEventHandler(async (event) => {
         id: params.id,
       },
     });
+
+    await esDelete("covers", params.id);
+
+    await deleteCache(`cover:${params.id}:*`);
+    await deleteCache(`cover:list:*`);
   } catch {}
 
   return {

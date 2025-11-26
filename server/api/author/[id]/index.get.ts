@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { formatAuthor } from "~~/server/utils/formatResponse";
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(
@@ -14,15 +13,11 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const author = await prisma.author.findUnique({
-    where: {
-      id: params.id,
-    },
-    include: {
-      mangaAuthored: query["includes[]"]?.includes("manga"),
-      mangaDrawn: query["includes[]"]?.includes("manga"),
-    },
-  });
+  const cacheKey = `author:${params.id}:${query["includes[]"]?.join(",")}`;
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
+
+  const author = await esGetById("authors", params.id);
 
   if (!author)
     throw createError({
@@ -30,8 +25,14 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Author not found",
     });
 
-  return {
+  const expanded = await expandRelationships(author, query["includes[]"]);
+
+  const response = {
     result: "ok",
-    data: formatAuthor(author),
+    data: expanded,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

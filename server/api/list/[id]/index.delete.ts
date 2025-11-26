@@ -40,6 +40,10 @@ export default defineEventHandler(async (event) => {
     },
   });
 
+  await esDelete("custom_lists", params.id);
+  await deleteCache(`custom_list:${user.id}`);
+  await deleteCache(`custom_list:user:${user.id}:*`);
+
   return {
     result: "ok",
   };

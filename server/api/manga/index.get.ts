@@ -1,10 +1,4 @@
 import { z } from "zod";
-import { formatManga } from "~~/server/utils/formatResponse";
-import type {
-  ContentRating,
-  PublicationDemographic,
-} from "~~/shared/prisma/enums";
-import type { MangaWhereInput } from "~~/shared/prisma/models";
 
 export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(
@@ -30,141 +24,154 @@ export default defineEventHandler(async (event) => {
       createdAtSince: zDateString.optional(),
       updatedAtSince: zDateString.optional(),
       "order[latestUploadedChapter]": zOrderDirection.optional(),
-      group: zUuid.optional(),
+      // group: zUuid.optional(), ???
     }).parse,
   );
 
-  const ids = query["ids[]"] as string[] | undefined;
-  const publicationDemographic = query["publicationDemographic[]"] as
-    | PublicationDemographic[]
-    | undefined;
-  const contentRating = query["contentRating[]"] as ContentRating[] | undefined;
-  const originalLanguage = query["originalLanguage[]"] as string[] | undefined;
-  const excludedOriginalLanguage = query["excludedOriginalLanguage[]"] as
-    | string[]
-    | undefined;
-  const authors = query["authors[]"] as string[] | undefined;
-  const artists = query["artists[]"] as string[] | undefined;
+  const cacheKey = `manga:list:${JSON.stringify(query)}`;
+  const cached = await getCache(cacheKey);
 
-  const filters: MangaWhereInput = {};
+  if (cached) return cached;
 
-  if (ids) filters.id = { in: ids };
-  if (query.year) filters.year = query.year;
-  if (query.status) filters.status = query.status;
-  if (publicationDemographic)
-    filters.publicationDemographic = { in: publicationDemographic };
-  if (contentRating) filters.contentRating = { in: contentRating };
-  if (originalLanguage) filters.originalLanguage = { in: originalLanguage };
-  if (excludedOriginalLanguage)
-    filters.NOT = {
-      originalLanguage: {
-        in: excludedOriginalLanguage,
-      },
-    };
-  if (query.createdAtSince)
-    filters.createdAt = { gte: new Date(query.createdAtSince) };
-  if (query.updatedAtSince)
-    filters.createdAt = { gte: new Date(query.updatedAtSince) };
+  const esQuery: any = { bool: { must: [], must_not: [] as any[] } };
+
+  if (query["ids[]"]) {
+    esQuery.bool.must.push({ terms: { id: query["ids[]"] } });
+  }
+
+  if (query.title) {
+    esQuery.bool.must.push({
+      match_phrase_prefix: { "attributes.title": query.title },
+    });
+  }
+
   if (query.authorOrArtist) {
-    filters.OR = [
-      { authors: { some: { id: query.authorOrArtist } } },
-      { artists: { some: { id: query.authorOrArtist } } },
+    esQuery.bool.should = [
+      nestedRelationship("author", [query.authorOrArtist]),
+      nestedRelationship("artist", [query.authorOrArtist]),
     ];
+    esQuery.bool.minimum_should_match = 1;
   }
+  if (query["authors[]"])
+    esQuery.bool.must.push(nestedRelationship("author", query["authors[]"]));
+  if (query["artists[]"])
+    esQuery.bool.must.push(nestedRelationship("artist", query["artists[]"]));
 
-  const andConditions: MangaWhereInput[] = [];
-
-  if (query["authors[]"]) {
-    andConditions.push({
-      authors: { some: { id: { in: authors } } },
-    });
+  if (query.year) {
+    esQuery.bool.must.push({ terms: { "attributes.year": query.year } });
   }
-
-  if (query["artists[]"]) {
-    andConditions.push({
-      artists: { some: { id: { in: artists } } },
-    });
-  }
-
-  if (query["includedTags[]"]) {
-    andConditions.push({
-      tags: {
-        [query.includedTagsMode === "AND" ? "every" : "some"]: {
-          id: { in: query["includedTags[]"] },
-        },
-      },
-    });
-  }
-
-  if (query["excludedTags[]"]) {
-    andConditions.push({
-      NOT: {
-        tags: {
-          [query.excludedTagsMode === "AND" ? "every" : "some"]: {
-            id: { in: query["excludedTags[]"] },
+  if (query["includedTags[]"]?.length) {
+    esQuery.bool.must.push({
+      nested: {
+        path: "attributes.tags",
+        query: {
+          bool: {
+            [query.includedTagsMode === "AND" ? "must" : "should"]: query[
+              "includedTags[]"
+            ].map((id) => ({
+              term: { "attributes.tags.id": id },
+            })),
           },
         },
       },
     });
   }
 
-  if (andConditions.length > 0) filters.AND = andConditions;
-
-  const [manga, total] = await Promise.all([
-    prisma.manga.findMany({
-      take: query.limit,
-      skip: query.offset,
-      where: filters,
-      include: {
-        authors: query["includes[]"]?.includes("author"),
-        artists: query["includes[]"]?.includes("artist"),
-        primaryCover: query["includes[]"]?.includes("cover_art"),
-        relationsTo: query["includes[]"]?.includes("manga")
-          ? {
-              include: {
-                to: true,
-              },
-            }
-          : true,
-        chapters: {
-          select: {
-            id: true,
+  if (query["excludedTags[]"]?.length) {
+    esQuery.bool.must_not.push({
+      nested: {
+        path: "attributes.tags",
+        query: {
+          bool: {
+            [query.excludedTagsMode === "AND" ? "must" : "should"]: query[
+              "excludedTags[]"
+            ].map((id) => ({
+              term: { "attributes.tags.id": id },
+            })),
           },
-          orderBy: {
-            publishAt: "desc",
-          },
-          take: 1,
         },
       },
-    }),
+    });
+  }
 
-    prisma.manga.count({
-      where: filters,
-    }),
-  ]);
+  if (query.status) {
+    esQuery.bool.must.push({ terms: { "attributes.status": query.status } });
+  }
 
-  const languages = await prisma.uploadedChapter.groupBy({
-    by: ["mangaId", "translatedLanguage"],
-    _count: true,
-    where: {
-      mangaId: { in: manga.map((m) => m.id) },
-    },
+  if (query["originalLanguage[]"]) {
+    esQuery.bool.must.push({
+      terms: { "attributes.originalLanguage": query["originalLanguage[]"] },
+    });
+  }
+
+  if (query["excludedOriginalLanguage[]"])
+    esQuery.bool.must_not.push({
+      terms: {
+        "attributes.originalLanguage": query["excludedOriginalLanguage[]"],
+      },
+    });
+
+  if (query["publicationDemographic[]"]) {
+    esQuery.bool.must.push({
+      terms: {
+        "attributes.publicationDemographic": query["publicationDemographic[]"],
+      },
+    });
+  }
+
+  if (query["contentRating[]"]) {
+    esQuery.bool.must.push({
+      terms: { "attributes.contentRating": query["contentRating[]"] },
+    });
+  }
+  if (query.createdAtSince) {
+    esQuery.bool.must.push({
+      range: {
+        "attributes.createdAt": {
+          gte: new Date(query.createdAtSince).toISOString(),
+        },
+      },
+    });
+  }
+
+  if (query.updatedAtSince) {
+    esQuery.bool.must.push({
+      range: {
+        "attributes.updatedAt": {
+          gte: new Date(query.updatedAtSince).toISOString(),
+        },
+      },
+    });
+  }
+  const sort: any[] = [];
+  if (query["order[latestUploadedChapter]"]) {
+    // incorrect, we probably should store latest uploaded chapter timestamp
+    sort.push({
+      "attributes.latestUploadedChapter": {
+        order: query["order[latestUploadedChapter]"],
+      },
+    });
+  }
+  const { hits, total } = await esSearch("manga", {
+    query: esQuery,
+    from: query.offset,
+    size: query.limit,
+    sort,
   });
 
-  const langMap = new Map<string, string[]>();
-  for (const row of languages) {
-    const list = langMap.get(row.mangaId) ?? [];
-    list.push(row.translatedLanguage);
-    langMap.set(row.mangaId, list);
-  }
+  const expanded = await Promise.all(
+    hits.map((hit) => expandRelationships(hit, query["includes[]"])),
+  );
 
-  return {
+  const response = {
     result: "ok",
-    data: manga.map((m) =>
-      formatManga(m, m.chapters?.[0].id ?? null, langMap.get(m.id) ?? []),
-    ),
+    data: expanded,
     limit: query.limit,
     offset: query.offset,
     count: total,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

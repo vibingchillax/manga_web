@@ -108,13 +108,7 @@ export default defineEventHandler(async (event) => {
     include: {
       members: {
         select: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              roles: true,
-            },
-          },
+          userId: true,
           role: true,
         },
       },
@@ -128,8 +122,15 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const formatted = formatGroup(result);
+
+  await esIndex("scanlation_groups", formatted.id, formatted);
+
+  await deleteCache(`scanlation_group:${formatted.id}:*`);
+  await deleteCache(`scanlation_group:list:*`);
+
   return {
     result: "ok",
-    data: formatGroup(result),
+    data: formatted,
   };
 });

@@ -1,4 +1,3 @@
-import { paginationSchema } from "~~/shared/utils/zodHelper";
 import { z } from "zod";
 import { UserRole } from "~~/shared/prisma/enums";
 
@@ -17,29 +16,39 @@ export default defineEventHandler(async (event) => {
   const seePrivate =
     user?.id === params.id || user?.roles.includes(UserRole.admin);
 
-  const [lists, total] = await Promise.all([
-    prisma.customList.findMany({
-      take: query.limit,
-      skip: query.offset,
-      where: {
-        userId: params.id,
-        ...(seePrivate ? {} : { visibility: "public" }),
-      },
-    }),
+  const cacheKey = `custom_lists:user:${params.id}:${seePrivate ? "all" : "public"}:${JSON.stringify(query)}`;
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
 
-    prisma.customList.count({
-      where: {
-        userId: params.id,
-        ...(seePrivate ? {} : { visibility: "public" }),
-      },
-    }),
-  ]);
+  const filters: any[] = [nestedRelationship("user", [params.id])];
 
-  return {
+  if (!seePrivate) {
+    filters.push({
+      term: { "attributes.visibility": "public" },
+    });
+  }
+
+  const esQuery = {
+    bool: {
+      must: filters,
+    },
+  };
+
+  const { hits, total } = await esSearch("custom_lists", {
+    query: esQuery,
+    from: query.offset,
+    size: query.limit,
+  });
+
+  const response = {
     result: "ok",
-    data: lists.map(formatCustomList),
+    data: hits,
     limit: query.limit,
     offset: query.offset,
     count: total,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

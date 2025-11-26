@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { formatGroup } from "~~/server/utils/formatResponse";
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(
@@ -7,25 +6,11 @@ export default defineEventHandler(async (event) => {
     z.object({ id: zUuid }).parse,
   );
 
-  const group = await prisma.scanlationGroup.findUnique({
-    where: {
-      id: params.id,
-    },
-    include: {
-      members: {
-        select: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              roles: true,
-            },
-          },
-          role: true,
-        },
-      },
-    },
-  });
+  const cacheKey = `scanlation_group:${params.id}`;
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
+
+  const group = await esGetById("scanlation_groups", params.id);
 
   if (!group)
     throw createError({
@@ -33,8 +18,14 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Group not found",
     });
 
-  return {
+  const expanded = await expandRelationships(group, ["leader, member"]);
+
+  const response = {
     result: "ok",
-    data: formatGroup(group),
+    data: expanded,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

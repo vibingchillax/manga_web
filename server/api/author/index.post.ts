@@ -85,6 +85,10 @@ export default defineEventHandler(async (event) => {
     },
   });
 
+  const formatted = formatAuthor(author);
+
+  await esIndex("authors", formatted.id, formatted);
+
   return {
     result: "ok",
     data: formatAuthor(author),

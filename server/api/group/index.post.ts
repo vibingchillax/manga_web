@@ -54,8 +54,12 @@ export default defineEventHandler(async (event) => {
     },
   });
 
+  const formatted = formatGroup(group);
+
+  await esIndex("scanlation_groups", formatted.id, formatted);
+
   return {
     result: "ok",
-    data: formatGroup(group),
+    data: formatted,
   };
 });

@@ -29,6 +29,11 @@ export default defineEventHandler(async (event) => {
     },
   });
 
+  await esDelete("scanlation_groups", params.id);
+
+  await deleteCache(`scanlation_group:${params.id}:*`);
+  await deleteCache(`scanlation_group:list:*`);
+
   return {
     result: "ok",
   };

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { formatCoverArt } from "~~/server/utils/formatResponse";
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(
@@ -14,23 +13,11 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const cover = await prisma.coverArt.findUnique({
-    where: {
-      id: params.id,
-    },
-    include: {
-      manga: query["includes[]"]?.includes("manga"),
-      user: query["includes[]"]?.includes("user")
-        ? {
-            select: {
-              id: true,
-              username: true,
-              roles: true,
-            },
-          }
-        : undefined,
-    },
-  });
+  const key = `cover:${params.id}:${query["includes[]"]?.join(",")}`;
+  const cached = await getCache(key);
+  if (cached) return cached;
+
+  const cover = await esGetById("covers", params.id);
 
   if (!cover)
     throw createError({
@@ -38,8 +25,14 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Cover not found",
     });
 
-  return {
+  const expanded = await expandRelationships(cover, query["includes[]"]);
+
+  const response = {
     result: "ok",
-    data: formatCoverArt(cover),
+    data: expanded,
   };
+
+  await setCache(key, response);
+
+  return response;
 });

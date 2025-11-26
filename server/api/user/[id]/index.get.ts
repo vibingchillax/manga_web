@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { formatUser } from "~~/server/utils/formatResponse";
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(
@@ -9,21 +8,11 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: params.id,
-    },
-    select: {
-      id: true,
-      username: true,
-      roles: true,
-      groupMemberships: {
-        select: {
-          groupId: true,
-        },
-      },
-    },
-  });
+  const cacheKey = `user:${params.id}}`;
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
+
+  const user = await esGetById("users", params.id);
 
   if (!user)
     throw createError({
@@ -31,8 +20,12 @@ export default defineEventHandler(async (event) => {
       statusMessage: "User not found",
     });
 
-  return {
+  const response = {
     result: "ok",
-    data: formatUser(user),
+    data: user,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

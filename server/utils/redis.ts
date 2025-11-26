@@ -20,8 +20,8 @@ export async function setCache(key: string, value: any) {
 }
 
 export async function deleteCache(pattern: string) {
-  const keys = await redis.keys(pattern)
-  if (keys.length) await redis.del(...keys)
+  const keys = await redis.keys(pattern);
+  if (keys.length) await redis.del(...keys);
 }
 
 redis.on("connect", () => {

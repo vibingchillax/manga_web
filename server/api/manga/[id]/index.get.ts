@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { formatManga } from "~~/server/utils/formatResponse";
 
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(
@@ -16,65 +15,47 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const result = await prisma.manga.findUnique({
-    where: {
-      id: params.id,
-    },
-    include: {
-      authors: query["includes[]"]?.includes("author"),
-      artists: query["includes[]"]?.includes("artist"),
-      primaryCover: query["includes[]"]?.includes("cover_art"),
-      relationsTo: query["includes[]"]?.includes("manga")
-        ? {
-            include: {
-              to: true,
-            },
-          }
-        : true,
-      chapters: {
-        select: {
-          id: true,
-        },
-        orderBy: {
-          publishAt: "desc",
-        },
-        take: 1,
-      },
-    },
-  });
+  const user = await getAuthenticatedUser(event);
 
-  if (!result) {
+  const cacheKey = `manga:${params.id}:${JSON.stringify(query)}`;
+  const cached = await getCache(cacheKey);
+
+  if (cached) {
+    await incrementView(
+      "manga",
+      params.id,
+      user?.id,
+      event.context.clientIp,
+      event.context.userAgent,
+    );
+    return cached;
+  }
+
+  const manga = await esSearch("manga", params.id);
+
+  if (!manga) {
     throw createError({
       statusCode: 404,
       statusMessage: "Manga not found",
     });
   }
 
-  const user = await getAuthenticatedUser(event);
   await incrementView(
     "manga",
-    result.id,
+    params.id,
     user?.id,
     event.context.clientIp,
     event.context.userAgent,
   );
 
-  const languagesRows = await prisma.uploadedChapter.groupBy({
-    by: ["translatedLanguage"],
-    where: { mangaId: params.id },
-    _count: true,
-  });
+  const expanded = await expandRelationships(manga, query["includes[]"]);
 
-  const availableTranslatedLanguages = languagesRows.map(
-    (row) => row.translatedLanguage,
-  );
-
-  return {
+  const response = {
     result: "ok",
-    data: formatManga(
-      result,
-      result.chapters?.[0].id ?? null,
-      availableTranslatedLanguages,
-    ),
+    data: expanded,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

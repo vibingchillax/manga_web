@@ -63,10 +63,31 @@ export default defineEventHandler(async (event) => {
         connect: { id: body.primaryCover },
       },
     },
+    include: {
+      authors: {
+        select: {
+          id: true,
+        },
+      },
+      artists: {
+        select: {
+          id: true,
+        },
+      },
+      primaryCover: {
+        select: {
+          id: true,
+        },
+      },
+      relationsTo: true,
+    },
   });
+
+  const formatted = formatManga(created);
+  await esIndex("manga", formatted.id, formatted);
 
   return {
     result: "ok",
-    data: formatManga(created),
+    data: formatted,
   };
 });

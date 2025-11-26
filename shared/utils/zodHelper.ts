@@ -86,7 +86,7 @@ export const zArrayable = <T extends z.ZodTypeAny>(schema: T) =>
   z.union([schema, z.array(schema)]).transform((val) => {
     if (!val) return undefined;
     return Array.isArray(val) ? val : [val];
-  });
+  }) as z.ZodEffects<z.ZodUnion<[T, z.ZodArray<T>]>, z.infer<T>[] | undefined>;
 
 export const zUniqueUuidArray = z
   .array(zUuid, { message: "Each must be a valid UUID" })

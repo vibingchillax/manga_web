@@ -55,11 +55,25 @@ export default defineEventHandler(async (event) => {
           increment: 1,
         },
       },
+      include: {
+        groups: {
+          select: {
+            groupId: true,
+          },
+        },
+      },
     });
+
+    const formatted = formatUploadedChapter(chapter);
+
+    await esIndex("chapters", formatted.id, formatted);
+
+    await deleteCache(`chapter:${formatted.id}:*`);
+    await deleteCache(`chapter:list:*`);
 
     return {
       result: "ok",
-      data: formatUploadedChapter(chapter),
+      data: formatted,
     };
   } catch (err) {
     if (err instanceof PrismaClientKnownRequestError && err.code === "P2025") {

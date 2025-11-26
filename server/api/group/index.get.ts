@@ -1,55 +1,49 @@
-import { formatGroup } from "~~/server/utils/formatResponse";
-
 export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(
     event,
     baseQuerySchema.extend({
       name: zName.optional(),
-      focusedLanguage: zLang.optional(), //why mangadex only allows to search 1 i have no idea
+      focusedLanguage: zLang.optional(),
     }).parse,
   );
 
-  const ids = query["ids[]"] as string[] | undefined;
+  const cacheKey = `scanlation_groups:list:${JSON.stringify(query)}`;
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
 
-  const filters = {
-    id: ids ? { in: ids } : undefined,
-    name: query.name ? { contains: query.name } : undefined,
-    focusedLanguages: query.focusedLanguage
-      ? { has: query.focusedLanguage }
-      : undefined,
-  };
+  const esQuery: any = { bool: { must: [] } };
 
-  const [groups, total] = await Promise.all([
-    prisma.scanlationGroup.findMany({
-      take: query.limit,
-      skip: query.offset,
-      where: filters,
-      include: {
-        members: {
-          select: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                roles: true,
-              },
-            },
-            role: true,
-          },
-        },
-      },
-    }),
+  if (query["ids[]"]?.length) {
+    esQuery.bool.must.push({ terms: { id: query["ids[]"] } });
+  }
 
-    prisma.scanlationGroup.count({
-      where: filters,
-    }),
-  ]);
+  if (query.name) {
+    esQuery.bool.must.push({
+      match_phrase_prefix: { "attributes.name": query.name },
+    });
+  }
 
-  return {
+  if (query.focusedLanguage) {
+    esQuery.bool.must.push({
+      terms: { "attributes.focusedLanguages": query.focusedLanguage },
+    });
+  }
+
+  const { hits, total } = await esSearch("scanlation_groups", {
+    query: esQuery,
+    size: query.limit,
+    from: query.offset,
+  });
+
+  const response = {
     result: "ok",
-    data: groups.map(formatGroup),
+    data: hits,
     limit: query.limit,
     offset: query.offset,
     count: total,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

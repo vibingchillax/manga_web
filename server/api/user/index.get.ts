@@ -1,5 +1,3 @@
-import { formatUser } from "~~/server/utils/formatResponse";
-
 const querySchema = baseQuerySchema.extend({
   username: zName.optional(),
   "order[username]": zOrderDirection.optional(),
@@ -16,35 +14,47 @@ export default defineEventHandler(async (event) => {
 
   const query = await getValidatedQuery(event, querySchema.parse);
 
-  const ids = query["ids[]"] as string[] | undefined;
+  const cacheKey = `user:list:${JSON.stringify(query)}`;
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
 
-  const filters = {
-    id: ids ? { in: ids } : undefined,
-    username: query.username ? { contains: query.username } : undefined,
+  const esQuery: any = {
+    bool: {
+      must: [] as any[],
+    },
   };
 
-  const [users, total] = await Promise.all([
-    prisma.user.findMany({
-      take: query.limit,
-      skip: query.offset,
-      where: filters,
-      orderBy: query["order[username]"]
-        ? { username: query["order[username]"] }
-        : undefined,
-      select: {
-        id: true,
-        username: true,
-        roles: true,
-      },
-    }),
-    prisma.user.count({ where: filters }),
-  ]);
+  if (query["ids[]"]?.length) {
+    esQuery.bool.must.push({ terms: { id: query["ids[]"] } });
+  }
 
-  return {
+  if (query.username) {
+    esQuery.bool.must.push({
+      match_phrase_prefix: { "attributes.username": query.username },
+    });
+  }
+
+  const sort: any = [];
+  if (query["order[username]"]) {
+    sort.push({ "attributes.username": { order: query["order[username]"] } });
+  }
+
+  const { hits, total } = await esSearch("users", {
+    query: esQuery,
+    from: query.offset,
+    size: query.limit,
+    sort,
+  });
+
+  const response = {
     result: "ok",
-    data: users.map(formatUser),
+    data: hits,
     limit: query.limit,
     offset: query.offset,
     count: total,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

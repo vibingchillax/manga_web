@@ -29,6 +29,11 @@ export default defineEventHandler(async (event) => {
         id: params.id,
       },
     });
+
+    await esDelete("manga", params.id);
+
+    await deleteCache(`manga:${params.id}:*`);
+    await deleteCache(`manga:list:*`);
   } catch {}
 
   return {

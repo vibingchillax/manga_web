@@ -13,11 +13,13 @@ import type {
 import type { MangaRelType, UserRole } from "~~/shared/prisma/enums";
 import { GroupRole } from "~~/shared/prisma/enums";
 
-export type SafeUser = {
+export type UserFromPrisma = {
   id: string;
   username: string;
   roles: UserRole[];
-  groupRole?: GroupRole;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
   groupMemberships?: {
     groupId: string;
   }[];
@@ -44,14 +46,14 @@ const RELATION_TYPE_MAP = {
 
 export function formatAuthor(
   author: Author & {
-    mangaAuthored?: Manga[];
-    mangaDrawn?: Manga[];
+    mangaAuthored?: { id: string }[];
+    mangaDrawn?: { id: string }[];
   },
   type: "author" | "artist" = "author",
 ) {
   const { id, mangaAuthored, mangaDrawn, ...rest } = author;
 
-  const mangaMap = new Map<string, Manga>();
+  const mangaMap = new Map<string, { id: string }>();
   mangaAuthored?.forEach((m) => mangaMap.set(m.id, m));
   mangaDrawn?.forEach((m) => mangaMap.set(m.id, mangaMap.get(m.id) || m));
 
@@ -59,17 +61,15 @@ export function formatAuthor(
     id,
     type,
     attributes: rest,
-    relationships: Array.from(mangaMap.values()).map((m) => formatManga),
+    relationships: Array.from(mangaMap.values()).map((m) => ({
+      id: m.id,
+      type: "manga" as const,
+    })),
   };
 }
 
-export function formatCoverArt(
-  cover: CoverArt & {
-    manga?: Manga;
-    user?: SafeUser | null;
-  },
-) {
-  const { id, manga, mangaId, uploader, user, ...rest } = cover;
+export function formatCoverArt(cover: CoverArt) {
+  const { id, mangaId, uploader, ...rest } = cover;
   return {
     id: id,
     type: "cover_art" as const,
@@ -114,12 +114,10 @@ export function formatCustomList(
 
 export function formatManga(
   manga: Manga & {
-    authors?: Author[];
-    artists?: Author[];
-    primaryCover?: CoverArt | null;
-    relationsTo?: (MangaRelation & {
-      to?: Manga;
-    })[];
+    authors?: { id: string }[];
+    artists?: { id: string }[];
+    primaryCover?: { id: string } | null;
+    relationsTo?: MangaRelation[];
   },
   latestUploadedChapter: string | null = null,
   availableTranslatedLanguages: string[] = [],
@@ -142,18 +140,27 @@ export function formatManga(
       latestUploadedChapter,
     },
     relationships: [
-      ...(authors?.map((a) => formatAuthor(a, "author")) ?? []),
-      ...(artists?.map((a) => formatAuthor(a, "artist")) ?? []),
-      ...(primaryCover ? [formatCoverArt(primaryCover)] : []),
-      ...(relationsTo?.map((a) =>
-        a.to
-          ? formatMangaRelation(a.to, a.type)
-          : {
-              id: a.toId,
-              type: "manga" as const,
-              related: RELATION_TYPE_MAP[a.type],
+      ...(authors?.map((a) => ({
+        id: a.id,
+        type: "author" as const,
+      })) ?? []),
+      ...(artists?.map((a) => ({
+        id: a.id,
+        type: "artist" as const,
+      })) ?? []),
+      ...(primaryCover
+        ? [
+            {
+              id: primaryCover.id,
+              type: "cover_art",
             },
-      ) ?? []),
+          ]
+        : []),
+      ...(relationsTo?.map((a) => ({
+        id: a.toId,
+        type: "manga" as const,
+        related: RELATION_TYPE_MAP[a.type],
+      })) ?? []),
     ],
   };
 }
@@ -262,30 +269,32 @@ export function formatScrapedChapter(
 
 export function formatUploadedChapter(
   chapter: UploadedChapter & {
-    manga?: Manga;
-    user?: SafeUser;
-    groups?: ScanlationGroup[];
+    groups?: { groupId: string }[];
   },
 ) {
-  const { id, user, groups, manga, mangaId, ...rest } = chapter;
+  const { id, groups, uploader, mangaId, ...rest } = chapter;
   return {
     id: id,
     type: "chapter" as const,
     attributes: rest,
     relationships: [
-      ...(manga
-        ? [formatManga(manga)]
-        : [
+      {
+        id: mangaId,
+        type: "manga" as const,
+      },
+      ...(uploader
+        ? [
             {
-              id: mangaId,
-              type: "manga" as const,
+              id: uploader,
+              type: "user" as const,
             },
-          ]),
-      ...(user ? [formatUser(user)] : []),
+          ]
+        : []),
       ...(groups
-        ? groups.map((g) => {
-            return formatGroup(g);
-          })
+        ? groups.map((g) => ({
+            id: g.groupId,
+            type: "scanlation_group" as const,
+          }))
         : []),
     ],
   };
@@ -293,7 +302,7 @@ export function formatUploadedChapter(
 
 export function formatGroup(
   group: ScanlationGroup & {
-    members?: { user: SafeUser; role: GroupRole }[];
+    members?: { userId: string; role: GroupRole }[];
   },
 ) {
   const { id, members, ...rest } = group;
@@ -303,28 +312,22 @@ export function formatGroup(
     attributes: rest,
     relationships: [
       ...(members?.map((m) => ({
-        id: m.user.id,
+        id: m.userId,
         type:
           m.role === GroupRole.leader
             ? ("leader" as const)
             : ("member" as const),
-        attributes: {
-          username: m.user.username,
-          roles: m.user.roles,
-        },
       })) || []),
     ],
   };
 }
 
-export function formatUser(user: SafeUser) {
+export function formatUser(user: UserFromPrisma) {
+  const { id, groupMemberships, ...rest } = user;
   return {
-    id: user.id,
+    id: id,
     type: "user" as const,
-    attributes: {
-      username: user.username,
-      roles: user.roles,
-    },
+    attributes: rest,
     relationships: [
       ...(user.groupMemberships?.map((g) => ({
         id: g.groupId,
@@ -336,7 +339,7 @@ export function formatUser(user: SafeUser) {
 
 export function formatComment(
   comment: Comment & {
-    user?: SafeUser;
+    user?: UserFromPrisma;
     votes?: { vote: number }[];
     _count?: { replies: number };
   },
@@ -365,6 +368,9 @@ export function formatComment(
               attributes: {
                 username: comment.user.username,
                 roles: comment.user.roles,
+                version: comment.user.version,
+                createdAt: comment.user.createdAt,
+                updatedAt: comment.user.updatedAt,
               },
             },
           ]

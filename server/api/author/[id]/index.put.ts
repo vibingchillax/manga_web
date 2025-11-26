@@ -36,11 +36,30 @@ export default defineEventHandler(async (event) => {
           increment: 1,
         },
       },
+      include: {
+        mangaAuthored: {
+          select: {
+            id: true,
+          },
+        },
+        mangaDrawn: {
+          select: {
+            id: true,
+          },
+        },
+      },
     });
+
+    const formatted = formatAuthor(author);
+
+    await esIndex("authors", formatted.id, formatted);
+
+    await deleteCache(`author:${author.id}:*`);
+    await deleteCache(`author:list:*`);
 
     return {
       result: "ok",
-      data: formatAuthor(author),
+      data: formatted,
     };
   } catch (err) {
     if (err instanceof PrismaClientKnownRequestError && err.code === "P2025") {

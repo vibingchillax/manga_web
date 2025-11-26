@@ -11,27 +11,31 @@ export default defineEventHandler(async (event) => {
 
   const query = await getValidatedQuery(event, paginationSchema.parse);
 
-  const [lists, total] = await Promise.all([
-    prisma.customList.findMany({
-      take: query.limit,
-      skip: query.offset,
-      where: {
-        userId: user.id,
-      },
-    }),
+  const cacheKey = `custom_list:user:${user.id}:${JSON.stringify(query)}`;
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
 
-    prisma.customList.count({
-      where: {
-        userId: user.id,
-      },
-    }),
-  ]);
+  const esQuery = {
+    bool: {
+      must: [nestedRelationship("user", [user.id])],
+    },
+  };
 
-  return {
+  const { hits, total } = await esSearch("custom_lists", {
+    query: esQuery,
+    from: query.offset,
+    size: query.limit,
+  });
+
+  const response = {
     result: "ok",
-    data: lists.map(formatCustomList),
+    data: hits,
     limit: query.limit,
     offset: query.offset,
     count: total,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

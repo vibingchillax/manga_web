@@ -11,38 +11,51 @@ export default defineEventHandler(async (event) => {
   );
 
   const user = await getAuthenticatedUser(event);
+  const cacheKey = `custom_list:${params.id}`;
+  const cached: any = await getCache(cacheKey);
 
-  const list = await prisma.customList.findUnique({
-    where: {
-      id: params.id,
-    },
-    include: {
-      manga: {
-        select: {
-          id: true,
-        },
-      },
-    },
-  });
+  if (cached) {
+    const isOwner =
+      user?.id ===
+      cached.data.relationships?.find((r: any) => r.type === "user")?.id;
+    const isAdmin = user?.roles?.includes(UserRole.admin);
 
-  if (!list)
-    throw createError({
-      statusCode: 404,
-      statusMessage: "List not found",
-    });
+    if (
+      cached.data.attributes.visibility === "private" &&
+      !(isOwner || isAdmin)
+    ) {
+      throw createError({ statusCode: 404, statusMessage: "List not found" });
+    }
 
-  if (
-    list.visibility === "private" &&
-    !(user?.id === list.userId || user?.roles.includes(UserRole.admin))
-  ) {
+    return cached;
+  }
+
+  const list: any = await esSearch("custom_lists", params.id);
+
+  if (!list) {
     throw createError({
       statusCode: 404,
       statusMessage: "List not found",
     });
   }
 
-  return {
+  const isOwner =
+    user?.id === list.relationships?.find((r: any) => r.type === "user")?.id;
+  const isAdmin = user?.roles.includes(UserRole.admin);
+
+  if (list.visibility === "private" && !(isOwner || isAdmin)) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "List not found",
+    });
+  }
+
+  const response = {
     result: "ok",
-    data: formatCustomList(list),
+    data: list,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

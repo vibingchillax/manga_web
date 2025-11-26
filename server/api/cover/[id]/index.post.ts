@@ -100,8 +100,12 @@ export default defineEventHandler(async (event) => {
     },
   });
 
+  const formatted = formatCoverArt(created);
+
+  await esIndex("covers", formatted.id, formatted);
+
   return {
     result: "ok",
-    data: formatCoverArt(created),
+    data: formatted,
   };
 });

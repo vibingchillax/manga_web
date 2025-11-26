@@ -1,6 +1,3 @@
-import { formatAuthor } from "~~/server/utils/formatResponse";
-import type { SortOrder } from "~~/shared/prisma/internal/prismaNamespace";
-
 export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(
     event,
@@ -10,39 +7,51 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const ids = query["ids[]"] as string[] | undefined;
+  const cacheKey = `author:list:${JSON.stringify(query)}`;
+  const cached = await getCache(cacheKey);
+  if (cached) return cached;
 
-  const filters = {
-    id: ids ? { in: ids } : undefined,
-    name: query.name ? { contains: query.name } : undefined,
+  const esQuery: any = {
+    bool: {
+      must: [] as any[],
+    },
   };
 
-  const orderBy = query["order[name]"]
-    ? { name: query["order[name]"] as SortOrder }
-    : undefined;
+  if (query["ids[]"]?.length) {
+    esQuery.bool.must.push({ terms: { id: query["ids[]"] } });
+  }
 
-  const [authors, total] = await Promise.all([
-    prisma.author.findMany({
-      take: query.limit,
-      skip: query.offset,
-      where: filters,
-      orderBy: orderBy,
-      include: {
-        mangaAuthored: query["includes[]"]?.includes("manga"),
-        mangaDrawn: query["includes[]"]?.includes("manga"),
-      },
-    }),
+  if (query.name) {
+    esQuery.bool.must.push({
+      match_phrase_prefix: { "attributes.name": query.name },
+    });
+  }
 
-    prisma.author.count({
-      where: filters,
-    }),
-  ]);
+  const sort: any = [];
+  if (query["order[name]"]) {
+    sort.push({ "attributes.name": { order: query["order[name]"] } });
+  }
 
-  return {
+  const { hits, total } = await esSearch("authors", {
+    query: esQuery,
+    from: query.offset,
+    size: query.limit,
+    sort,
+  });
+
+  const expanded = await Promise.all(
+    hits.map((hit) => expandRelationships(hit, query["includes[]"])),
+  );
+
+  const response = {
     result: "ok",
-    data: authors.map((a) => formatAuthor(a)),
+    data: expanded,
     limit: query.limit,
     offset: query.offset,
     count: total,
   };
+
+  await setCache(cacheKey, response);
+
+  return response;
 });

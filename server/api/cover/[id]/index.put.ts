@@ -46,9 +46,16 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    const formatted = formatCoverArt(updated);
+
+    await esIndex("covers", formatted.id, formatted);
+
+    await deleteCache(`cover:${formatted.id}:*`);
+    await deleteCache(`cover:list:*`);
+
     return {
       result: "ok",
-      data: formatCoverArt(updated),
+      data: formatted,
     };
   } catch (err) {
     if (err instanceof PrismaClientKnownRequestError && err.code === "P2025") {

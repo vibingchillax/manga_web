@@ -72,6 +72,12 @@ export default defineEventHandler(async (event) => {
     },
   });
 
+  const formatted = formatCustomList(updated);
+
+  await esIndex("custom_lists", formatted.id, formatted);
+  await deleteCache(`custom_list:${formatted.id}`);
+  await deleteCache(`custom_list:user:${updated.userId}`);
+
   return {
     result: "ok",
     data: formatCustomList(updated),

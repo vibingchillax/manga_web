@@ -39,8 +39,12 @@ export default defineEventHandler(async (event) => {
     },
   });
 
+  const formatted = formatCustomList(created);
+
+  await esIndex("custom_lists", formatted.id, formatted);
+
   return {
     result: "ok",
-    data: formatCustomList(created),
+    data: formatted,
   };
 });
