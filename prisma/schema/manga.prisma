@@ -1,32 +1,32 @@
 model Manga {
-  id                            String                 @id @db.Uuid
+  id                            String                  @id @db.Uuid
   title                         Json
   altTitles                     Json?
   description                   Json?
-  isLocked                      Boolean                @default(false)
-  authors                       Author[]               @relation("MangaAuthors")
-  artists                       Author[]               @relation("MangaArtists")
+  isLocked                      Boolean                 @default(false)
+  authors                       Author[]                @relation("MangaAuthors")
+  artists                       Author[]                @relation("MangaArtists")
   links                         Json?
   originalLanguage              String
   lastVolume                    String?
   lastChapter                   String?
-  publicationDemographic        PublicationDemographic
-  status                        MangaStatus            @default(ongoing)
+  publicationDemographic        PublicationDemographic?
+  status                        MangaStatus             @default(ongoing)
   year                          Int?
   contentRating                 ContentRating
-  chapterNumberResetOnNewVolume Boolean                @default(true)
-  tags                          Tag[]                  @relation("MangaTags")
-  state                         MangaState             @default(draft)
+  chapterNumberResetOnNewVolume Boolean                 @default(true)
+  tags                          Tag[]                   @relation("MangaTags")
+  state                         MangaState              @default(draft)
   covers                        CoverArt[]
-  primaryCoverId                String?                @unique @db.Uuid
-  primaryCover                  CoverArt?              @relation("PrimaryCover", fields: [primaryCoverId], references: [id])
-  version                       Int                    @default(1)
-  viewCount                     Int                    @default(0)
-  createdAt                     DateTime               @default(now()) @db.Timestamp(6)
-  updatedAt                     DateTime               @default(now()) @updatedAt @db.Timestamp(6)
+  primaryCoverId                String?                 @unique @db.Uuid
+  primaryCover                  CoverArt?               @relation("PrimaryCover", fields: [primaryCoverId], references: [id])
+  version                       Int                     @default(1)
+  viewCount                     Int                     @default(0)
+  createdAt                     DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt                     DateTime                @default(now()) @updatedAt @db.Timestamp(6)
   chapters                      UploadedChapter[]
-  relationsFrom                 MangaRelation[]        @relation("MangaRelationsFrom")
-  relationsTo                   MangaRelation[]        @relation("MangaRelationsTo")
+  relationsFrom                 MangaRelation[]         @relation("MangaRelationsFrom")
+  relationsTo                   MangaRelation[]         @relation("MangaRelationsTo")
   lists                         CustomList[]
   ratings                       MangaRating[]
 

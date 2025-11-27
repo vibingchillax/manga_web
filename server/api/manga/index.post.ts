@@ -13,7 +13,7 @@ export const MangaSchema = z.object({
   originalLanguage: zLang,
   lastVolume: zVolume.optional(),
   lastChapter: zChapter.optional(),
-  publicationDemographic: zPublicationDemographic,
+  publicationDemographic: zPublicationDemographic.optional(),
   status: zMangaStatus,
   year: z.number().int().min(0).optional(),
   contentRating: zContentRating,
