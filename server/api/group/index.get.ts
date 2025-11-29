@@ -35,9 +35,13 @@ export default defineEventHandler(async (event) => {
     from: query.offset,
   });
 
+  const expanded = await Promise.all(
+    hits.map((hit) => expandRelationships(hit, query["includes[]"])),
+  );
+
   const response = {
     result: "ok",
-    data: hits,
+    data: expanded,
     limit: query.limit,
     offset: query.offset,
     count: total,

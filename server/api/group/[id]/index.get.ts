@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Group not found",
     });
 
-  const expanded = await expandRelationships(group, ["leader, member"]);
+  const expanded = await expandRelationships(group, ["leader", "member"]);
 
   const response = {
     result: "ok",

@@ -20,7 +20,11 @@ export default defineEventHandler(async (event) => {
       "publicationDemographic[]": zArrayable(
         zPublicationDemographic,
       ).optional(),
-      "contentRating[]": zArrayable(zContentRating).optional(),
+      "contentRating[]": zArrayable(zContentRating).default([
+        "safe",
+        "suggestive",
+        "erotica",
+      ]),
       createdAtSince: zDateString.optional(),
       updatedAtSince: zDateString.optional(),
       "order[latestUploadedChapter]": zOrderDirection.optional(),

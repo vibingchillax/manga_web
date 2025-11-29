@@ -11,7 +11,11 @@ export default defineEventHandler(async (event) => {
       "translatedLanguage[]": zArrayable(zLang).optional(),
       "originalLanguage[]": zArrayable(zLang).optional(),
       "excludedOriginalLanguage[]": zArrayable(zLang).optional(),
-      "contentRating[]": zArrayable(zContentRating).optional(),
+      "contentRating[]": zArrayable(zContentRating).default([
+        "safe",
+        "suggestive",
+        "erotica",
+      ]),
       "excludedGroups[]": zArrayable(zUuid).optional(),
       "excludedUploaders[]": zArrayable(zUuid).optional(),
       createdAtSince: zDateString.optional(),

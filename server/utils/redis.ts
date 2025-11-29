@@ -6,6 +6,7 @@ export const redis = new Redis({
 });
 
 export async function getCache<T>(key: string): Promise<T | null> {
+  if (process.env.NODE_ENV !== "production") return null;
   const cached = await redis.get(key);
   if (!cached) return null;
   try {
@@ -16,6 +17,7 @@ export async function getCache<T>(key: string): Promise<T | null> {
 }
 
 export async function setCache(key: string, value: any) {
+  if (process.env.NODE_ENV !== "production") return;
   await redis.set(key, JSON.stringify(value));
 }
 

@@ -39,11 +39,12 @@ export async function esSearch(index: string, query: any) {
     size: query.size ?? 10,
     from: query.from ?? 0,
     query: query.query,
+    track_total_hits: true,
   });
 
   return {
     hits: result.hits.hits.map((h) => h._source),
-    total: result.hits.total ?? 0,
+    total: result.hits.total?.value ?? 0,
   };
 }
 
@@ -98,8 +99,15 @@ export async function expandRelationships(
     }
 
     const obj: any = await esGetById(index, rel.id);
-    obj.type = rel.type;
-    expanded.push(obj ?? rel);
+    if (obj) {
+      expanded.push({
+        id: obj.id,
+        type: rel.type,
+        attributes: obj.attributes ?? {},
+      });
+    } else {
+      expanded.push(rel);
+    }
   }
 
   out.relationships = expanded;

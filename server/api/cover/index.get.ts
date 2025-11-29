@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     if (dir) sort.push({ [f]: { order: dir } });
   });
 
-  const { hits, total } = await esSearch("cover_art", {
+  const { hits, total } = await esSearch("covers", {
     query: esQuery,
     from: query.offset,
     size: query.limit,
