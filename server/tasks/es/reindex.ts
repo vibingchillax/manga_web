@@ -8,23 +8,43 @@ export async function bulkIndex(index: string, docs: any[]) {
     doc,
   ]);
 
-  await esClient.bulk({
-    refresh: true,
+  const res = await esClient.bulk({
+    refresh: false,
     operations,
   });
+
+  if (res.errors) {
+    for (const item of res.items) {
+      const error = item.index?.error;
+      if (error) {
+        console.error(
+          `Bulk index error in index=${index}, id=${item.index?._id}:`,
+          JSON.stringify(error, null, 2)
+        );
+      }
+    }
+    throw new Error("Bulk index failed — see logs above");
+  }
 }
 
+
 async function indexAuthors() {
-  for (let skip = 0; ; skip += batchSize) {
+  let cursorId: string | undefined;
+
+  while (true) {
     const authors = await prisma.author.findMany({
-      skip,
       take: batchSize,
+      skip: cursorId ? 1 : 0,
+      cursor: cursorId ? { id: cursorId } : undefined,
+      orderBy: { id: "asc" },
       include: {
         mangaAuthored: { select: { id: true } },
         mangaDrawn: { select: { id: true } },
       },
     });
+
     if (authors.length === 0) break;
+    cursorId = authors[authors.length - 1].id;
 
     const docs = authors.map((a) => formatAuthor(a));
     await bulkIndex("authors", docs);
@@ -33,10 +53,14 @@ async function indexAuthors() {
 }
 
 async function indexChapters() {
-  for (let skip = 0; ; skip += batchSize) {
+  let cursorId: string | undefined;
+
+  while (true) {
     const chapters = await prisma.uploadedChapter.findMany({
-      skip,
       take: batchSize,
+      skip: cursorId ? 1 : 0,
+      cursor: cursorId ? { id: cursorId } : undefined,
+      orderBy: { id: "asc" },
       include: {
         groups: {
           select: {
@@ -45,7 +69,9 @@ async function indexChapters() {
         },
       },
     });
+
     if (chapters.length === 0) break;
+    cursorId = chapters[chapters.length - 1].id;
 
     const docs = chapters.map((c) => formatUploadedChapter(c));
     await bulkIndex("chapters", docs);
@@ -54,12 +80,18 @@ async function indexChapters() {
 }
 
 async function indexCovers() {
-  for (let skip = 0; ; skip += batchSize) {
+  let cursorId: string | undefined;
+
+  while (true) {
     const covers = await prisma.coverArt.findMany({
-      skip,
       take: batchSize,
+      skip: cursorId ? 1 : 0,
+      cursor: cursorId ? { id: cursorId } : undefined,
+      orderBy: { id: "asc" },
     });
+
     if (covers.length === 0) break;
+    cursorId = covers[covers.length - 1].id;
 
     const docs = covers.map((c) => formatCoverArt(c));
     await bulkIndex("covers", docs);
@@ -68,17 +100,23 @@ async function indexCovers() {
 }
 
 async function indexCustomList() {
-  for (let skip = 0; ; skip += batchSize) {
+  let cursorId: string | undefined;
+
+  while (true) {
     const lists = await prisma.customList.findMany({
-      skip,
       take: batchSize,
+      skip: cursorId ? 1 : 0,
+      cursor: cursorId ? { id: cursorId } : undefined,
+      orderBy: { id: "asc" },
       include: {
         manga: {
           select: { id: true },
         },
       },
     });
+
     if (lists.length === 0) break;
+    cursorId = lists[lists.length - 1].id;
 
     const docs = lists.map((c) => formatCustomList(c));
     await bulkIndex("custom_lists", docs);
@@ -87,10 +125,14 @@ async function indexCustomList() {
 }
 
 async function indexManga() {
-  for (let skip = 0; ; skip += batchSize) {
+  let cursorId: string | undefined;
+
+  while (true) {
     const mangaList = await prisma.manga.findMany({
-      skip,
       take: batchSize,
+      skip: cursorId ? 1 : 0,
+      cursor: cursorId ? { id: cursorId } : undefined,
+      orderBy: { id: "asc" },
       include: {
         authors: { select: { id: true } },
         artists: { select: { id: true } },
@@ -98,10 +140,15 @@ async function indexManga() {
         relationsTo: true,
         chapters: {
           select: { translatedLanguage: true, publishAt: true, id: true },
+          orderBy: { publishAt: "desc" },
+          take: 1,
         },
+        tags: true, // This will now work without timing out
       },
     });
+
     if (mangaList.length === 0) break;
+    cursorId = mangaList[mangaList.length - 1].id;
 
     const docs = mangaList.map((m) => {
       const { chapters } = m;
@@ -121,15 +168,21 @@ async function indexManga() {
 }
 
 async function indexScanlationGroups() {
-  for (let skip = 0; ; skip += batchSize) {
+  let cursorId: string | undefined;
+
+  while (true) {
     const groups = await prisma.scanlationGroup.findMany({
-      skip,
       take: batchSize,
+      skip: cursorId ? 1 : 0,
+      cursor: cursorId ? { id: cursorId } : undefined,
+      orderBy: { id: "asc" },
       include: {
         members: { select: { userId: true, role: true } },
       },
     });
+
     if (groups.length === 0) break;
+    cursorId = groups[groups.length - 1].id;
 
     const docs = groups.map((g) => formatGroup(g));
     await bulkIndex("scanlation_groups", docs);
@@ -138,10 +191,14 @@ async function indexScanlationGroups() {
 }
 
 async function indexUsers() {
-  for (let skip = 0; ; skip += batchSize) {
+  let cursorId: string | undefined;
+
+  while (true) {
     const users = await prisma.user.findMany({
-      skip,
       take: batchSize,
+      skip: cursorId ? 1 : 0,
+      cursor: cursorId ? { id: cursorId } : undefined,
+      orderBy: { id: "asc" },
       select: {
         id: true,
         username: true,
@@ -152,7 +209,9 @@ async function indexUsers() {
         groupMemberships: true,
       },
     });
+
     if (users.length === 0) break;
+    cursorId = users[users.length - 1].id;
 
     const docs = users.map((u) => formatUser(u));
     await bulkIndex("users", docs);
@@ -173,6 +232,18 @@ export default defineTask({
     await indexManga();
     await indexScanlationGroups();
     await indexUsers();
+    const indexes = [
+      "authors",
+      "chapters",
+      "covers",
+      "custom_lists",
+      "manga",
+      "scanlation_groups",
+      "users",
+    ];
+    await Promise.all(
+      indexes.map((index) => esClient.indices.refresh({ index })),
+    );
     return {
       result: "ok",
     };

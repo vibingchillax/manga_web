@@ -1,12 +1,7 @@
 import { esClient } from "~~/server/utils/elastic";
 
 async function createAuthorIndex() {
-  const exists = await esClient.indices.exists({ index: "authors" });
-
-  if (exists) {
-    console.log("Author index already exists");
-    return;
-  }
+  await esClient.indices.delete({ index: "authors" }, { ignore: [404] });
 
   await esClient.indices.create({
     index: "authors",
@@ -58,12 +53,7 @@ async function createAuthorIndex() {
 }
 
 async function createChapterIndex() {
-  const exists = await esClient.indices.exists({ index: "chapters" });
-
-  if (exists) {
-    console.log("Chapter index already exists");
-    return;
-  }
+  await esClient.indices.delete({ index: "chapters" }, { ignore: [404] });
 
   await esClient.indices.create({
     index: "chapters",
@@ -119,12 +109,7 @@ async function createChapterIndex() {
 }
 
 async function createCoverArtIndex() {
-  const exists = await esClient.indices.exists({ index: "covers" });
-
-  if (exists) {
-    console.log("Cover index already exists");
-    return;
-  }
+  await esClient.indices.delete({ index: "covers" }, { ignore: [404] });
 
   await esClient.indices.create({
     index: "covers",
@@ -156,12 +141,7 @@ async function createCoverArtIndex() {
 }
 
 async function createCustomListIndex() {
-  const exists = await esClient.indices.exists({ index: "custom_lists" });
-
-  if (exists) {
-    console.log("Custom List index already exists");
-    return;
-  }
+  await esClient.indices.delete({ index: "custom_lists" }, { ignore: [404] });
 
   await esClient.indices.create({
     index: "custom_lists",
@@ -191,12 +171,7 @@ async function createCustomListIndex() {
 }
 
 async function createScanlationGroupIndex() {
-  const exists = await esClient.indices.exists({ index: "scanlation_groups" });
-
-  if (exists) {
-    console.log("Scanlation Group index already exists");
-    return;
-  }
+  await esClient.indices.delete({ index: "scanlation_groups" }, { ignore: [404] });
 
   await esClient.indices.create({
     index: "scanlation_groups",
@@ -244,12 +219,7 @@ async function createScanlationGroupIndex() {
 }
 
 async function createMangaIndex() {
-  const exists = await esClient.indices.exists({ index: "manga" });
-
-  if (exists) {
-    console.log("Manga index already exists");
-    return;
-  }
+  await esClient.indices.delete({ index: "manga" }, { ignore: [404] });
 
   await esClient.indices.create({
     index: "manga",
@@ -294,10 +264,16 @@ async function createMangaIndex() {
                 type: { type: "keyword", index: false },
                 attributes: {
                   properties: {
-                    name: { type: "text" },
-                    group: { type: "keyword" },
+                    name: { type: "object", enabled: false },
+                    description: { type: "object", enabled: false },
+                    group: { type: "keyword", index: false },
+                    version: { type: "integer", index: false },
                   },
                 },
+                relationships: {
+                  type: "nested",
+                  enabled: false
+                }
               },
             },
             version: { type: "integer" },
@@ -319,12 +295,7 @@ async function createMangaIndex() {
 }
 
 async function createUserIndex() {
-  const exists = await esClient.indices.exists({ index: "users" });
-
-  if (exists) {
-    console.log("User index already exists");
-    return;
-  }
+  await esClient.indices.delete({ index: "users" }, { ignore: [404] });
 
   await esClient.indices.create({
     index: "users",
@@ -359,7 +330,7 @@ async function createUserIndex() {
 export default defineTask({
   meta: {
     name: "es:setup",
-    description: "Setup Elasticsearch indices",
+    description: "Setup Elasticsearch indices (this will remove existing indices)",
   },
   async run() {
     await createAuthorIndex();

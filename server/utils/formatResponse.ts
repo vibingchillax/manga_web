@@ -8,6 +8,7 @@ import type {
   ScanlationGroup,
   ScrapedChapter,
   ScrapedManga,
+  Tag,
   UploadedChapter,
 } from "~~/shared/prisma/client";
 import type { MangaRelType, UserRole } from "~~/shared/prisma/enums";
@@ -118,6 +119,8 @@ export function formatManga(
     artists?: { id: string }[];
     primaryCover?: { id: string } | null;
     relationsTo?: MangaRelation[];
+    chapters?: any; // we don't care about this here
+    tags?: Tag[];
   },
   latestUploadedChapter: string | null = null,
   availableTranslatedLanguages: string[] = [],
@@ -129,13 +132,24 @@ export function formatManga(
     primaryCover,
     primaryCoverId,
     relationsTo,
+    chapters,
+    tags: rawTags,
     ...rest
   } = manga;
+  const tags = rawTags?.map((t) => {
+    const { id, ...tagRest } = t;
+    return {
+      id,
+      type: "tag" as const,
+      attributes: tagRest,
+    };
+  });
   return {
     id: id,
     type: "manga" as const,
     attributes: {
       ...rest,
+      tags,
       availableTranslatedLanguages,
       latestUploadedChapter,
     },
