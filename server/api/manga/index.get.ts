@@ -44,9 +44,33 @@ export default defineEventHandler(async (event) => {
   }
 
   if (query.title) {
-    esQuery.bool.must.push({
-      match_phrase_prefix: { "attributes.title": query.title },
-    });
+    const titleQuery = {
+      bool: {
+        should: [
+          {
+            multi_match: {
+              query: query.title,
+              type: "bool_prefix",
+              fields: ["attributes.title.*"],
+            },
+          },
+          {
+            nested: {
+              path: "attributes.altTitles",
+              query: {
+                multi_match: {
+                  query: query.title,
+                  type: "bool_prefix",
+                  fields: ["attributes.altTitles.*"],
+                },
+              },
+            },
+          },
+        ],
+      },
+    };
+
+    esQuery.bool.must.push(titleQuery);
   }
 
   if (query.authorOrArtist) {
@@ -156,6 +180,7 @@ export default defineEventHandler(async (event) => {
       },
     });
   }
+
   const { hits, total } = await esSearch("manga", {
     query: esQuery,
     from: query.offset,
@@ -172,7 +197,7 @@ export default defineEventHandler(async (event) => {
     data: expanded,
     limit: query.limit,
     offset: query.offset,
-    count: total,
+    total: total,
   };
 
   await setCache(cacheKey, response);

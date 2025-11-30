@@ -171,7 +171,7 @@ export function formatManga(
           ]
         : []),
       ...(relationsTo?.map((a) => ({
-        id: a.toId,
+        id: a.fromId,
         type: "manga" as const,
         related: RELATION_TYPE_MAP[a.type],
       })) ?? []),

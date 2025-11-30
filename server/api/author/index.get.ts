@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
   const sort: any = [];
   if (query["order[name]"]) {
-    sort.push({ "attributes.name": { order: query["order[name]"] } });
+    sort.push({ "attributes.name.keyword": { order: query["order[name]"] } });
   }
 
   const { hits, total } = await esSearch("authors", {
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     data: expanded,
     limit: query.limit,
     offset: query.offset,
-    count: total,
+    total: total,
   };
 
   await setCache(cacheKey, response);

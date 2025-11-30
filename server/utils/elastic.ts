@@ -39,6 +39,7 @@ export async function esSearch(index: string, query: any) {
     size: query.size ?? 10,
     from: query.from ?? 0,
     query: query.query,
+    sort: query.sort,
     track_total_hits: true,
   });
 

@@ -19,14 +19,13 @@ export async function bulkIndex(index: string, docs: any[]) {
       if (error) {
         console.error(
           `Bulk index error in index=${index}, id=${item.index?._id}:`,
-          JSON.stringify(error, null, 2)
+          JSON.stringify(error, null, 2),
         );
       }
     }
     throw new Error("Bulk index failed — see logs above");
   }
 }
-
 
 async function indexAuthors() {
   let cursorId: string | undefined;

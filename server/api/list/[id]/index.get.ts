@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     return cached;
   }
 
-  const list: any = await esSearch("custom_lists", params.id);
+  const list: any = await esGetById("custom_lists", params.id);
 
   if (!list) {
     throw createError({

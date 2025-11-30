@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
     data: hits,
     limit: query.limit,
     offset: query.offset,
-    count: total,
+    total: total,
   };
 
   await setCache(cacheKey, response);

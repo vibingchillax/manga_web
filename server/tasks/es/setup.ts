@@ -71,22 +71,8 @@ async function createChapterIndex() {
                 },
               },
             },
-            volume: {
-              type: "text",
-              fields: {
-                keyword: {
-                  type: "keyword",
-                },
-              },
-            },
-            chapter: {
-              type: "text",
-              fields: {
-                keyword: {
-                  type: "keyword",
-                },
-              },
-            },
+            volume: { type: "keyword" },
+            chapter: { type: "keyword" },
             translatedLanguage: { type: "keyword" },
             pages: { type: "object", enabled: false },
             version: { type: "integer" },
@@ -119,7 +105,7 @@ async function createCoverArtIndex() {
         type: { type: "keyword", index: false },
         attributes: {
           properties: {
-            volume: { type: "text" },
+            volume: { type: "keyword" },
             file: { type: "object", enabled: false },
             description: { type: "text", index: false },
             locale: { type: "keyword" },
@@ -171,7 +157,10 @@ async function createCustomListIndex() {
 }
 
 async function createScanlationGroupIndex() {
-  await esClient.indices.delete({ index: "scanlation_groups" }, { ignore: [404] });
+  await esClient.indices.delete(
+    { index: "scanlation_groups" },
+    { ignore: [404] },
+  );
 
   await esClient.indices.create({
     index: "scanlation_groups",
@@ -272,8 +261,8 @@ async function createMangaIndex() {
                 },
                 relationships: {
                   type: "nested",
-                  enabled: false
-                }
+                  enabled: false,
+                },
               },
             },
             version: { type: "integer" },
@@ -330,7 +319,8 @@ async function createUserIndex() {
 export default defineTask({
   meta: {
     name: "es:setup",
-    description: "Setup Elasticsearch indices (this will remove existing indices)",
+    description:
+      "Setup Elasticsearch indices (this will remove existing indices)",
   },
   async run() {
     await createAuthorIndex();

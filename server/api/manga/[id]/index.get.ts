@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     return cached;
   }
 
-  const manga = await esSearch("manga", params.id);
+  const manga = await esGetById("manga", params.id);
 
   if (!manga) {
     throw createError({
