@@ -1,17 +1,17 @@
-import type { components } from "#open-fetch-schemas/mangadex";
 import type { Flags } from "@manga_web/sources";
+import type { Entity, MangaRelated } from "./common";
 import type {
-  ContentRating,
-  PublicationDemographic,
-  UserRole,
-} from "../prisma/client";
-
-export type Author = components["schemas"]["Author"];
-export type Cover = components["schemas"]["Cover"];
-export type Manga = components["schemas"]["Manga"];
-export type MangaList = components["schemas"]["MangaList"];
-export type Relationship = components["schemas"]["Relationship"];
-export type Tag = components["schemas"]["Tag"];
+  AuthorAttributes,
+  ChapterAttributes,
+  CoverAttributes,
+  CustomListAttributes,
+  MangaAttributes,
+  ScanlationGroupAttributes,
+  ScrapedChapterAttributes,
+  ScrapedMangaAttributes,
+  TagAttributes,
+  UserAttributes,
+} from "./attributes";
 
 export type MangaAggregateResponse = Record<
   string,
@@ -46,127 +46,128 @@ export enum UploadState {
   Removed,
 }
 
-type Resource<Type extends string, Attr, Rel = unknown> = {
-  id: string;
-  type: Type;
-  attributes: Attr;
-  relationships?: Rel[];
-};
+export type Author = Entity<
+  "author",
+  AuthorAttributes,
+  { id: string; type: "manga"; attributes?: MangaAttributes }
+>;
 
-export type ScrapedManga = Resource<
-  "scraped_manga",
-  {
-    mangadexId: string;
-    sourceId: string;
-    title: { en: string };
-    altTitles: any;
-    description: { en: string | null };
-    originalLanguage: string | null;
-    publicationDemographic: PublicationDemographic | null;
-    status: string | null;
-    year: number | null;
-    contentRating: ContentRating | null;
-    tags: {
+export type UploadedChapter = Entity<
+  "chapter",
+  ChapterAttributes,
+  | {
       id: string;
-      type: "tag";
-      attributes: { name: { en: string } };
-    }[];
-    version: number;
-    createdAt: string; //nuxt automatically serialize Date objs for us
-    updatedAt: string;
-  },
+      type: "user";
+      attributes?: UserAttributes;
+    }
+  | {
+      id: string;
+      type: "manga";
+      attributes?: MangaAttributes;
+    }
+  | {
+      id: string;
+      type: "scanlation_group";
+      attributes?: ScanlationGroupAttributes;
+    }
+>;
+
+export type Cover = Entity<
+  "cover_art",
+  CoverAttributes,
+  | {
+      id: string;
+      type: "manga";
+      attributes?: MangaAttributes;
+    }
+  | {
+      id: string;
+      type: "user";
+      attributes?: UserAttributes;
+    }
+>;
+
+export type CustomList = Entity<
+  "custom_list",
+  CustomListAttributes,
+  | {
+      id: string;
+      type: "user";
+      attributes?: UserAttributes;
+    }
+  | {
+      id: string;
+      type: "manga";
+      attributes?: MangaAttributes;
+    }
+>;
+
+export type ScanlationGroup = Entity<
+  "scanlation_group",
+  ScanlationGroupAttributes,
+  {
+    id: string;
+    type: "leader" | "member";
+    attributes?: UserAttributes;
+  }
+>;
+
+export type Tag = Entity<"tag", TagAttributes>;
+
+export type Manga = Entity<
+  "manga",
+  MangaAttributes,
+  | {
+      id: string;
+      type: "author";
+      attributes?: AuthorAttributes;
+    }
+  | {
+      id: string;
+      type: "artist";
+      attributes?: AuthorAttributes;
+    }
+  | {
+      id: string;
+      type: "cover_art";
+      attributes?: CoverAttributes;
+    }
+  | {
+      id: string;
+      type: "manga";
+      related: MangaRelated;
+      attributes?: MangaAttributes;
+    }
+>;
+
+export type User = Entity<
+  "user",
+  UserAttributes,
+  {
+    id: string;
+    type: "scanlation_group";
+  }
+>;
+
+export type ScrapedManga = Entity<
+  "scraped_manga",
+  ScrapedMangaAttributes,
   | { id: string; type: "author"; attributes: { name: string } }
   | { id: string; type: "artist"; attributes: { name: string } }
   | { id: string; type: "scraped_cover_art"; attributes: { url: string } }
 >;
 
-export type ScrapedChapter = Resource<
+export type ScrapedChapter = Entity<
   "scraped_chapter",
-  {
-    sourceId: string;
-    title: string | null;
-    volume: string | null;
-    chapter: string | null;
-    translatedLanguage: string;
-    uploader: string | null;
-    originalUrl: string;
-    pages: ScrapedPage[];
-    branch: string | null;
-    createdAt: string;
-    updatedAt: string;
-    publishAt: string | null;
-  },
+  ScrapedChapterAttributes,
   ScrapedManga | { id: string; type: "scraped_manga" } | ScrapedScanlationGroup
 >;
 
-export type ScrapedPage = {
-  originalUrl: string;
-  cid: string | null;
-};
-
-export type ScrapedScanlationGroup = Resource<
+export type ScrapedScanlationGroup = Entity<
   "scraped_scanlation_group",
   {
     name: string;
   }
->;
-
-export type ScanlationGroup = Resource<
-  "scanlation_group",
-  {
-    name: string;
-    altNames: any;
-    website: string | null;
-    ircServer: string | null;
-    ircChannel: string | null;
-    discord: string | null;
-    contactEmail: string | null;
-    description: string | null;
-    twitter: string | null;
-    mangaUpdates: string | null;
-    focusedLanguages: string[];
-    locked: boolean;
-    official: boolean;
-    verified: boolean;
-    inactive: boolean;
-    exLicensed: boolean;
-    publishDelay: string | null;
-    version: number;
-    createdAt: string;
-    updatedAt: string;
-  },
-  {
-    id: string;
-    type: "leader" | "member";
-    attributes: { username: string; roles: UserRole[] };
-  }
->;
-
-export type User = Resource<
-  "user",
-  {
-    username: string;
-    roles: UserRole[];
-  },
-  { id: string; type: string | "scanlation_group" }
->;
-
-export type UploadedChapter = Resource<
-  "chapter",
-  {
-    title?: string | null;
-    volume?: string | null;
-    chapter?: string | null;
-    pages: any;
-    translatedLanguage: string;
-    uploader?: string | null;
-    version: number;
-    createdAt: string;
-    updatedAt: string;
-    publishAt: string;
-    readableAt: string;
-  },
-  User | ScanlationGroup | Manga
 >;
 
 export type ChapterStatistics = {

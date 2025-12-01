@@ -40,9 +40,7 @@ const activeTab = ref<
 const followsList = ref<
   { mangaId: string; status: MangaFollowStatus }[] | undefined
 >();
-const mangaList = ref<
-  { result: string; response: string; data?: Manga[] } | undefined
->();
+const mangaList = ref<Manga[]>();
 
 if (loggedIn.value) {
   const { data: fList } = await useFetch("/api/user/follows/manga", {
@@ -55,16 +53,19 @@ if (loggedIn.value) {
     () => followsList.value?.map((m) => m.mangaId) ?? [],
   );
 
-  const { data: mList } = await useMangadex("/manga", {
-    query: {
-      limit: 32,
-      offset: 0,
-      "ids[]": idsList.value,
-      "includes[]": ["cover_art"],
+  const { data: mList } = await useFetch<CollectionResponse<Manga>>(
+    "/api/manga",
+    {
+      query: {
+        limit: 32,
+        offset: 0,
+        "ids[]": idsList.value,
+        "includes[]": ["cover_art"],
+      },
+      key: "follows",
     },
-    key: "follows",
-  });
-  mangaList.value = mList.value;
+  );
+  mangaList.value = mList.value?.data;
 }
 
 const followsMap = computed(() => {
@@ -74,9 +75,9 @@ const followsMap = computed(() => {
 });
 
 const filteredManga = computed(() => {
-  if (!mangaList.value?.data) return [];
+  if (!mangaList.value) return [];
   const map = followsMap.value;
-  return mangaList.value.data.filter(
+  return mangaList.value.filter(
     (manga) => map.get(manga.id!) === activeTab.value,
   );
 });

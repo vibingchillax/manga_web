@@ -7,8 +7,6 @@ const props = defineProps<{
 
 const manga = props.manga;
 
-const { $mangadex } = useNuxtApp();
-
 const selectedLocales = ref([manga.attributes?.originalLanguage ?? "??"]);
 const allCovers = ref<Cover[]>([]);
 const foundLocales = ref<string[]>([]);
@@ -31,7 +29,7 @@ const covers = computed(() => {
         parseFloat(b.attributes?.volume ?? "0"),
     )
     .map((c) => ({
-      file: c.attributes?.fileName,
+      file: c.attributes?.file.data.cid,
       volume: c.attributes?.volume,
     }));
 
@@ -56,28 +54,28 @@ const availableLocales = computed(() => {
 
 const { pending, error } = useAsyncData(async () => {
   if (!manga.id) return;
-  const result = await $mangadex("/cover", {
+  const result = await $fetch<CollectionResponse<Cover>>("/api/cover", {
     query: {
       "order[volume]": "asc",
       "manga[]": [manga.id as string],
       limit: 100,
       offset: 0,
-    } as any,
+    },
   });
 
   if (result.total! > 100) {
-    const next = await $mangadex("/cover", {
+    const next = await $fetch<CollectionResponse<Cover>>("/api/cover", {
       query: {
         "order[volume]": "asc",
         "manga[]": [manga.id as string],
         limit: 100,
         offset: 100,
-      } as any,
+      },
     });
 
     result.data?.push(...(next.data ?? []));
   }
-  const data = result.data as Cover[];
+  const data = result.data;
   allCovers.value = data;
   foundLocales.value = data
     .filter((c) => c.attributes?.locale)
@@ -118,9 +116,7 @@ const { pending, error } = useAsyncData(async () => {
             v-for="cover in covers"
             :key="cover.file"
             :manga="manga"
-            :cover-file="
-              `https://uploads.mangadex.org/covers/${manga.id}/` + cover.file
-            "
+            :cover-file="useAppConfig().kuboGatewayUrl + `/${cover.file}`"
             :label="cover.volume ? `Volume ${cover.volume}` : 'No volume'"
             :no-title="false"
             lightbox

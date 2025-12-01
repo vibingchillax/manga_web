@@ -102,7 +102,7 @@ export const useScrapedChapterMeta = () => {
   })();
 
   const mangaLink = reader.manga
-    ? `/title/${reader.manga.attributes.mangadexId}/`
+    ? `/title/${reader.manga.attributes.mangaId}/`
     : "";
 
   const chapterNo = reader.currentChapter?.attributes.chapter ?? null;

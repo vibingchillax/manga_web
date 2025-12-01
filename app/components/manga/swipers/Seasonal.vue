@@ -8,12 +8,12 @@ const swiper = useSwiper(swiperContainerRef);
 const preferences = usePreferencesStore();
 const { contentRating } = storeToRefs(preferences);
 
-const { data } = await useMangadex("/list/{id}", {
-  path: {
-    id: "68ab4f4e-6f01-4898-9038-c5eee066be27", //list gets changed or list gets updated?
+const { data } = await useFetch<SingleResponse<CustomList>>(
+  "/api/list/68ab4f4e-6f01-4898-9038-c5eee066be27",
+  {
+    key: "seasonal_ids",
   },
-  key: "seasonal_ids",
-});
+);
 
 const seasonal = computed(() => data.value?.data?.attributes?.name);
 const idList = computed(
@@ -29,7 +29,7 @@ const {
   data: mangaList,
   pending,
   error,
-} = await useMangadex("/manga", {
+} = await useFetch<CollectionResponse<Manga>>("/api/manga", {
   query: {
     limit: 32,
     offset: 0,
@@ -38,7 +38,7 @@ const {
     "order[followedCount]": "desc",
     "contentRating[]": contentRating.value,
     "ids[]": idList.value,
-  } as any,
+  },
   watch: [contentRating],
   key: "seasonal",
 });

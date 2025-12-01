@@ -2,12 +2,12 @@
 const router = useRouter();
 const preferences = usePreferencesStore();
 const { contentRating } = storeToRefs(preferences);
-const { data } = await useMangadex("/list/{id}", {
-  path: {
-    id: "68ab4f4e-6f01-4898-9038-c5eee066be27",
+const { data } = await useFetch<SingleResponse<CustomList>>(
+  "/list/68ab4f4e-6f01-4898-9038-c5eee066be27",
+  {
+    key: "seasonal_ids",
   },
-  key: "seasonal_ids",
-});
+);
 
 const seasonal = computed(() => data.value?.data?.attributes?.name);
 const idList = computed(
@@ -23,14 +23,14 @@ const {
   data: mangaList,
   pending,
   error,
-} = await useMangadex("/manga", {
+} = await useFetch<CollectionResponse<Manga>>("/api/manga", {
   query: {
     limit: 32,
     offset: 0,
     "includes[]": ["cover_art"],
     "contentRating[]": contentRating.value,
     "ids[]": idList.value,
-  } as any,
+  },
   watch: [contentRating],
   key: "seasonalPage",
 });

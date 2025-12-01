@@ -1,14 +1,14 @@
 <script setup lang="ts">
 const route = useRoute();
-const { data, pending, error } = await useMangadex("/manga/{id}", {
-  path: {
-    id: route.params.mangaId as string,
+const { data, pending, error } = await useFetch<SingleResponse<Manga>>(
+  `/api/manga/${route.params.mangaId}`,
+  {
+    query: {
+      "includes[]": ["cover_art", "author", "artist"],
+    },
+    key: `manga-${route.params.mangaId}`,
   },
-  query: {
-    "includes[]": ["cover_art", "author", "artist"],
-  },
-  key: `manga-${route.params.mangaId}`,
-});
+);
 const manga = data.value?.data;
 </script>
 

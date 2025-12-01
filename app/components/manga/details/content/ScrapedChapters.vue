@@ -34,7 +34,7 @@ async function scrapeFromSource() {
       body: {
         title: title.value,
         sourceId: selectedSource.value.id,
-        mangadexId: manga.id,
+        mangaId: manga.id,
       },
     });
 

@@ -21,18 +21,21 @@ const isoLocal = dayjs()
   .minute(0)
   .second(0)
   .format("YYYY-MM-DDTHH:mm:ss");
-const { data, pending, error } = await useMangadex("/manga", {
-  query: {
-    "includes[]": ["cover_art", "author", "artist"],
-    "contentRating[]": contentRating.value,
-    "order[followedCount]": "desc", //it's all because of this line
-    hasAvailableChapters: "true",
-    createdAtSince: isoLocal,
-    limit: 10,
-  } as any, //💀
-  watch: [contentRating],
-  key: "popular",
-});
+const { data, pending, error } = await useFetch<CollectionResponse<Manga>>(
+  "/api/manga",
+  {
+    query: {
+      "includes[]": ["cover_art", "author", "artist"],
+      "contentRating[]": contentRating.value,
+      "order[followedCount]": "desc",
+      // hasAvailableChapters: "true",
+      createdAtSince: isoLocal,
+      limit: 10,
+    },
+    watch: [contentRating],
+    key: "popular",
+  },
+);
 
 onMounted(() => {
   nextTick(() => {

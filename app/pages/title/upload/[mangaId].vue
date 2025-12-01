@@ -12,15 +12,15 @@ const {
   data: mangaResponse,
   pending,
   error,
-} = await useMangadex("/manga/{id}", {
-  path: {
-    id: route.params.mangaId as string,
+} = await useFetch<SingleResponse<Manga>>(
+  `/api/manga/${route.params.mangaId}`,
+  {
+    query: {
+      "includes[]": ["cover_art", "author", "artist"],
+    },
+    key: `manga-${route.params.mangaId}`,
   },
-  query: {
-    "includes[]": ["cover_art", "author", "artist"],
-  },
-  key: `manga-${route.params.mangaId}`,
-});
+);
 
 const session = ref<string | null>(null);
 const manga = mangaResponse.value?.data;

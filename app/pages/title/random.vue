@@ -5,7 +5,7 @@ const {
   data: response,
   pending,
   error,
-} = await useMangadex("/manga/random", {
+} = await useFetch<SingleResponse<Manga>>("/api/manga/random", {
   query: {
     "contentRating[]": contentRating.value,
   },

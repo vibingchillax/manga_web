@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { Author } from "~~/shared/types";
 
-const { $mangadex } = useNuxtApp();
-
 const props = defineProps<{
   author: Author;
 }>();
@@ -20,7 +18,7 @@ const fetchData = async () => {
   pending.value = true;
   error.value = null;
   try {
-    const response = await $mangadex("/manga", {
+    const response = await $fetch<CollectionResponse<Manga>>("/api/manga", {
       query: {
         limit: 32,
         offset: (page.value - 1) * 32,
@@ -29,7 +27,7 @@ const fetchData = async () => {
         "contentRating[]": contentRating.value,
       },
     });
-    mangaList.value = response.data as Manga[];
+    mangaList.value = response.data;
     total.value = response.total ?? 1;
   } catch (err) {
     error.value = err as Error;

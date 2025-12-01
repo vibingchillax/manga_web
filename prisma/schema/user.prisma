@@ -38,6 +38,7 @@ model MangaFollow {
   mangaId String            @db.Uuid
   status  MangaFollowStatus
   user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  manga   Manga             @relation(fields: [mangaId], references: [id])
 
   @@id([userId, mangaId])
   @@index([userId])

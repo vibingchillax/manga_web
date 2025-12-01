@@ -29,6 +29,8 @@ model Manga {
   relationsTo                   MangaRelation[]         @relation("MangaRelationsTo")
   lists                         CustomList[]
   ratings                       MangaRating[]
+  ScrapedManga                  ScrapedManga[]
+  MangaFollow                   MangaFollow[]
 
   @@index([originalLanguage])
   @@index([status])

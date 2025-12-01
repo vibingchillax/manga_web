@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { useDebounce } from "@vueuse/core";
-import type { MangaList } from "~~/shared/types";
-const { $mangadex } = useNuxtApp();
+import type { CollectionResponse } from "~~/shared/types/common";
 const router = useRouter();
 const focus = ref(false);
 const inputRef = ref<HTMLInputElement | null>(null);
 const query = ref("");
 const debouncedQuery = useDebounce(query, 500);
 const preferences = usePreferencesStore();
-const results = ref<MangaList>();
+const results = ref<Manga[]>();
 const loading = ref(false);
 const error = ref<string>("");
 
@@ -35,7 +34,7 @@ watch(debouncedQuery, async (val) => {
   }
   loading.value = true;
   try {
-    results.value = await $mangadex("/manga", {
+    const data = await $fetch<CollectionResponse<Manga>>("/api/manga", {
       query: {
         title: val,
         "includes[]": ["cover_art"],
@@ -43,8 +42,10 @@ watch(debouncedQuery, async (val) => {
         "order[relevance]": "desc",
         "contentRating[]": preferences.contentRating,
         limit: 5,
-      } as any,
+      },
     });
+
+    results.value = data.data;
   } catch (e) {
     error.value = e as string;
     useToast().add({
@@ -117,7 +118,7 @@ watch(
               </NuxtLink>
               <div class="grid gap-2">
                 <MangaCardDense
-                  v-for="manga in results?.data?.slice(0, 6)"
+                  v-for="manga in results?.slice(0, 6)"
                   :key="manga.id"
                   :manga="manga"
                   @click="unfocus()"

@@ -13,20 +13,12 @@ export default defineNuxtConfig({
     "nuxt-swiper",
     "@pinia/nuxt",
     "@nuxt/icon",
-    "nuxt-open-fetch",
     "pinia-plugin-persistedstate/nuxt",
     "@nuxtjs/device",
     "@vueuse/nuxt",
     "@nuxtjs/i18n",
   ],
   css: ["~/assets/css/main.css"],
-  openFetch: {
-    clients: {
-      mangadex: {
-        baseURL: "https://api.mangadex.org",
-      },
-    },
-  },
   runtimeConfig: {
     jwtSecret: process.env.JWT_SECRET,
     esPassword: process.env.ELASTIC_PASSWORD,

@@ -1,8 +1,4 @@
-import type { Relationship } from "~~/shared/types";
-
-function isManga(r: Relationship) {
-  return r.type === "manga";
-}
+import type { MangaRelated, Relationship } from "~~/shared/types/common";
 
 const relatedLabels: Record<string, string> = {
   monochrome: "Monochrome",
@@ -48,16 +44,16 @@ export const useRelatedManga = async (manga: Manga) => {
   const pref = usePreferencesStore();
   const { contentRating } = storeToRefs(pref);
 
-  const relatedMangaList = manga.relationships?.filter(isManga) ?? [];
-  const grouped = relatedMangaList.reduce<Record<string, Relationship[]>>(
-    (acc, r) => {
-      const key = r.related ?? "other";
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(r);
-      return acc;
-    },
-    {},
-  );
+  const relatedMangaList =
+    manga.relationships?.filter((r) => r.type === "manga") ?? [];
+  const grouped = relatedMangaList.reduce<
+    Record<string, Relationship<"manga", MangaRelated>[]>
+  >((acc, r) => {
+    const key = r.related ?? "other";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(r);
+    return acc;
+  }, {});
 
   const relatedGroups = relatedOrder
     .filter((type) => grouped[type])
@@ -68,16 +64,19 @@ export const useRelatedManga = async (manga: Manga) => {
     }));
 
   const ids = relatedGroups.flatMap((r) => r.manga!.map((m) => m.id!));
-  const { data, pending, error } = await useMangadex("/manga", {
-    query: {
-      "ids[]": ids,
-      "includes[]": ["cover_art"],
-      "contentRating[]": contentRating.value,
-      limit: 100,
+  const { data, pending, error } = await useFetch<CollectionResponse<Manga>>(
+    "/api/manga",
+    {
+      query: {
+        "ids[]": ids,
+        "includes[]": ["cover_art"],
+        "contentRating[]": contentRating.value,
+        limit: 100,
+      },
+      watch: [contentRating],
+      key: `manga-related-${manga.id}`,
     },
-    watch: [contentRating],
-    key: `manga-related-${manga.id}`,
-  });
+  );
 
   const mangaMap = new Map<string, Manga>();
   data.value?.data?.forEach((m: Manga) => mangaMap.set(m.id!, m));

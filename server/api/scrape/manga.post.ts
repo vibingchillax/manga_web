@@ -13,7 +13,7 @@ const scrapeMangaSchema = z.object({
     .min(1, { message: "title must be at least 1 character" })
     .max(500, { message: "title can not exceed 500 characters" })
     .trim(),
-  mangadexId: z.string().uuid({ message: "mangadexId must be a valid UUID" }),
+  mangaId: z.string().uuid({ message: "mangaId must be a valid UUID" }),
 });
 
 export default defineEventHandler(async (event) => {
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     const result = await prisma.scrapedManga.findMany({
       where: {
         sourceId: body.sourceId,
-        mangaDexId: body.mangadexId,
+        mangaId: body.mangaId,
       },
     });
 
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
     const status = await prisma.scrapeStatus.findUnique({
       where: {
         targetId_targetType: {
-          targetId: body.mangadexId,
+          targetId: body.mangaId,
           targetType: ScrapeTarget.manga,
         },
       },

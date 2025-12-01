@@ -1,45 +1,45 @@
 model Comment {
-  id          String       @id @default(uuid()) @db.Uuid
-  body        String?
-  deleted     Boolean      @default(false)
-  editedAt    DateTime?
-  createdAt   DateTime     @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime     @updatedAt @default(now()) @db.Timestamp(6)
+  id        String    @id @default(uuid()) @db.Uuid
+  body      String?
+  deleted   Boolean   @default(false)
+  editedAt  DateTime?
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamp(6)
 
-  userId      String       @db.Uuid
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  parentId    String?      @db.Uuid
-  parent      Comment?     @relation("CommentReplies", fields: [parentId], references: [id])
-  replies     Comment[]    @relation("CommentReplies")
+  parentId String?   @db.Uuid
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
 
-  target      CommentTarget?
-  votes       CommentVote[]
+  target CommentTarget?
+  votes  CommentVote[]
 
   @@index([parentId])
 }
 
 model CommentTarget {
-  id          String             @id @default(uuid()) @db.Uuid
-  targetType  CommentTargetType
-  targetId    String             @db.Uuid
+  id         String            @id @default(uuid()) @db.Uuid
+  targetType CommentTargetType
+  targetId   String            @db.Uuid
 
-  comment     Comment?           @relation(fields: [commentId], references: [id])
-  commentId   String?            @db.Uuid @unique
+  comment   Comment? @relation(fields: [commentId], references: [id])
+  commentId String?  @unique @db.Uuid
 
   @@index([targetType, targetId])
 }
 
 model CommentVote {
-  userId    String  @db.Uuid
-  commentId String  @db.Uuid
-  vote      Int     // -1, 0, +1
+  userId    String @db.Uuid
+  commentId String @db.Uuid
+  vote      Int // -1, 0, +1
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@id([userId, commentId])
 }

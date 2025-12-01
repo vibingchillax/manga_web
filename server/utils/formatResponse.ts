@@ -194,7 +194,7 @@ export function formatScrapedManga(manga: ScrapedManga) {
     id: manga.id,
     type: "scraped_manga" as const,
     attributes: {
-      mangadexId: manga.mangaDexId,
+      mangaId: manga.mangaId,
       sourceId: manga.sourceId,
       title: { en: manga.title },
       altTitles: manga.altTitles,

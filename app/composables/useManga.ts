@@ -33,9 +33,15 @@ export const useManga = (manga: Manga | undefined) => {
       (r) => r.type === "cover_art",
     );
 
-    const urlOriginal = `https://uploads.mangadex.org/covers/${manga?.id}/${coverRelation?.attributes?.fileName}`;
-    const url256 = `https://uploads.mangadex.org/covers/${manga?.id}/${coverRelation?.attributes?.fileName}.256.jpg`;
-    const url512 = `https://uploads.mangadex.org/covers/${manga?.id}/${coverRelation?.attributes?.fileName}.512.jpg`;
+    const urlOriginal =
+      useAppConfig().kuboGatewayUrl +
+      `/${coverRelation?.attributes?.file.data.cid}`;
+    const url256 =
+      useAppConfig().kuboGatewayUrl +
+      `/${coverRelation?.attributes?.file.data.cid256}`;
+    const url512 =
+      useAppConfig().kuboGatewayUrl +
+      `/${coverRelation?.attributes?.file.data.cid512}`;
     return {
       urlOriginal,
       url256,
@@ -150,7 +156,7 @@ export const useScrapedManga = (manga: Ref<ScrapedManga | undefined>) => {
 
   const detailsUrl = computed(
     () =>
-      `/title/${manga.value?.attributes.mangadexId}/${toKebabCase(title.value)}`,
+      `/title/${manga.value?.attributes.mangaId}/${toKebabCase(title.value)}`,
   );
 
   return {
@@ -164,11 +170,11 @@ export const toManga = (manga: ScrapedManga) => {
   const {
     id,
     type,
-    attributes: { mangadexId, ...attrRest },
+    attributes: { mangaId, ...attrRest },
     ...rest
   } = manga;
   return {
-    id: mangadexId,
+    id: mangaId,
     type: "manga",
     attributes: {
       ...attrRest,

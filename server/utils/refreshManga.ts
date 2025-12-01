@@ -4,7 +4,7 @@ import { ScrapeTarget } from "~~/shared/prisma/enums";
 type MangaRequestBody = {
   sourceId: string;
   title: string;
-  mangadexId: string;
+  mangaId: string;
 };
 
 export async function refreshManga(mangaInput: MangaRequestBody) {
@@ -22,7 +22,7 @@ export async function refreshManga(mangaInput: MangaRequestBody) {
   const created = await prisma.scrapedManga.createManyAndReturn({
     data: scrapeNew.map((manga) => ({
       id: randomUUID(),
-      mangaDexId: mangaInput.mangadexId,
+      mangaId: mangaInput.mangaId,
       sourceId: manga.sourceId,
       title: manga.title,
       url: manga.url,
@@ -44,7 +44,7 @@ export async function refreshManga(mangaInput: MangaRequestBody) {
   await prisma.scrapeStatus.upsert({
     where: {
       targetId_targetType: {
-        targetId: mangaInput.mangadexId,
+        targetId: mangaInput.mangaId,
         targetType: ScrapeTarget.manga,
       },
     },
@@ -53,7 +53,7 @@ export async function refreshManga(mangaInput: MangaRequestBody) {
     },
     create: {
       id: randomUUID(),
-      targetId: mangaInput.mangadexId,
+      targetId: mangaInput.mangaId,
       targetType: ScrapeTarget.manga,
       refreshedAt: new Date(),
     },
