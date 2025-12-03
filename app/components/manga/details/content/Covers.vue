@@ -29,7 +29,7 @@ const covers = computed(() => {
         parseFloat(b.attributes?.volume ?? "0"),
     )
     .map((c) => ({
-      file: c.attributes?.file.data.cid,
+      file: c.attributes?.file.data,
       volume: c.attributes?.volume,
     }));
 
@@ -114,9 +114,9 @@ const { pending, error } = useAsyncData(async () => {
         >
           <MangaCover
             v-for="cover in covers"
-            :key="cover.file"
+            :key="cover.file.cid"
             :manga="manga"
-            :cover-file="useAppConfig().kuboGatewayUrl + `/${cover.file}`"
+            :cover-file="cover.file"
             :label="cover.volume ? `Volume ${cover.volume}` : 'No volume'"
             :no-title="false"
             lightbox

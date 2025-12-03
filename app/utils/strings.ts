@@ -10,3 +10,18 @@ export function toKebabCase(input: string | undefined): string {
     .replace(/^-+|-+$/g, "") // trim starting/ending dashes
     .toLowerCase();
 }
+
+export function getLocalizedString(
+  textObj: Record<string, string> | undefined,
+): string | undefined {
+  if (!textObj) return undefined;
+  return textObj.en ?? textObj["??"] ?? textObj[Object.keys(textObj)[0]!];
+}
+
+export function prependGatewayUrl(cid: string | undefined): string | undefined {
+  if (!cid) {
+    return undefined;
+  }
+  const gatewayUrl = useAppConfig().kuboGatewayUrl;
+  return `${gatewayUrl}/${cid}`;
+}

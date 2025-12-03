@@ -33,15 +33,9 @@ export const useManga = (manga: Manga | undefined) => {
       (r) => r.type === "cover_art",
     );
 
-    const urlOriginal =
-      useAppConfig().kuboGatewayUrl +
-      `/${coverRelation?.attributes?.file.data.cid}`;
-    const url256 =
-      useAppConfig().kuboGatewayUrl +
-      `/${coverRelation?.attributes?.file.data.cid256}`;
-    const url512 =
-      useAppConfig().kuboGatewayUrl +
-      `/${coverRelation?.attributes?.file.data.cid512}`;
+    const urlOriginal = prependGatewayUrl(coverRelation?.attributes?.file.data.cid);
+    const url256 = prependGatewayUrl(coverRelation?.attributes?.file.data.cid256);
+    const url512 = prependGatewayUrl(coverRelation?.attributes?.file.data.cid512);
     return {
       urlOriginal,
       url256,

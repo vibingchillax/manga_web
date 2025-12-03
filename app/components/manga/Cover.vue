@@ -9,7 +9,7 @@ const props = withDefaults(
     maxLength?: number;
     noLink?: boolean;
     openInNewTab?: boolean;
-    coverFile?: string;
+    coverFile?: CoverData["data"];
     noTitle?: boolean;
     contain?: boolean;
     showFlag?: boolean;
@@ -27,6 +27,8 @@ const loading = ref(false);
 const lightboxVisible = ref(false);
 
 const { cover, title, detailsUrl } = useManga(props.manga);
+
+const gatewayUrl = useAppConfig().kuboGatewayUrl
 
 const componentTag = computed(() => {
   if (props.noLink) return "div";
@@ -47,20 +49,23 @@ const displayLabel = computed(() => {
   );
 });
 
-const suffix = computed(() => (props.use256 ? ".256.jpg" : ".512.jpg"));
-
 const computedSrc = computed(() => {
   if (!props.manga) return "";
-  return props.coverFile
-    ? props.coverFile + suffix.value
-    : props.use256
-      ? cover.value.url256
-      : cover.value.url512;
+
+  if (props.coverFile) {
+    return props.use256 ? prependGatewayUrl(props.coverFile.cid256) : prependGatewayUrl(props.coverFile.cid512)
+  }
+
+  if (props.use256) {
+    return cover.value.url256;
+  }
+
+  return cover.value.url512
 });
 
 const fullResSrc = computed(() => {
   if (!props.manga) return "";
-  return props.coverFile ? props.coverFile : cover.value.urlOriginal;
+  return props.coverFile ? prependGatewayUrl(props.coverFile.cid) : cover.value.urlOriginal;
 });
 
 function onClick(e: MouseEvent) {
