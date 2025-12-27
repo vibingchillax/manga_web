@@ -74,6 +74,7 @@ model MangaRating {
 enum MangaState {
   draft
   published
+  rejected
 }
 
 enum PublicationDemographic {
